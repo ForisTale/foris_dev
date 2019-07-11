@@ -128,3 +128,4 @@ dmypy.json
 /static/
 /functional_tests/screendumps/
 virtualenv/
+/functional_tests/superlists/screendumps/
