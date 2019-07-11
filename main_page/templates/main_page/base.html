@@ -6,24 +6,23 @@
     <meta name="viewpoint" content="width=device-width, initial-scale=1">
     <title>Foris.dev</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/base.css" rel="stylesheet">
+    {% block stylesheet %}{% endblock %}
 </head>
 <body>
-<div class="container">
-<nav class="navbar navbar-default" role="navigation">
+<div class="container text-info">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'main_page:home' %}">Foris.dev</a>
-        </div>
-        <div class="nav navbar-nav">
-            <ul>
-                <li><a href="{% url 'main_page:about_me' %}">About Me</a></li>
-            </ul>
-        </div>
+        <a class="navbar-brand text-info" href="{% url 'main_page:home' %}">Foris.dev</a>
+        <a class="text-info" href="{% url 'main_page:about_me' %}">About Me</a>
     </div>
 </nav>
 
 {% block body %}
 {% endblock %}
 </div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </body>
 </html>

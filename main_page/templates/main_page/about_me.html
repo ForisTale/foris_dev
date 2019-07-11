@@ -1,21 +1,24 @@
 {% extends "main_page/base.html" %}
-{% block body %}
 
-<div class="container">
+{% block stylesheet %}
+<link href="/static/about_me.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
 <div class="row">
-    <div class="col align-self-center" id="about_me">
-        <h3>About me</h3>
-        <p>Something</p>
+    <div class="col my-5" id="about_me">
+        <h3>About me:</h3>
+        <p>Little over year ago I decide to change my life.<br>
+        First I lost over 40kg, now from about six month I learn how to programing.<br>
+        At first I learn Python, then change to django and now I have enough skill to start work for money.<br></p>
     </div>
 </div>
 <div class="row">
-    <div class="col align-self-center">
-        <h3>Link to my github.</h3>
+    <div class="col my-5">
+        <h3>Links to my accounts:</h3>
         <ul>
-            <li><a href="https://github.com/ForisTale">My github.</a></li>
+            <li><a class="text-info" href="https://github.com/ForisTale">https://github.com/ForisTale</a></li>
         </ul>
     </div>
 </div>
-</div>
-
 {% endblock %}
