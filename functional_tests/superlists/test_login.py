@@ -32,7 +32,7 @@ class LoginTest(FunctionalTest):
         if not url_search:
             self.fail(f"Could not find url in email body:\n{body}")
         url = url_search.group(0)
-        self.assertIn(self.live_server_url, url)
+        self.assertIn(self.live_server_url[:-5], url)
 
         # She clicks it
         self.browser.get(url)

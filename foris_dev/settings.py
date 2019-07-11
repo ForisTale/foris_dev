@@ -16,16 +16,21 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+is_deployed = os.path.exists("./.env")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%u7e9233)7h9uv1^b9n+_i714k4&w_el0vuy6fd_ypsl^@ddy_'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+if is_deployed:
+    with open("./.env", "r") as env_file:
+        secret = env_file.readline()
+        secret = secret[secret.find("=") + 1:].strip()
+        SECRET_KEY = secret
+        name = env_file.readline()
+        name = name[name.find("=") + 1:].strip()
+        ALLOWED_HOSTS = [name]
+    DEBUG = False
+else:
+    DEBUG = True
+    SECRET_KEY = "insecure-key-for-dev"
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -38,7 +43,35 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main_page',
+    'accounts',
+    'lists',
+    'functional_tests',
 ]
+
+AUTH_USER_MODEL = "accounts.User"
+
+AUTHENTICATION_BACKENDS =[
+    "accounts.authentication.PasswordlessAuthenticationBackend",
+]
+
+# Make that all error messages are displayed in terminal
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+        },
+    },
+    "root": {"level": "INFO"},
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -120,3 +153,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = "taleforis@gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+if is_deployed:
+    with open("../.secret") as secret_file:
+        secret = secret_file.readline()
+    EMAIL_HOST_PASSWORD = secret.strip()
+else:
+    EMAIL_HOST_PASSWORD = ""

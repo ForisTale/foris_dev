@@ -15,7 +15,7 @@ import os
 import time
 import poplib
 
-MAX_WAIT = 20
+MAX_WAIT = 2
 TEST_EMAIL = "staging_test_email@yahoo.com"
 FOR_TEST_EMAIL = "staging_test_email"
 SCREEN_DUMP_LOCATION = os.path.join(
@@ -46,6 +46,8 @@ class FunctionalTest(StaticLiveServerTestCase):
         if self.staging_server:
             self.live_server_url = "http://" + self.staging_server
             reset_database(self.staging_server)
+        else:
+            self.live_server_url = self.live_server_url + "/lists"
 
     def tearDown(self):
         if self._test_has_failed():

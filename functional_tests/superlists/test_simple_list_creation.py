@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-from functional_tests.base import FunctionalTest
+from .base import FunctionalTest
 
 
 class NewVisitorTest(FunctionalTest):

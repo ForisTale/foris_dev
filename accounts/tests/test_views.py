@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import patch, call
-from functional_tests.base import TEST_EMAIL
+from functional_tests.superlists.base import TEST_EMAIL
 from accounts.models import Token
 
 
@@ -10,7 +10,7 @@ class SendLoginEmailViewTest(TestCase):
         response = self.client.post("/accounts/send_login_email", data={
             "email": TEST_EMAIL
         })
-        self.assertRedirects(response, "/")
+        self.assertRedirects(response, "/lists/")
 
     @patch("accounts.views.send_mail")
     def test_sends_mail_to_address_from_post(self, mock_send_mail):
@@ -59,7 +59,7 @@ class LogoutTest(TestCase):
 
     def test_logout_view_redirect_after_logout(self):
         response = self.client.get("/accounts/logout")
-        self.assertRedirects(response, "/")
+        self.assertRedirects(response, "/lists/")
 
 
 @patch("accounts.views.auth")
@@ -67,7 +67,7 @@ class LoginViewTest(TestCase):
 
     def test_redirect_to_home_page(self, mock_auth):
         response = self.client.get("/accounts/login?token=abc123")
-        self.assertRedirects(response, "/")
+        self.assertRedirects(response, "/lists/")
 
     def test_calls_authenticate_with_uid_from_get_request(self, mock_auth):
         self.client.get("/accounts/login?token=abc123")

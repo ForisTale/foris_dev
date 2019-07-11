@@ -22,16 +22,16 @@ def send_login_email(request):
         request,
         "Check your email, we've sent you a link you can use to log in."
     )
-    return redirect("/")
+    return redirect("/lists/")
 
 
 def login(request):
     user = auth.authenticate(request.GET.get("token"))
     if user:
         auth.login(request, user)
-    return redirect("/")
+    return redirect("/lists/")
 
 
 def logout_view(request):
     auth.logout(request)
-    return redirect("/")
+    return redirect("/lists/")
