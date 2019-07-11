@@ -3,6 +3,7 @@ from lists.models import List
 from lists.forms import ItemForm, ExistingListItemForm, NewListForm
 from django.contrib.auth import get_user_model
 
+USER_DONT_EXISTS_ERROR = "You can't share list with non exists user."
 User = get_user_model()
 
 
@@ -36,9 +37,14 @@ def my_lists(request, email):
 
 def share(request, list_id):
     list_ = List.objects.get(id=list_id)
-
     email = request.POST["sharee"]
-    user = User.objects.get(email=email)
+    try:
+        user = User.objects.get(email=email)
+        list_.shared_with.add(user)
+        return redirect(list_)
+    except User.DoesNotExist:
+        user_error = USER_DONT_EXISTS_ERROR
 
-    list_.shared_with.add(user)
-    return redirect(list_)
+    return render(request, "lists/list.html", {"list": list_, "user_error": user_error})
+
+

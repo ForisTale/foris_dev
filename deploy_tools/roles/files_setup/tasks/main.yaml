@@ -55,17 +55,17 @@
   args:
     chdir: "{{ site_folder }}"
 
-- name: Check if .env exists
+- name: Check if deployment_settings exists
   stat:
-    path: "{{ site_folder }}/.env"
-  register: env_exists
+    path: "{{ site_folder }}/deployment_settings.yaml"
+  register: settings_exists
 
-- name: Generate .env
-  script: generate_env_file.py
+- name: Generate deployment_settings
+  script: generate_deployment_settings.py
   args:
     chdir: "{{ site_folder }}/deploy_tools/"
     executable: python3
-  when: env_exists.stat.exists == False
+  when: settings_exists.stat.exists == False
 
 - name: Update static files.
   command: ./virtualenv/bin/python manage.py collectstatic --noinput

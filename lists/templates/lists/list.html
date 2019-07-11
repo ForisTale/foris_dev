@@ -24,6 +24,11 @@
                 <input name="sharee" id="sharee" placeholder="your-friend@example.com" type="email">
             {% csrf_token %}
             </form>
+            {% if user_error %}
+            <div class="has-error">
+                <h6>{{ user_error }}</h6>
+            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

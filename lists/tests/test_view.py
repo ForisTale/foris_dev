@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils.html import escape
 from lists.models import Item, List
 from lists.forms import (
-    EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR,
+    EMPTY_ITEM_ERROR,
     ExistingListItemForm, ItemForm
 )
 from unittest.mock import patch, Mock
@@ -10,6 +10,7 @@ from django.http import HttpRequest
 from lists.views import new_list
 import unittest
 from django.contrib.auth import get_user_model
+from lists.views import USER_DONT_EXISTS_ERROR
 
 User = get_user_model()
 
@@ -208,6 +209,15 @@ class SharedViewTest(TestCase):
         )
 
         self.assertIn(shared, list_.shared_with.all())
+
+    def test_add_non_exist_user_is_not_save_and_return_error(self):
+        list_ = List.objects.create()
+        response = self.client.post(
+            f"/lists/{list_.id}/share",
+            data={"sharee": "non@exist.com"}
+        )
+        self.assertEqual(list_.shared_with.count(), 0)
+        self.assertContains(response, escape(USER_DONT_EXISTS_ERROR))
 
     def test_redirect_after_POST(self):
         User.objects.create(email="a@b.com")

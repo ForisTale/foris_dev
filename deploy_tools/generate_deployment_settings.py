@@ -1,5 +1,6 @@
 import random
 import os
+import yaml
 
 
 secret_key = "".join(random.SystemRandom().choices(
@@ -10,6 +11,8 @@ path = os.getcwd()
 path = path[:-13]
 host = os.path.basename(path)
 
-with open(f"{path}/.env", "w+") as env_file:
-    env_file.write("DJANGO_SECRET_KEY="+secret_key+"\n")
-    env_file.write("SITE_NAME="+host+"\n")
+settings = {"SITE_NAME": host,
+            "DJANGO_SECRET_KEY": secret_key}
+
+with open(f"{path}/deployment_settings.yaml", "w") as yaml_file:
+    yaml.dump(settings, yaml_file)

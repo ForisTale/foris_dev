@@ -11,21 +11,19 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import yaml
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-is_deployed = os.path.exists("./.env")
+is_deployed = os.path.exists("./deployment_settings.yaml")
 
 if is_deployed:
-    with open("./.env", "r") as env_file:
-        secret = env_file.readline()
-        secret = secret[secret.find("=") + 1:].strip()
-        SECRET_KEY = secret
-        name = env_file.readline()
-        name = name[name.find("=") + 1:].strip()
-        ALLOWED_HOSTS = [name]
+    with open("./deployment_settings.yaml", "r") as settings_file:
+        settings = yaml.safe_load(settings_file)
+        SECRET_KEY = settings["DJANGO_SECRET_KEY"]
+        ALLOWED_HOSTS = ["SITE_NAME"]
     DEBUG = False
 else:
     DEBUG = True
