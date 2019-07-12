@@ -23,7 +23,7 @@ if is_deployed:
     with open("./deployment_settings.yaml", "r") as settings_file:
         settings = yaml.safe_load(settings_file)
         SECRET_KEY = settings["DJANGO_SECRET_KEY"]
-        ALLOWED_HOSTS = ["SITE_NAME"]
+        ALLOWED_HOSTS = [settings["SITE_NAME"]]
     DEBUG = False
 else:
     DEBUG = True
