@@ -15,7 +15,7 @@ import os
 import time
 import poplib
 
-MAX_WAIT = 2
+MAX_WAIT = 10
 TEST_EMAIL = "staging_test_email@yahoo.com"
 FOR_TEST_EMAIL = "staging_test_email"
 SCREEN_DUMP_LOCATION = os.path.join(
@@ -44,8 +44,9 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.browser = webdriver.Firefox()
         self.staging_server = os.environ.get("STAGING_SERVER")
         if self.staging_server:
-            self.live_server_url = "http://" + self.staging_server
+            self.live_server_url = "http://" + self.staging_server + "/lists"
             reset_database(self.staging_server)
+            time.sleep(1)
         else:
             self.live_server_url = self.live_server_url + "/lists"
 

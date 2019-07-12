@@ -32,7 +32,7 @@ class BasicTest(FunctionalTest):
         # And sees links to his github, and other sites
         all_links = self.driver.find_elements_by_tag_name("li")
         all_links = [link.text for link in all_links]
-        my_link = "https://github.com/ForisTale"
+        my_link = "github.com/ForisTale"
         self.assertIn(my_link, all_links)
 
         # Satisfied he click on main site link and is back to main site.
