@@ -34,7 +34,6 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -48,7 +47,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = "accounts.User"
 
-AUTHENTICATION_BACKENDS =[
+AUTHENTICATION_BACKENDS = [
     "accounts.authentication.PasswordlessAuthenticationBackend",
 ]
 
@@ -153,7 +152,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "taleforis@gmail.com"
+EMAIL_HOST_USER = "foris.dev@gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 if is_deployed:
