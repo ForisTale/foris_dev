@@ -11,7 +11,7 @@ ExecStart=/home/{{ ansible_user }}/sites/{{ ansible_host }}/virtualenv/bin/gunic
     --bind unix:/tmp/{{ ansible_host }}.socket \
     --access-logfile ../access.log \
     --error-logfile ../error.log \
-    superlists.wsgi
+    {{ project_dir }}.wsgi
 
 [Install]
 WantedBy=multi-user.target
