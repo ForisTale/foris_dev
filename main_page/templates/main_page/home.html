@@ -1,1 +1,30 @@
 {% extends "main_page/base.html" %}
+{% block stylesheet %}
+<link href="/static/main_page/home.css"
+{% endblock %}
+
+{% block body %}
+<div class="row my-5">
+    <div class="col">
+        <h2 class="text-info">Purpose of this website:</h2>
+        <p class="text-info">This site was created to demonstrate some of my django projects.<br>
+        If you want to know more about my projects visit "About Me" page, where you can find link to my accounts.</p>
+    </div>
+</div>
+<div class="row my-5">
+    <div class="col">
+        <h2><a class="text-info" href="{% url 'lists:home' %}">Superlists</a></h2>
+        <p class="text-info">
+            Superlists is a project created using the book:<br>
+            <a href="https://www.obeythetestinggoat.com/">"Test-Driven Development with Python"</a>
+            by Harry Percival.<br>
+            This is very good book that I can recommend to anyone how want to learn Django or TDD.
+        </p>
+    </div>
+</div>
+<div class="row my-5">
+<div class="col">
+    <p>My projects are deployed using Ansible and under CI using Jenkins.</p>
+</div>
+</div>
+{% endblock %}
