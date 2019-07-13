@@ -5,27 +5,27 @@
 
 {% block body %}
 <div class="row my-5">
-    <div class="col">
-        <h2 class="text-info">Purpose of this website:</h2>
-        <p class="text-info">This site was created to demonstrate some of my django projects.<br>
+    <div class="col-6 col-md-12 my-5 mx-auto">
+        <h2>Purpose of this website:</h2>
+        <p>This site was created to demonstrate some of my django projects.<br>
         If you want to know more about my projects visit "About Me" page, where you can find link to my accounts.</p>
     </div>
 </div>
 <div class="row my-5">
-    <div class="col">
+    <div class="col-6 col-md-12 mx-auto">
         <h2><a class="text-info" href="{% url 'lists:home' %}">Superlists</a></h2>
-        <p class="text-info">
+        <p>
             Superlists is a project created using the book:<br>
             <a href="https://www.obeythetestinggoat.com/">"Test-Driven Development with Python"</a>
             by Harry Percival.<br>
             This is very good book that I can recommend to anyone how want to learn Django or TDD.<br>
             Link to github of this project:
-            <a href="https://github.com/ForisTale/Django_TDD">https://github.com/ForisTale/Django_TDD</a>
+            <a class="text-info" href="https://github.com/ForisTale/Django_TDD">https://github.com/ForisTale/Django_TDD</a>
         </p>
     </div>
 </div>
 <div class="row my-5">
-<div class="col">
+<div class="col-6 col-md-12 mx-auto">
     <p>My projects are deployed using Ansible and under CI using Jenkins.</p>
 </div>
 </div>
