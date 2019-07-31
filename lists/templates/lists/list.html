@@ -10,17 +10,17 @@
             <h6>List shared with:</h6>
             <ul>
                 {% for item in list.shared_with.all %}
-                <li class="list-sharee">{{ item.email }}</li>
+                    <li class="list-sharee">{{ item.email }}</li>
                 {% endfor %}
             </ul>
             <p id="id_list_owner">List owner: {{ list.owner.email }}</p>
         </div>
 
         <div class="col-auto">
-            <form method="POST" action="{% url 'lists:share' list.id %}">
+            <form id="id_share_form" method="POST" action="{% url 'lists:share' list.id %}">
                 <label for="sharee">Share this list with your friend!</label>
                 <input name="sharee" id="sharee" placeholder="your-friend@example.com" type="email">
-            {% csrf_token %}
+                {% csrf_token %}
             </form>
             {% if user_error %}
             <div class="has-error">
@@ -34,8 +34,11 @@
 {% block scripts %}
     <script>
     $(document).ready(function () {
-        let url = "{% url "api_list" list.id %}";
-        window.Superlists.initialize(url);
+        window.Superlists.initialize({
+            listApiUrl: "{% url 'list-detail' list.id %}",
+            itemsApiUrl: "{% url 'item-list' %}",
+            listId: {{ list.id }},
+        });
     });
     </script>
 {% endblock %}

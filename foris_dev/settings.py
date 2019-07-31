@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'lists',
     'functional_tests',
+    'rest_framework',
 ]
 
 AUTH_USER_MODEL = "accounts.User"

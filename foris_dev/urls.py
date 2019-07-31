@@ -16,12 +16,12 @@ Including another URLconf
 from django.urls import path, include
 from main_page import urls as main_page_urls
 from lists import urls as lists_urls
-from lists import api_urls
 from accounts import urls as accounts_urls
+from rest_api.api_urls import router
 
 urlpatterns = [
     path("", include(main_page_urls)),
     path("lists/", include(lists_urls)),
     path("accounts/", include(accounts_urls)),
-    path("api/", include(api_urls)),
+    path("api/", include(router.urls)),
 ]
