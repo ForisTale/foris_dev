@@ -3,18 +3,21 @@
 {% block form_action %}{% url "lists:view_list" list.id %}{% endblock %}
 
 {% block table %}
-    <table id="id_list_table" class="table">
-    </table>
-    <div class="row">
-        <div class="col-auto">
-            <h6>List shared with:</h6>
-            <ul>
-                {% for item in list.shared_with.all %}
-                    <li class="list-sharee">{{ item.email }}</li>
-                {% endfor %}
-            </ul>
-            <p id="id_list_owner">List owner: {{ list.owner.email }}</p>
-        </div>
+<table id="id_list_table" class="table">
+    {% for item in list.item_set.all %}
+    <tr><td>{{ forloop.counter }}: {{ item.text }}</td></tr>
+    {% endfor %}
+</table>
+<div class="row">
+    <div class="col-auto">
+        <h6>List shared with:</h6>
+        <ul>
+            {% for item in list.shared_with.all %}
+            <li class="list-sharee">{{ item.email }}</li>
+            {% endfor %}
+        </ul>
+        <p id="id_list_owner">List owner: {{ list.owner.email }}</p>
+    </div>
 
         <div class="col-auto">
             <form id="id_share_form" method="POST" action="{% url 'lists:share' list.id %}">
