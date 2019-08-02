@@ -1,5 +1,5 @@
 from selenium import webdriver
-from .base import FunctionalTest
+from .superlist_base import FunctionalTest
 from .list_page import ListPage
 from .my_list_page import MyListPage
 
@@ -11,23 +11,23 @@ def quit_if_possible(browesr):
         pass
 
 
-class SharingTest(FunctionalTest):
+class SuperlistSharingTest(FunctionalTest):
 
     def test_can_share_a_list_with_another_user(self):
         # Edith is a logged-in user
         self.create_pre_authenticated_session("edith@example.com")
-        edith_browser = self.browser
-        self.addCleanup(lambda: quit_if_possible(self.browser))
+        edith_browser = self.driver
+        self.addCleanup(lambda: quit_if_possible(self.driver))
 
         # Her friend Oniciferous is also hanging out on the lists site
         oni_browser = webdriver.Firefox()
         self.addCleanup(lambda: quit_if_possible(oni_browser))
-        self.browser = oni_browser
+        self.driver = oni_browser
         self.create_pre_authenticated_session("oniciferous@example.com")
 
         # Edith goes to the home page and start a list
-        self.browser = edith_browser
-        self.browser.get(self.live_server_url)
+        self.driver = edith_browser
+        self.driver.get(self.live_server_url)
         list_page = ListPage(self).add_list_item("Get help")
 
         # She notices a "Share this list" option
@@ -42,11 +42,11 @@ class SharingTest(FunctionalTest):
         list_page.share_list_with("oniciferous@example.com")
 
         # Oniciferous now goes to the lists page with his browser
-        self.browser = oni_browser
+        self.driver = oni_browser
         MyListPage(self).go_to_my_lists_page()
 
         # He sees Edith's list in there!
-        self.browser.find_element_by_link_text("Get help").click()
+        self.driver.find_element_by_link_text("Get help").click()
 
         # On the list page, Oniferous can see that it's Edith's list
         self.wait_for(lambda: self.assertEqual(
@@ -58,7 +58,7 @@ class SharingTest(FunctionalTest):
         list_page.add_list_item("Hi Edith!")
 
         # When Edith refreshes the page, she sees Oniferous's addiction
-        self.browser = edith_browser
-        self.browser.refresh()
+        self.driver = edith_browser
+        self.driver.refresh()
         list_page.wait_for_row_in_list_table("Hi Edith!", 2)
 

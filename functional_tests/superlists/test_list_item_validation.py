@@ -1,27 +1,27 @@
-from .base import FunctionalTest
+from .superlist_base import FunctionalTest
 from selenium.webdriver.common.keys import Keys
 
 
-class ItemValidationTest(FunctionalTest):
+class SuperlistItemValidationTest(FunctionalTest):
 
     def get_error_element(self):
-        return self.browser.find_element_by_css_selector(".has-error")
+        return self.driver.find_element_by_css_selector(".has-error")
 
     def test_cannot_add_empty_list_items(self):
         # Edith goes to the home page and accidentally tries to submit an empty list item.
         # She hits Enter on the empty input box.
-        self.browser.get(self.live_server_url)
+        self.driver.get(self.live_server_url)
         self.get_item_input_box().send_keys(Keys.ENTER)
 
         # The home page refreshes, and there is an error message saying that
         # list items cannot be blank.
-        self.wait_for(lambda: self.browser.find_element_by_css_selector(
+        self.wait_for(lambda: self.driver.find_element_by_css_selector(
             "#id_text:invalid"
         ))
 
         # She starts typing text for the new item and error dissapears
         self.get_item_input_box().send_keys("Buy milk.")
-        self.wait_for(lambda: self.browser.find_element_by_css_selector(
+        self.wait_for(lambda: self.driver.find_element_by_css_selector(
             "#id_text:valid"
         ))
 
@@ -34,13 +34,13 @@ class ItemValidationTest(FunctionalTest):
 
         # Again, the browser will not comply
         self.wait_for_row_in_list_table("1: Buy milk.")
-        self.wait_for(lambda: self.browser.find_element_by_css_selector(
+        self.wait_for(lambda: self.driver.find_element_by_css_selector(
             "#id_text:invalid"
         ))
 
         # And she can correct it by filling some text in
         self.get_item_input_box().send_keys("Make tea.")
-        self.wait_for(lambda: self.browser.find_element_by_css_selector(
+        self.wait_for(lambda: self.driver.find_element_by_css_selector(
             "#id_text:valid"
         ))
         self.get_item_input_box().send_keys(Keys.ENTER)
@@ -49,7 +49,7 @@ class ItemValidationTest(FunctionalTest):
 
     def test_cannot_add_duplicate_items(self):
         # Edith goes to the page and start a new list
-        self.browser.get(self.live_server_url)
+        self.driver.get(self.live_server_url)
         self.add_list_item("Buy wellies.")
 
         # She accidentally tries to enter a duplicate item
@@ -64,7 +64,7 @@ class ItemValidationTest(FunctionalTest):
 
     def test_error_messages_are_cleared_on_input(self):
         # Edith starts a list causes a validation error:
-        self.browser.get(self.live_server_url)
+        self.driver.get(self.live_server_url)
         self.add_list_item("Banter too thick.")
         self.get_item_input_box().send_keys("Banter too thick.")
         self.get_item_input_box().send_keys(Keys.ENTER)

@@ -180,7 +180,7 @@ if is_deployed:
     # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     # SECURE_HSTS_PRELOAD = True
 
-    # that requests over HTTP are redirected to HTTPS. aslo can config in webserver
+    # that requests over HTTP are redirected to HTTPS. also can config in webserver
     # SECURE_SSL_REDIRECT = True
 
     # for more security

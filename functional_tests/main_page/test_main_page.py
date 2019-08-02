@@ -1,7 +1,7 @@
-from .base import FunctionalTest
+from functional_tests.base import FunctionalTest
 
 
-class BasicTest(FunctionalTest):
+class MainPageBasicTest(FunctionalTest):
 
     def check_link_send_to_correct_url(self, link_text, url_ending):
         self.driver.find_element_by_link_text(link_text).click()

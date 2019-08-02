@@ -1,13 +1,13 @@
-from .base import FunctionalTest
+from .superlist_base import FunctionalTest
 
 import time
 
 
-class LayoutAndStylingTest(FunctionalTest):
+class SuperlistLayoutAndStylingTest(FunctionalTest):
     def test_layout_and_styling(self):
         # Edith going to the home page
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
+        self.driver.get(self.live_server_url)
+        self.driver.set_window_size(1024, 768)
 
         # She notices the input box is nicely centered
         input_box = self.get_item_input_box()
