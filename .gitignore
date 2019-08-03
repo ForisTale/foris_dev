@@ -129,3 +129,4 @@ dmypy.json
 /functional_tests/screendumps/
 virtualenv/
 /functional_tests/superlists/screendumps/
+/ts.html
