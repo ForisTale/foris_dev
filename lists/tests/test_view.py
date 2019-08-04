@@ -28,6 +28,13 @@ class HomePageTest(TestCase):
 
 class ListViewTest(TestCase):
 
+    def post_invalid_input(self):
+        list_ = List.objects.create()
+        return self.client.post(
+            f"/lists/{list_.id}/",
+            data={"text": ""}
+        )
+
     def test_uses_list_templates(self):
         list_ = List.objects.create()
         response = self.client.get(f"/lists/{list_.id}/")
@@ -64,13 +71,6 @@ class ListViewTest(TestCase):
         )
 
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
-
-    def post_invalid_input(self):
-        list_ = List.objects.create()
-        return self.client.post(
-            f"/lists/{list_.id}/",
-            data={"text": ""}
-        )
 
     def test_for_invalid_input_nothing_saved_to_db(self):
         self.post_invalid_input()

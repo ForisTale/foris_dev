@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'lists',
     'functional_tests',
     'rest_framework',
+    'the_elder_commands',
 ]
 
 AUTH_USER_MODEL = "accounts.User"

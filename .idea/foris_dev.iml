@@ -27,6 +27,8 @@
     <option name="TEMPLATE_FOLDERS">
       <list>
         <option value="$MODULE_DIR$/main_page/templates" />
+        <option value="$MODULE_DIR$/the_elder_commands/templates" />
+        <option value="$MODULE_DIR$/lists/templates" />
       </list>
     </option>
   </component>

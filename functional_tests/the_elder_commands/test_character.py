@@ -30,7 +30,7 @@ DEFAULT_SKILL = {
 
 class CharacterTest(FunctionalTest):
 
-    def test_default_look_and_valuesC(self):
+    def test_default_look_and_values(self):
         # Foris open The elder commands website.
         self.driver.get(self.live_server_url)
 
@@ -39,26 +39,26 @@ class CharacterTest(FunctionalTest):
 
         # On page he sees "chose race" button
         self.assertEqual(
-            self.driver.find_element_by_id("id_chose_race_button").text,
+            self.driver.find_element_by_tag_name("button").text,
             "Chose Race"
         )
 
         # with selected Nord.
-        self.assertEqual(
-            self.driver.find_element_by_id("id_race_name").text,
-            "Nord"
-        )
+        self.equal_find_element_by_id("id_race_name", "Chosen race: Nord")
 
         # There is also skill list category,
-        skill_table = self.driver.find_elements_by_tag_name("td")
-
         for category in DEFAULT_SKILL.keys():
+            skill_table = self.driver.find_elements_by_tag_name("th")
+            skill_table = [row.text for row in skill_table]
+
             self.assertIn(
                 category,
                 skill_table
             )
 
         # with skills,
+            skill_table = self.driver.find_elements_by_tag_name("td")
+            skill_table = [row.text for row in skill_table]
 
             for skill in DEFAULT_SKILL[category]:
                 self.assertIn(
@@ -67,25 +67,31 @@ class CharacterTest(FunctionalTest):
                 )
 
         # that every one of them has some values.
-                self.assertNotEqual(
-                    self.driver.find_element_by_name(f"id_{skill}_value"),
-                    ""
-                )
+                skill_value = 15
+                if skill == "Two-handed":
+                    skill_value += 10
+                elif skill in ["Block", "Light Armor", "Speech",
+                               "One-handed", "Smithing"]:
+                    skill_value += 5
+                self.equal_find_element_by_id(f"id_{skill}_value", str(skill_value))
 
         # There are empty checkboxes next to values
                 self.equal_find_element_by_id(f"id_{skill}_priority", "")
 
         # and adjustment priority with default value
-        self.equal_find_element_by_id("id_priority_value", 2)
+        self.equal_find_element_by_id("id_priority_value", "2")
 
         # next to it are two boxes with calculated lvl
-        self.equal_find_element_by_id("id_calculated_level", 1)
+        self.equal_find_element_by_id("id_calculated_level", "1")
 
         # and desired lvl.
         self.equal_find_element_by_id("id_desired_level", "")
 
         # On the bottom is button with name calculate.
-        self.equal_find_element_by_id("id_calculate_button", "Calculate")
+        self.assertEqual(
+            self.driver.find_elements_by_tag_name("button")[1].text,
+            "Calculate"
+        )
 
         # There is also empty commands lists column.
         self.equal_find_element_by_id("id_commands_list", "")

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Elder Commands</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<div class="dropdown">
+    <button class="btn btn-dark dropdown-toggle" type="button" id="id_chose_race"
+            data-todge="dropdown" aria-haspopup="true" aria-expanded="false">
+        Chose Race
+    </button>
+    <div class="dropdown-menu" aria-labelledby="id_chose_race">
+
+    </div>
+</div>
+<p id="id_race_name">Chosen race: {{ character_form.race }}</p>
+
+{% for category, category_skills in character_form.skills.items %}
+<table class="table table-dark">
+    <thead>
+    <th>Priority</th>
+    <th>Value</th>
+    <th>{{ category }}</th>
+    </thead>
+    <tbody>
+    {% for skill, value in category_skills.items %}
+        <tr>
+        <td id="id_{{ skill }}_priority"></td>
+        <td id="id_{{ skill }}_value">{{ value }}</td>
+        <td>{{ skill }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+
+<p id="id_priority_value">2</p>
+<p id="id_calculated_level">1</p>
+<p id="id_desired_level"></p>
+<button>Calculate</button>
+
+<p id="id_commands_list"></p>
+
+</body>
+</html>

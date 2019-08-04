@@ -18,10 +18,12 @@ from main_page import urls as main_page_urls
 from lists import urls as lists_urls
 from accounts import urls as accounts_urls
 from rest_api.api_urls import router
+from the_elder_commands import urls as tec_urls
 
 urlpatterns = [
     path("", include(main_page_urls)),
     path("lists/", include(lists_urls)),
     path("accounts/", include(accounts_urls)),
     path("api/", include(router.urls)),
+    path("the_elder_commands/", include(tec_urls)),
 ]
