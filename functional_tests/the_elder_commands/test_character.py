@@ -44,7 +44,7 @@ class CharacterTest(FunctionalTest):
         )
 
         # with selected Nord.
-        self.equal_find_element_by_id("id_race_name", "Chosen race: Nord")
+        self.equal_find_element_by_id("id_race_name", "Chosen race:\nNord")
 
         # There is also skill list category,
         for category in DEFAULT_SKILL.keys():
@@ -78,11 +78,17 @@ class CharacterTest(FunctionalTest):
         # There are empty checkboxes next to values
                 self.equal_find_element_by_id(f"id_{skill}_priority", "")
 
-        # and adjustment priority with default value
-        self.equal_find_element_by_id("id_priority_value", "2")
+        # and place for skill new value
+                self.assertEqual(
+                    self.driver.find_element_by_name(f"{skill}_new_value").text,
+                    ""
+                )
+
+        # Below is adjustment priority
+        self.equal_find_element_by_id("id_priority_value", "")
 
         # next to it are two boxes with calculated lvl
-        self.equal_find_element_by_id("id_calculated_level", "1")
+        self.equal_find_element_by_id("id_calculated_level", "Calculated level: 1")
 
         # and desired lvl.
         self.equal_find_element_by_id("id_desired_level", "")
@@ -94,4 +100,4 @@ class CharacterTest(FunctionalTest):
         )
 
         # There is also empty commands lists column.
-        self.equal_find_element_by_id("id_commands_list", "")
+        self.equal_find_element_by_id("id_commands_list", "Commands List:\nPlaceholder")

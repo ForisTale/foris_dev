@@ -6,6 +6,11 @@ class CharacterForm:
     def __init__(self, race=None):
         self.skills = None
         self.race = race
+        self.possible_races = [
+            "Altmer", "Argonian", "Bosmer", "Breton",
+            "Dunmer", "Imperial", "Khajiit",
+            "Nord", "Ork", "Redguard",
+        ]
         self.race_skill_update(race)
 
     def race_skill_update(self, race):

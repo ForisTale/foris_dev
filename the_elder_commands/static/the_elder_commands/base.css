@@ -1,0 +1,20 @@
+body {
+    background-color: black;
+    color: #17a2b8;
+}
+
+.dropdown-menu, .dropdown-item {
+    background-color: #343a40;
+    color: #17a2b8;
+}
+
+input {
+    background-color: black;
+    color: #17a2b8;
+}
+
+#id_desired_level, #id_priority_value,
+.new-values {
+  height: 25px;
+  width: 35px;
+}
