@@ -1,4 +1,5 @@
 djangorestframework
-django==2.2.3
+django
 gunicorn==19.9.0
 pyyaml
+psycopg2

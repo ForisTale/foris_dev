@@ -105,11 +105,17 @@ WSGI_APPLICATION = 'foris_dev.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
+if not is_deployed and os.name == "nt":
+    with open("D:/secret.txt") as secret_file:
+        secret = secret_file.readline()
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'foris_dev',
+        'USER': 'postgres',
+        'PASSWORD': secret.strip(),
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
