@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from .models import Character
 from .forms import CharacterForm
 from .services import CharacterService
 from .inventory import SKILLS_CONSOLE_NAME, DEFAULT_SKILLS
@@ -18,14 +19,13 @@ def character_view(request):
         desired_skills = copy.deepcopy(DEFAULT_SKILLS)
         set_skills_values(default, default_skills)
         set_skills_values(desired, desired_skills)
-
         post = {
             **unpacked_post,
             "default_skills": default_skills,
             "desired_skills": desired_skills,
-            "session_key": request.session.session_key,
         }
-        form = CharacterForm(data=post)
+        instance = Character.objects.get_or_create(session_key=request.session.session_key)[0]
+        form = CharacterForm(data=post, instance=instance)
         if form.is_valid():
             form.save()
         else:

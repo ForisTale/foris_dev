@@ -12,4 +12,4 @@ class CharacterForm(forms.models.ModelForm):
 
     class Meta:
         model = Character
-        fields = ("race", "session_key", "default_skills", "desired_skills")
+        fields = ("race", "default_skills", "desired_skills")
