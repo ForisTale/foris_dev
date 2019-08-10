@@ -6,10 +6,16 @@
       <w>bosmer</w>
       <w>dunmer</w>
       <w>foris</w>
+      <w>heavyarmor</w>
       <w>khajiit</w>
+      <w>lightarmor</w>
+      <w>lockpicking</w>
       <w>nord</w>
+      <w>onehanded</w>
       <w>redguard</w>
       <w>smithing</w>
+      <w>speechcraft</w>
+      <w>twohanded</w>
     </words>
   </dictionary>
 </component>
