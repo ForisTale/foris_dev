@@ -1,26 +1,15 @@
-from functional_tests.the_elder_commands.test_character import DEFAULT_SKILL
-import copy
+from django import forms
+from the_elder_commands.models import Character
 
 
-class CharacterForm:
-    def __init__(self, race=None):
-        self.skills = None
-        self.race = race
-        self.possible_races = [
-            "Altmer", "Argonian", "Bosmer", "Breton",
-            "Dunmer", "Imperial", "Khajiit",
-            "Nord", "Ork", "Redguard",
-        ]
-        self.race_skill_update(race)
+class CharacterForm(forms.models.ModelForm):
 
-    def race_skill_update(self, race):
-        skills = copy.deepcopy(DEFAULT_SKILL)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["race"].required = False
+        self.fields["default_skills"].required = False
+        self.fields["desired_skills"].required = False
 
-        if race == "Nord":
-            skills["Combat"]["Two-handed"] += 10
-            skills["Stealth"]["Speech"] += 5
-            skills["Stealth"]["Light Armor"] += 5
-            for skill in ["Block", "One-handed", "Smithing"]:
-                skills["Combat"][skill] += 5
-
-        self.skills = skills
+    class Meta:
+        model = Character
+        fields = ("race", "session_key", "default_skills", "desired_skills")

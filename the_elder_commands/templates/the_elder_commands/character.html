@@ -19,69 +19,80 @@
             Chose Race
         </button>
         <div class="dropdown-menu" aria-labelledby="id_chose_race">
-            {% for race in character_form.possible_races %}
-                <a class="dropdown-item" href="#">{{ race }}</a>
+            {% for race in character.playable_races %}
+                <form action="{% url 'tec:character' %}" method="post">
+                    <button class="dropdown-item {{ race.1 }}" value="{{ race.0 }}" name="race" type="submit">
+                        {{ race.0 }}
+                    </button>
+                {% csrf_token %}
+                </form>
+
             {% endfor %}
         </div>
     </div>
-    <h6 class="text-info" id="id_race_name">Chosen race:<br>{{ character_form.race }}</h6>
 
-<div class="row">
-    {% for category, category_skills in character_form.skills.items %}
-        <div class="col-lg-4">
-            <table class="table table-dark text-info">
-                <thead>
-                <tr>
-                    <th>Priority</th>
-                    <th>{{ category }}</th>
-                    <th>Value</th>
-                    <th>New value</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for skill, value in category_skills.items %}
+    <h6 class="text-info" id="id_race_name">Chosen race:<br>{{ character.race }}</h6>
+
+<form action="{% url 'tec:character' %}" method="post">
+    <div class="row">
+        {% for category, category_skills in character.default_skills.items %}
+            <div class="col-lg-4">
+                <table class="table table-dark text-info">
+                    <thead>
                     <tr>
-                        <td><label class="container">
-                            <input id="id_{{ skill }}_priority" type="checkbox">
-                        </label></td>
-                    <td>{{ skill }}</td>
-                    <td id="id_{{ skill }}_value">{{ value }}</td>
-                        <td id="id_{{ skill }}_new_value"><label>
-                            <input class="new-values" name="{{ skill }}_new_value">
-                        </label></td>
+                        <th>Priority</th>
+                        <th>{{ category }}</th>
+                        <th>Value</th>
+                        <th>New value</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for skill, item in category_skills.items %}
+                        <tr>
+                            <td><label class="container">
+                                <input id="id_{{ item.console_name }}_priority" type="checkbox">
+                            </label></td>
+                        <td>{{ skill }}</td>
+                        <td id="id_{{ item.console_name}}_value"><label>
+                            <input class="base_values" name="{{ skill }}_base" value="{{ item.value }}">
+                        </label></td>
+                        <td id="id_{{ item.console_name }}_new_value"><label>
+                            <input class="new_values" name="{{ skill }}_new">
+                        </label></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label>Priority multiplier:
+                <input id="id_priority_multiplier" name="priority_multiplier" value="2">
+            </label>
+
         </div>
-    {% endfor %}
-</div>
+        <div class="col-md-4">
+            <h6 id="id_calculated_level">Calculated level: 1</h6>
+        </div>
+        <div class="col-md-4">
+            <label>Desired level:
+                <input id="id_desired_level" name="desired_level">
+            </label>
 
-<div class="row">
-    <div class="col-md-4">
-        <label>Priority value:
-            <input id="id_priority_value" name="priority_value" value="2">
-        </label>
-
+        </div>
     </div>
-    <div class="col-md-4">
-        <h6 id="id_calculated_level">Calculated level: 1</h6>
+    <div class="row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-2 center-block">
+            <button class="btn btn-dark text-info" id="id_calculate" type="submit">Calculate</button>
+            {% csrf_token %}
+        </div>
+        <div class="col-sm-5"></div>
     </div>
-    <div class="col-md-4">
-        <label>Desired level:
-            <input id="id_desired_level" name="desired_level">
-        </label>
-
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-5"></div>
-    <div class="col-sm-2 center-block">
-        <button class="btn btn-dark text-info">Calculate</button>
-    </div>
-    <div class="col-sm-5"></div>
-</div>
-
+</form>
 </div>
 
 <div class="col-md-2">
@@ -98,7 +109,6 @@
         </tbody>
     </table>
 </div>
-
 </div>
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

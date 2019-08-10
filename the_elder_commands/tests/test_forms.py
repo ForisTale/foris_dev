@@ -1,20 +1,23 @@
 from django.test import TestCase
 from the_elder_commands.forms import CharacterForm
-from functional_tests.the_elder_commands.test_character import DEFAULT_SKILL
-import copy
+from the_elder_commands.models import Character
 
 
 class CharacterFormTest(TestCase):
 
-    def test_character_form_skills_value_depend_on_race(self):
-        form = CharacterForm()
-        self.assertEqual(form.skills, DEFAULT_SKILL)
+    def test_form_passes_data_to_service(self):
+        form = CharacterForm(data={"race": "Nord", "session_key": "key"})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(Character.objects.count(), 1)
+        self.assertEqual(
+            Character.objects.get(session_key="key"),
+            Character.objects.all()[0]
+        )
 
-        nord_form = CharacterForm("Nord")
-        skills = copy.deepcopy(DEFAULT_SKILL)
-        skills["Combat"]["Two-handed"] += 10
-        skills["Stealth"]["Speech"] += 5
-        skills["Stealth"]["Light Armor"] += 5
-        for skill in ["Block", "One-handed", "Smithing"]:
-            skills["Combat"][skill] += 5
-        self.assertEqual(nord_form.skills, skills)
+    def test_session_key_is_required(self):
+        form = CharacterForm(data={"session_key": ""})
+        self.assertEqual(
+            form.errors["session_key"],
+            ["This field is required."]
+        )
