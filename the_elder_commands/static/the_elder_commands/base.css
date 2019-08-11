@@ -13,8 +13,13 @@ input {
     color: #17a2b8;
 }
 
-#id_desired_level, #id_priority_multiplier,
+#id_desired_level,
 .new_values, .base_values {
   height: 25px;
   width: 35px;
+}
+
+#id_priority_multiplier {
+    height: 25px;
+    width: 55px;
 }

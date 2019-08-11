@@ -1,5 +1,6 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from the_elder_commands.inventory import DEFAULT_SKILLS
+import time
 
 
 class CharacterTest(FunctionalTest):
@@ -48,23 +49,23 @@ class CharacterTest(FunctionalTest):
                                "One-handed", "Smithing",
                                "Speech"]:
                     skill_value += 5
-                base_value = self.driver.find_element_by_name(f"{items['for_id']}_base")
+                base_value = self.driver.find_element_by_name(f"{items['console_name']}_base")
                 self.assertEqual(
                     base_value.get_attribute("value"),
                     str(skill_value)
                 )
 
         # There are empty checkboxes next to values
-                self.equal_find_element_by_id(f"id_{items['for_id']}_priority", "")
+                self.equal_find_element_by_id(f"id_{items['console_name']}_priority", "")
 
         # and place for skill new value
                 self.assertEqual(
-                    self.driver.find_element_by_name(f"{items['for_id']}_new").text,
+                    self.driver.find_element_by_name(f"{items['console_name']}_new").text,
                     ""
                 )
 
         # Below is adjustment priority
-        self.equal_find_element_by_id("id_priority_value", "")
+        self.equal_find_element_by_id("id_priority_multiplier", "")
 
         # next to it are two boxes with calculated lvl
         self.equal_find_element_by_id("id_calculated_level", "Calculated level: 1")
@@ -79,7 +80,7 @@ class CharacterTest(FunctionalTest):
         )
 
         # There is also empty commands lists column.
-        self.equal_find_element_by_id("id_commands_list", "Commands List:\nPlaceholder")
+        self.equal_find_element_by_id("id_commands_list", "Commands List:")
 
     def test_calculate_level(self):
         # Foris open the elder commands website.
@@ -101,34 +102,37 @@ class CharacterTest(FunctionalTest):
                                "One-handed", "Smithing",
                                "Two-handed"]:
                     skill_value += 5
-                base_value = self.driver.find_element_by_name(f"{items['for_id']}_base")
-                self.assertEqual(
+                base_value = self.driver.find_element_by_name(f"{items['console_name']}_base")
+                self.wait_for(lambda: self.assertEqual(
                     base_value.get_attribute("value"),
                     str(skill_value)
-                )
+                ))
 
         # Foris set new value for some skills
         new_values = self.driver.find_elements_by_class_name("new_values")
         for new_value in new_values:
-            if new_value.get_attribute("name") in ["twohanded_new_value",
-                                                   "speechcraft_new_value",
-                                                   "lightarmor_new_value"]:
+            if new_value.get_attribute("name") in ["alteration_new",
+                                                   "speechcraft_new",
+                                                   "lightarmor_new"]:
                 new_value.send_keys(20)
 
         # and then press calculate.
         self.driver.find_element_by_id("id_calculate").click()
 
-        # in calculated level value changed
-        self.wait_for(lambda x: self.equal_find_element_by_id("id_calculated_level", 3))
+        # in desired level value changed
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_name("desired_level").get_attribute("value"),
+            "3"
+        ))
 
         # and in commands list he sees list of commands
         list_of_commands = self.driver.find_element_by_id("id_commands_list")\
-            .find_element_by_tag_name("td")
+            .find_elements_by_tag_name("td")
         list_of_commands = [row.text for row in list_of_commands]
         commands = [
-            "player.advskill twohanded 2865",
-            "player.advskill speech 2865",
-            "player.advskill lightarmor 2865",
+            "player.advskill alteration 2132",
+            "player.advskill speechcraft 2132",
+            "player.advskill lightarmor 2132",
         ]
         self.assertEqual(commands, list_of_commands)
 

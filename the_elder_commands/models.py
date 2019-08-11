@@ -7,3 +7,5 @@ class Character(models.Model):
     session_key = models.TextField(default="", unique=True)
     default_skills = JSONField(default=dict)
     desired_skills = JSONField(default=dict)
+    desired_level = models.IntegerField(default=-1, null=True)
+    priority_multiplier = models.FloatField(default=1.5)

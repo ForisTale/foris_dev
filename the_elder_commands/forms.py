@@ -9,7 +9,12 @@ class CharacterForm(forms.models.ModelForm):
         self.fields["race"].required = False
         self.fields["default_skills"].required = False
         self.fields["desired_skills"].required = False
+        self.fields["desired_level"].required = False
+        self.fields["priority_multiplier"].required = False
 
     class Meta:
         model = Character
-        fields = ("race", "default_skills", "desired_skills")
+        fields = (
+            "race", "default_skills", "desired_skills",
+            "desired_level", "priority_multiplier",
+        )

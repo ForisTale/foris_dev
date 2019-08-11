@@ -28,14 +28,14 @@ class CharacterViewTest(TestCase):
     def test_pass_race_in_url_passed_it_to_form(self):
         self.client.post(
             "/the_elder_commands/",
-            data={"race": "Orc"}
+            data={"race": "Ork"}
         )
 
         self.assertEqual(Character.objects.count(), 1)
         model = Character.objects.first()
         self.assertEqual(
             model.race,
-            "Orc"
+            "Ork"
         )
 
     def test_view_build_dict_and_pass_it_to_form(self):
@@ -43,6 +43,7 @@ class CharacterViewTest(TestCase):
             "/the_elder_commands/",
             data={
                 "alteration_base": "35",
+                "alteration_new": "",
                 "heavyarmor_new": "40",
             }
         )
@@ -54,6 +55,28 @@ class CharacterViewTest(TestCase):
         self.assertEqual(
             model.desired_skills["Combat"]["Heavy Armor"]["value"],
             40
+        )
+        self.assertEqual(
+            model.desired_skills["Magic"]["Alteration"]["value"],
+            ""
+        )
+
+    def test_after_send_post_character_give_correct_level(self):
+        self.client.post("/the_elder_commands/", data={"race": "Ork"})
+        self.client.post(
+            "/the_elder_commands/",
+            data={
+                "twohanded_new": ["21"],
+                "speechcraft_new": ["21"],
+                "lightarmor_new": ["21"],
+            }
+        )
+
+        key = Character.objects.first().session_key
+        character = CharacterService(session_key=key)
+        self.assertEqual(
+            character.desired_level,
+            3
         )
 
 
@@ -77,19 +100,26 @@ class ExtractSkillsTest(TestCase):
         default, desired = extract_skills(post)
         self.assertEqual(
             [default, desired],
-            [{"alteration": 11}, {"heavyarmor": 44}]
+            [{"alteration": "11"}, {"heavyarmor": "44"}]
         )
 
 
 class SetSkillsValuesTest(TestCase):
 
     def test_will_return_two_correct_dicts(self):
-        result_1 = CharacterService.race_skill_update("Nord")
-        dictionary = CharacterService.race_skill_update("Nord")
+        result = CharacterService.default_race_skills_update("Nord")
+        dictionary = CharacterService.default_race_skills_update("Nord")
         set_skills_values({"alteration": "45"}, dictionary)
-        result_1["Magic"]["Alteration"]["value"] = 45
+        result["Magic"]["Alteration"]["value"] = 45
 
-        self.assertEqual(dictionary, result_1)
+        self.assertEqual(dictionary, result)
+
+    def test_empty_value_is_set_as_none(self):
+        result = CharacterService.default_race_skills_update("Nord")
+        dictionary = CharacterService.default_race_skills_update("Nord")
+        set_skills_values({"alteration": ""}, dictionary)
+        result["Magic"]["Alteration"]["value"] = ""
+        self.assertEqual(result, dictionary)
 
 
 class UnpackPOSTTest(TestCase):

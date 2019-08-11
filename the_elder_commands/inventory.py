@@ -14,31 +14,120 @@ SKILLS_CONSOLE_NAME = [
     'onehanded', 'smithing', 'twohanded', 'alchemy', 'lightarmor',
     'lockpicking', 'pickpocket', 'sneak', 'speechcraft'
 ]
-
 DEFAULT_SKILLS = {
     "Magic": {
-        "Alteration": {"console_name": "alteration", "value": 15},
-        "Conjuration":  {"console_name": "conjuration", "value": 15},
-        "Destruction":  {"console_name": "destruction", "value": 15},
-        "Enchanting":  {"console_name": "enchanting", "value": 15},
-        "Illusion":  {"console_name": "illusion", "value": 15},
-        "Restoration":  {"console_name": "restoration", "value": 15},
+        "Alteration": {
+            "console_name": "alteration",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Conjuration":  {
+            "console_name": "conjuration",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Destruction":  {
+            "console_name": "destruction",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Enchanting":  {
+            "console_name": "enchanting",
+            "value": 15,
+            "sim": 1,
+            "sio": 170,
+        },
+        "Illusion":  {
+            "console_name": "illusion",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Restoration":  {
+            "console_name": "restoration",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
     },
     "Combat": {
-        "Archery":  {"console_name": "marksman", "value": 15},
-        "Block":  {"console_name": "block", "value": 15},
-        "Heavy Armor":  {"console_name": "heavyarmor", "value": 15},
-        "One-handed":  {"console_name": "onehanded", "value": 15},
-        "Smithing":  {"console_name": "smithing", "value": 15},
-        "Two-handed":  {"console_name": "twohanded", "value": 15},
+        "Archery":  {
+            "console_name": "marksman",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Block":  {
+            "console_name": "block",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Heavy Armor":  {
+            "console_name": "heavyarmor",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "One-handed":  {
+            "console_name": "onehanded",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Smithing":  {
+            "console_name": "smithing",
+            "value": 15,
+            "sim": 0.25,
+            "sio": 300,
+        },
+        "Two-handed":  {
+            "console_name": "twohanded",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
     },
     "Stealth": {
-        "Alchemy":  {"console_name": "alchemy", "value": 15},
-        "Light Armor":  {"console_name": "lightarmor", "value": 15},
-        "Lockpicking":  {"console_name": "lockpicking", "value": 15},
-        "Pickpocket":  {"console_name": "pickpocket", "value": 15},
-        "Sneak":  {"console_name": "sneak", "value": 15},
-        "Speech":  {"console_name": "speechcraft", "value": 15},
+        "Alchemy":  {
+            "console_name": "alchemy",
+            "value": 15,
+            "sim": 1.6,
+            "sio": 65,
+        },
+        "Light Armor":  {
+            "console_name": "lightarmor",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
+        "Lockpicking":  {
+            "console_name": "lockpicking",
+            "value": 15,
+            "sim": 0.25,
+            "sio": 300,
+        },
+        "Pickpocket":  {
+            "console_name": "pickpocket",
+            "value": 15,
+            "sim": 0.25,
+            "sio": 250,
+        },
+        "Sneak":  {
+            "console_name": "sneak",
+            "value": 15,
+            "sim": 0.5,
+            "sio": 120,
+        },
+        "Speech":  {
+            "console_name": "speechcraft",
+            "value": 15,
+            "sim": 2,
+            "sio": 0,
+        },
     },
 }
 

@@ -54,10 +54,10 @@
                             </label></td>
                         <td>{{ skill }}</td>
                         <td id="id_{{ item.console_name}}_value"><label>
-                            <input class="base_values" name="{{ skill }}_base" value="{{ item.value }}">
+                            <input class="base_values" name="{{ item.console_name }}_base" value="{{ item.value }}">
                         </label></td>
                         <td id="id_{{ item.console_name }}_new_value"><label>
-                            <input class="new_values" name="{{ skill }}_new">
+                            <input class="new_values" name="{{ item.console_name }}_new">
                         </label></td>
                         </tr>
                     {% endfor %}
@@ -70,16 +70,17 @@
     <div class="row">
         <div class="col-md-4">
             <label>Priority multiplier:
-                <input id="id_priority_multiplier" name="priority_multiplier" value="2">
+                <input id="id_priority_multiplier" name="priority_multiplier"
+                       value="1.5" type="number" step="0.1">
             </label>
 
         </div>
         <div class="col-md-4">
-            <h6 id="id_calculated_level">Calculated level: 1</h6>
+            <h6 id="id_calculated_level">Calculated level: {{ character.default_level }}</h6>
         </div>
         <div class="col-md-4">
             <label>Desired level:
-                <input id="id_desired_level" name="desired_level">
+                <input id="id_desired_level" name="desired_level" value="{{ character.desired_level }}">
             </label>
 
         </div>
@@ -103,9 +104,11 @@
         </tr>
         </thead>
         <tbody>
+        {% for command in character.commands_list %}
         <tr>
-            <td>Placeholder</td>
+            <td>{{ command }}</td>
         </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>

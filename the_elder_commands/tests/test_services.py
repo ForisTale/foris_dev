@@ -8,7 +8,7 @@ import copy
 class CharacterServiceTest(TestCase):
 
     @staticmethod
-    def default_nord():
+    def set_up_default_nord():
         skills = copy.deepcopy(DEFAULT_SKILLS)
         skills["Combat"]["Two-handed"]["value"] += 10
         skills["Stealth"]["Speech"]["value"] += 5
@@ -16,6 +16,15 @@ class CharacterServiceTest(TestCase):
         for skill in ["Block", "One-handed", "Smithing"]:
             skills["Combat"][skill]["value"] += 5
         return skills
+
+    @staticmethod
+    def set_up_desire_skills():
+        Character.objects.create(race="Altmer", session_key="key")
+        character = CharacterService("key")
+        character.desired_skills["Combat"]["Two-handed"]["value"] = 20
+        character.desired_skills["Stealth"]["Speech"]["value"] = 20
+        character.desired_skills["Stealth"]["Light Armor"]["value"] = 20
+        return character
 
     def test_can_be_used_to_pass_data(self):
         Character.objects.create(session_key="key")
@@ -37,29 +46,41 @@ class CharacterServiceTest(TestCase):
         Character.objects.create(race="Altmer", session_key="key")
         self.assertEqual(CharacterService(session_key="key").race, "Altmer")
 
-    def test_skills_value_depend_on_race(self):
-        Character.objects.create(race="Nord", session_key="key")
-        skills = self.default_nord()
-        self.assertEqual(CharacterService(session_key="key").default_skills, skills)
+    def test_race_skills_update_depend_on_race(self):
+        default_skills = CharacterService.default_race_skills_update("Nord")
+        skills = self.set_up_default_nord()
+        self.assertEqual(default_skills, skills)
 
-    def test_predict_level_and_commands_list(self):
-        Character.objects.create(race="Altmer", session_key="key")
-        character = CharacterService("key")
-        character.desired_skills = copy.deepcopy(DEFAULT_SKILLS)
-        character.desired_skills["Combat"]["Two-handed"]["value"] += 5
-        character.desired_skills["Stealth"]["Speech"]["value"] += 5
-        character.desired_skills["Stealth"]["Light Armor"]["value"] += 5
+    def test_predict_level(self):
+        character = self.set_up_desire_skills()
+        level = character.predict_level(character.desired_skills)
+        self.assertEqual(level, 3)
 
-        self.assertEqual(character.predict_level, 3)
+    def test_commands_list(self):
+        character = self.set_up_desire_skills()
         commands_list = [
-            "player.advskill twohanded 2865",
-            "player.advskill speech 2865",
-            "player.advskill lightarmor 2865",
+            "player.advskill twohanded 2132",
+            "player.advskill lightarmor 2132",
+            "player.advskill speechcraft 2132",
         ]
-        self.assertEqual(character.commands_list, commands_list)
+        self.assertEqual(character.commands_list(), commands_list)
 
     def test_if_passes_non_exist_session_key_create_default(self):
-        character = CharacterService(session_key="key")
+        CharacterService(session_key="key")
+        character = Character.objects.first()
 
-        self.assertEqual(character.race, "Nord")
-        self.assertEqual(character.default_skills, self.default_nord())
+        self.assertEqual(character.session_key, "key")
+
+    def test_desired_skills_update_return_correct_object(self):
+        character = self.set_up_desire_skills()
+        self.assertEqual(
+            character.desired_skills["Stealth"]["Speech"]["value"],
+            20
+        )
+
+    def test_empty_character_desired_skills_return_desired_skills_empty_value(self):
+        character = CharacterService(session_key="key")
+        self.assertEqual(
+            character.desired_skills["Magic"]["Alteration"]["value"],
+            ""
+        )
