@@ -10,6 +10,18 @@
 </head>
 <body>
 <div class="row container-fluid">
+<div class="col-lg-4"></div>
+<div class="col-lg-4">
+    {% if form %}
+        {% for error in form.errors.values %}
+            <h4>{{ error }}</h4>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class="col-lg-4"></div>
+</div>
+
+<div class="row container-fluid">
 <div class="col-lg-1"></div>
 <div class="col-md-9">
 

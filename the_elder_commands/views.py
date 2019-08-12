@@ -61,7 +61,7 @@ def set_skills_values(skills_value, dictionary):
                 if skill_value == "":
                     value = ""
                 else:
-                    value = int(skill_value)
+                    value = skill_value
                 skill["value"] = value
 
 

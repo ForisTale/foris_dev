@@ -3,6 +3,45 @@ from the_elder_commands.models import Character
 from the_elder_commands.services import CharacterService
 from the_elder_commands.views import extract_skills, set_skills_values, unpack_post
 
+SKILL_POST = {
+    'alteration_base': "15",
+    'conjuration_base': "15",
+    'destruction_base': "15",
+    'enchanting_base': "15",
+    'illusion_base': "15",
+    'restoration_base': "15",
+    'marksman_base': "15",
+    'block_base': "15",
+    'heavyarmor_base': "15",
+    'onehanded_base': "15",
+    'smithing_base': "15",
+    'twohanded_base': "15",
+    'alchemy_base': "15",
+    'lightarmor_base': "15",
+    'lockpicking_base': "15",
+    'pickpocket_base': "15",
+    'sneak_base': "15",
+    'speechcraft_base': "15",
+    'alteration_new': "",
+    'conjuration_new': "",
+    'destruction_new': "",
+    'enchanting_new': "",
+    'illusion_new': "",
+    'restoration_new': "",
+    'marksman_new': "",
+    'block_new': "",
+    'heavyarmor_new': "",
+    'onehanded_new': "",
+    'smithing_new': "",
+    'twohanded_new': "",
+    'alchemy_new': "",
+    'lightarmor_new': "",
+    'lockpicking_new': "",
+    'pickpocket_new': "",
+    'sneak_new': "",
+    'speechcraft_new': "",
+}
+
 
 class CharacterViewTest(TestCase):
 
@@ -26,10 +65,7 @@ class CharacterViewTest(TestCase):
         self.assertRedirects(response, "/the_elder_commands/")
 
     def test_pass_race_in_url_passed_it_to_form(self):
-        self.client.post(
-            "/the_elder_commands/",
-            data={"race": "Ork"}
-        )
+        self.client.post("/the_elder_commands/", data={"race": "Ork"})
 
         self.assertEqual(Character.objects.count(), 1)
         model = Character.objects.first()
@@ -39,13 +75,13 @@ class CharacterViewTest(TestCase):
         )
 
     def test_view_build_dict_and_pass_it_to_form(self):
+        data = SKILL_POST.copy()
+        data["alteration_base"] = ["35"]
+        data["heavyarmor_new"] = ["40"]
+
         self.client.post(
             "/the_elder_commands/",
-            data={
-                "alteration_base": "35",
-                "alteration_new": "",
-                "heavyarmor_new": "40",
-            }
+            data=data
         )
         model = Character.objects.first()
         self.assertEqual(
@@ -63,13 +99,13 @@ class CharacterViewTest(TestCase):
 
     def test_after_send_post_character_give_correct_level(self):
         self.client.post("/the_elder_commands/", data={"race": "Ork"})
+        data = SKILL_POST.copy()
+        data["twohanded_new"] = ["21"]
+        data["speechcraft_new"] = ["21"]
+        data["lightarmor_new"] = ["21"]
         self.client.post(
             "/the_elder_commands/",
-            data={
-                "twohanded_new": ["21"],
-                "speechcraft_new": ["21"],
-                "lightarmor_new": ["21"],
-            }
+            data=data
         )
 
         key = Character.objects.first().session_key
@@ -109,7 +145,7 @@ class SetSkillsValuesTest(TestCase):
     def test_will_return_two_correct_dicts(self):
         result = CharacterService.default_race_skills_update("Nord")
         dictionary = CharacterService.default_race_skills_update("Nord")
-        set_skills_values({"alteration": "45"}, dictionary)
+        set_skills_values({"alteration": 45}, dictionary)
         result["Magic"]["Alteration"]["value"] = 45
 
         self.assertEqual(dictionary, result)
