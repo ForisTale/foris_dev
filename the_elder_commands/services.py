@@ -29,14 +29,14 @@ class CharacterService:
         return skills_tree
 
     def desired_skills_update(self, character):
-        if not character.desired_skills:
-            desired_skills = copy.deepcopy(self.default_skills)
-            for skills in desired_skills.values():
-                for skill in skills.values():
-                    skill["value"] = ""
-            return desired_skills
-        else:
+        if character.desired_skills:
             return character.desired_skills
+
+        desired_skills = copy.deepcopy(self.default_skills)
+        for skills in desired_skills.values():
+            for skill in skills.values():
+                skill["value"] = ""
+        return desired_skills
 
     def predict_level(self, check_against):
         default = self.default_race_skills_update(self.race)
@@ -49,7 +49,6 @@ class CharacterService:
                 if skill["value"] > default_value:
                     for char_xp in range(default_value + 1, skill["value"] + 1):
                         total_exp += char_xp
-
         level = (-2.5 + math.sqrt(8 * total_exp + 1225) / 10)
         return int(level)
 
@@ -64,8 +63,6 @@ class CharacterService:
                 if skill["value"] > default_value:
                     for skill_level in range(default_value + 1, skill["value"]):
                         total_exp += skill["sim"] * (skill_level ** 1.95) + skill["sio"]
-
                     commands.append(f"player.advskill {skill['console_name']} {int(total_exp) + 1}")
                     total_exp = 0
-
         return commands

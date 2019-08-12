@@ -8,40 +8,20 @@ from .inventory import SKILLS_CONSOLE_NAME
 def character_view(request):
     if not request.session.session_key:
         request.session.save()
-
+    form = None
     if request.method == "POST":
         instance = Character.objects.get_or_create(session_key=request.session.session_key)[0]
-
-        unpacked_post = unpack_post(request.POST)
-        default, desired = extract_skills(unpacked_post)
-
         if "race" in request.POST:
-            default_skills = CharacterService.default_race_skills_update(unpacked_post["race"])
-            set_skills_values(default, default_skills)
-            post = {
-                **unpacked_post,
-                "default_skills": default_skills,
-            }
+            default_skills = CharacterService.default_race_skills_update(request.POST["race"])
+            post = {**unpack_post(request.POST), "default_skills": default_skills}
         else:
-            default_skills = CharacterService.default_race_skills_update(instance.race)
-            desired_skills = CharacterService.default_race_skills_update(instance.race)
-            set_skills_values(default, default_skills)
-            set_skills_values(desired, desired_skills)
-            post = {
-                **unpacked_post,
-                "default_skills": default_skills,
-                "desired_skills": desired_skills,
-            }
+            post = correct_post(request.POST, instance.race)
         form = CharacterForm(data=post, instance=instance)
         if form.is_valid():
             form.save()
-        else:
-            print(form.errors)
-
-        return redirect("/the_elder_commands/")
-
+            return redirect(instance)
     character = CharacterService(session_key=request.session.session_key)
-    return render(request, "the_elder_commands/character.html", {"character": character})
+    return render(request, "the_elder_commands/character.html", {"character": character, "form": form})
 
 
 def unpack_post(post):
@@ -74,7 +54,6 @@ def extract_skills(post):
 
 
 def set_skills_values(skills_value, dictionary):
-
     for skills in dictionary.values():
         for skill in skills.values():
             if skill["console_name"] in skills_value.keys():
@@ -84,3 +63,19 @@ def set_skills_values(skills_value, dictionary):
                 else:
                     value = int(skill_value)
                 skill["value"] = value
+
+
+def correct_post(post, race):
+    unpacked_post = unpack_post(post)
+    default, desired = extract_skills(unpacked_post)
+    default_skills = CharacterService.default_race_skills_update(race)
+    desired_skills = CharacterService.default_race_skills_update(race)
+    set_skills_values(default, default_skills)
+    set_skills_values(desired, desired_skills)
+
+    post ={
+        **unpacked_post,
+        "default_skills": default_skills,
+        "desired_skills": desired_skills,
+    }
+    return post
