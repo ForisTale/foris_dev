@@ -80,7 +80,7 @@ class CharacterFormValidationTest(TestCase):
                      [{"desired_skills": desired_skills}, "desired_skills"]]:
             form = CharacterForm(data=case[0], instance=self.instance)
             self.check_fail_and_message(form, {case[1]:
-                                               ['All skills value must be integers!']})
+                                               ['All skills values must be integers!']})
 
     def test_desired_must_be_bigger_than_default(self):
         default_skills = CharacterService.default_race_skills_update("Nord")

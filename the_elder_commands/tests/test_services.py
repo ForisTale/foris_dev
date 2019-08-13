@@ -53,15 +53,18 @@ class CharacterServiceTest(TestCase):
 
     def test_predict_level(self):
         character = self.set_up_desire_skills()
-        level = character.predict_level(character.desired_skills)
+        level = character.predict_level(
+            character.default_race_skills_update(character.race),
+            character.desired_skills
+        )
         self.assertEqual(level, 3)
 
     def test_commands_list(self):
         character = self.set_up_desire_skills()
         commands_list = [
-            "player.advskill twohanded 2132",
-            "player.advskill lightarmor 2132",
-            "player.advskill speechcraft 2132",
+            "player.advskill twohanded 2525",
+            "player.advskill lightarmor 2525",
+            "player.advskill speechcraft 2525",
         ]
         self.assertEqual(character.commands_list(), commands_list)
 
@@ -84,3 +87,10 @@ class CharacterServiceTest(TestCase):
             character.desired_skills["Magic"]["Alteration"]["value"],
             ""
         )
+
+    def test_desired_level_is_calculated_against_default_skills(self):
+        skills = self.set_up_default_nord()
+        skills["Combat"]["One-handed"]["value"] = 35
+        Character.objects.create(session_key="key", default_skills=skills)
+        character = CharacterService(session_key="key")
+        self.assertEqual(character.desired_level, 4)

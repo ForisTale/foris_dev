@@ -76,4 +76,4 @@ class CharacterForm(forms.models.ModelForm):
                     try:
                         skill["value"] = int(skill["value"])
                     except ValueError:
-                        raise forms.ValidationError("All skills value must be integers!")
+                        raise forms.ValidationError("All skills values must be integers!")

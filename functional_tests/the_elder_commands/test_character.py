@@ -4,12 +4,13 @@ import time
 
 
 class CharacterTest(FunctionalTest):
-
-    def test_default_look_and_values(self):
+    def setUp(self):
+        super().setUp()
         # Foris open The elder commands website.
         self.driver.get(self.live_server_url)
 
-        # And in title sees website name.
+    def test_default_look_and_values(self):
+        # And in title Foris sees website name.
         self.assertEqual(self.driver.title, "The Elder Commands")
 
         # On page he sees "chose race" button
@@ -80,13 +81,62 @@ class CharacterTest(FunctionalTest):
         )
 
         # There is also empty commands lists column.
-        self.equal_find_element_by_id("id_commands_list", "Commands List:")
+        self.wait_for(lambda: self.equal_find_element_by_id("id_commands_list", "Commands List:"))
+
+    def test_validation(self):
+        # Then Foris write some letters into skills
+        self.driver.find_element_by_name("block_base").send_keys("dfsds")
+        self.driver.find_element_by_id("id_calculate").click()
+
+        # Error appear.
+        self.wait_for(lambda: self.assertIn(
+            "All skills values must be integers!",
+            self.driver.find_element_by_tag_name("body").text
+        ))
+
+        # So now he try give very large number into skill
+        self.driver.find_element_by_name("block_base").send_keys("101")
+        self.driver.find_element_by_id("id_calculate").click()
+
+        # Again error appear
+        self.wait_for(lambda: self.assertIn(
+            "The skill need to be a integer between 15 and 100.",
+            self.driver.find_element_by_tag_name("body").text
+        ))
+
+        # Not disheartened he try put value bigger than new value
+        self.driver.find_element_by_name("block_base").clear()
+        self.driver.find_element_by_name("block_base").send_keys("35")
+        self.driver.find_element_by_name("block_new").send_keys("25")
+        self.driver.find_element_by_id("id_calculate").click()
+
+        # and error appear
+        self.wait_for(lambda: self.assertIn(
+            "New value of skills must be bigger than a value!",
+            self.driver.find_element_by_tag_name("body").text
+        ))
+
+    def test_calculate_desired_level(self):
+        # Foris set skills in value and new value
+        self.driver.find_element_by_name("block_base").clear()
+        self.driver.find_element_by_name("block_base").send_keys("35")
+        self.driver.find_element_by_name("block_new").send_keys("55")
+        # after click calculate
+        self.driver.find_element_by_id("id_calculate").click()
+
+        # desired level and calculated level are correct
+        self.wait_for(lambda:self.assertEqual(
+            self.driver.find_element_by_id("id_calculated_level").text,
+            "Calculated level: 4"
+        ))
+
+        self.assertEqual(
+            self.driver.find_element_by_name("desired_level").get_attribute("value"),
+            "8"
+        )
 
     def test_calculate_level(self):
-        # Foris open the elder commands website.
-        self.driver.get(self.live_server_url)
-
-        # He change race to orc
+        # Foris change race to orc
         self.driver.find_element_by_id("id_chose_race").click()
         self.driver.find_element_by_class_name("ork_race").click()
 
@@ -130,9 +180,9 @@ class CharacterTest(FunctionalTest):
             .find_elements_by_tag_name("td")
         list_of_commands = [row.text for row in list_of_commands]
         commands = [
-            "player.advskill alteration 2132",
-            "player.advskill speechcraft 2132",
-            "player.advskill lightarmor 2132",
+            "player.advskill alteration 2525",
+            "player.advskill speechcraft 2525",
+            "player.advskill lightarmor 2525",
         ]
         self.assertEqual(commands, list_of_commands)
 
