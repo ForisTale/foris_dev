@@ -47,50 +47,34 @@ class CharacterFormValidationTest(TestCase):
         form = CharacterForm(data={"priority_multiplier": "ala"}, instance=self.instance)
         self.check_fail_and_message(form, {'priority_multiplier': ['Enter a number.']})
 
-    def test_default_skills_range(self):
-        default_skills = CharacterService.default_race_skills_update("Nord")
+    def test_skills_range(self):
+        skills = CharacterService.default_race_skills_update("Nord")
         cases = ["14", "101", "-50"]
-        for case in cases:
-            default_skills["Magic"]["Alteration"]["value"] = case
-            form = CharacterForm(data={"default_skills": default_skills}, instance=self.instance)
-            self.check_fail_and_message(form, {'default_skills':
-                                               ['The skill need to be a integer between 15 and 100.']})
-        default_skills["Magic"]["Alteration"]["value"] = "15"
-        form = CharacterForm(data={"default_skills": default_skills}, instance=self.instance)
-        self.assertTrue(form.is_valid())
-
-    def test_desired_skills_range(self):
-        desired_skills = CharacterService.default_race_skills_update("Nord")
-        cases = ["14", "101", "-50"]
-        for case in cases:
-            desired_skills["Magic"]["Alteration"]["value"] = case
-            form = CharacterForm(data={"desired_skills": desired_skills}, instance=self.instance)
-            self.check_fail_and_message(form, {'desired_skills':
-                                               ['The skill need to be a integer between 15 and 100.']})
-        desired_skills["Magic"]["Alteration"]["value"] = "15"
-        form = CharacterForm(data={"desired_skills": desired_skills}, instance=self.instance)
-        self.assertTrue(form.is_valid())
+        for kind in ["default", "desired"]:
+            for case in cases:
+                skills["Magic"]["Alteration"][kind + "_value"] = case
+                form = CharacterForm(data={"skills": skills}, instance=self.instance)
+                self.check_fail_and_message(form, {'skills':
+                                                   ['The skill need to be a integer between 15 and 100.']})
+            skills["Magic"]["Alteration"][kind + "_value"] = "15"
+            form = CharacterForm(data={"skills": skills}, instance=self.instance)
+            self.assertTrue(form.is_valid())
 
     def test_skills_values_are_numbers(self):
-        default_skills = CharacterService.default_race_skills_update("Nord")
-        desired_skills = CharacterService.default_race_skills_update("Nord")
-        default_skills["Magic"]["Alteration"]["value"] = "test"
-        desired_skills["Magic"]["Alteration"]["value"] = "test"
-        for case in [[{"default_skills": default_skills}, "default_skills"],
-                     [{"desired_skills": desired_skills}, "desired_skills"]]:
-            form = CharacterForm(data=case[0], instance=self.instance)
-            self.check_fail_and_message(form, {case[1]:
-                                               ['All skills values must be integers!']})
+        skills = CharacterService.default_race_skills_update("Nord")
+        skills["Magic"]["Alteration"]["default_value"] = "test"
+        skills["Magic"]["Alteration"]["desired_value"] = "test"
+        form = CharacterForm(data={"skills": skills}, instance=self.instance)
+        self.check_fail_and_message(form, {"skills":
+                                           ['All skills values must be integers!']})
 
     def test_desired_must_be_bigger_than_default(self):
-        default_skills = CharacterService.default_race_skills_update("Nord")
-        desired_skills = CharacterService.default_race_skills_update("Nord")
-        default_skills["Magic"]["Alteration"]["value"] = 55
-        form = CharacterForm(data={"default_skills": default_skills, "desired_skills": desired_skills},
-                             instance=self.instance)
-        self.check_fail_and_message(form, {'__all__': ['New value of skills must be bigger than a value!']})
+        skills = CharacterService.default_race_skills_update("Nord")
+        skills["Magic"]["Alteration"]["default_value"] = 55
+        skills["Magic"]["Alteration"]["desired_value"] = 35
+        form = CharacterForm(data={"skills": skills}, instance=self.instance)
+        self.check_fail_and_message(form, {'skills': ['New value of skills must be bigger than a value!']})
 
-        desired_skills["Magic"]["Alteration"]["value"] = 56
-        form = CharacterForm(data={"default_skills": default_skills, "desired_skills": desired_skills},
-                             instance=self.instance)
+        skills["Magic"]["Alteration"]["desired_value"] = 56
+        form = CharacterForm(data={"skills": skills}, instance=self.instance)
         self.assertTrue(form.is_valid())

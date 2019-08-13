@@ -85,15 +85,15 @@ class CharacterViewTest(TestCase):
         )
         model = Character.objects.first()
         self.assertEqual(
-            model.default_skills["Magic"]["Alteration"]["value"],
+            model.skills["Magic"]["Alteration"]["default_value"],
             35
         )
         self.assertEqual(
-            model.desired_skills["Combat"]["Heavy Armor"]["value"],
+            model.skills["Combat"]["Heavy Armor"]["desired_value"],
             40
         )
         self.assertEqual(
-            model.desired_skills["Magic"]["Alteration"]["value"],
+            model.skills["Magic"]["Alteration"]["desired_value"],
             ""
         )
 
@@ -133,10 +133,11 @@ class ExtractSkillsTest(TestCase):
             "alteration_base": "11",
             "heavyarmor_new": "44",
         }
-        default, desired = extract_skills(post)
+        skills = extract_skills(post)
         self.assertEqual(
-            [default, desired],
-            [{"alteration": "11"}, {"heavyarmor": "44"}]
+            skills,
+            {"default": {"alteration": "11"},
+             "desired": {"heavyarmor": "44"}}
         )
 
 
@@ -145,16 +146,16 @@ class SetSkillsValuesTest(TestCase):
     def test_will_return_two_correct_dicts(self):
         result = CharacterService.default_race_skills_update("Nord")
         dictionary = CharacterService.default_race_skills_update("Nord")
-        set_skills_values({"alteration": 45}, dictionary)
-        result["Magic"]["Alteration"]["value"] = 45
+        set_skills_values({"default": {"alteration": "45"}}, dictionary)
+        result["Magic"]["Alteration"]["default_value"] = "45"
 
         self.assertEqual(dictionary, result)
 
     def test_empty_value_is_set_as_none(self):
         result = CharacterService.default_race_skills_update("Nord")
         dictionary = CharacterService.default_race_skills_update("Nord")
-        set_skills_values({"alteration": ""}, dictionary)
-        result["Magic"]["Alteration"]["value"] = ""
+        set_skills_values({"desired": {"heavyarmor": ""}}, dictionary)
+        result["Magic"]["Alteration"]["desired_value"] = ""
         self.assertEqual(result, dictionary)
 
 

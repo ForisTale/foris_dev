@@ -12,8 +12,8 @@ def character_view(request):
     if request.method == "POST":
         instance = Character.objects.get_or_create(session_key=request.session.session_key)[0]
         if "race" in request.POST:
-            default_skills = CharacterService.default_race_skills_update(request.POST["race"])
-            post = {**unpack_post(request.POST), "default_skills": default_skills}
+            skills = CharacterService.default_race_skills_update(request.POST["race"])
+            post = {**unpack_post(request.POST), "skills": skills}
         else:
             post = correct_post(request.POST, instance.race)
         form = CharacterForm(data=post, instance=instance)
@@ -35,8 +35,7 @@ def unpack_post(post):
 
 
 def extract_skills(post):
-    default = {}
-    desired = {}
+    skills = {"default": {}, "desired": {}}
     keys = []
     keys += post.keys()
     for key in keys:
@@ -46,36 +45,34 @@ def extract_skills(post):
             value = post.pop(key)
             ending = key[spacer_index:]
             if ending == "_base":
-                default[skill] = value
+                skills["default"][skill] = value
             elif ending == "_new":
-                desired[skill] = value
+                skills["desired"][skill] = value
 
-    return default, desired
+    return skills
 
 
 def set_skills_values(skills_value, dictionary):
     for skills in dictionary.values():
         for skill in skills.values():
-            if skill["console_name"] in skills_value.keys():
-                skill_value = skills_value[skill["console_name"]]
-                if skill_value == "":
-                    value = ""
-                else:
-                    value = skill_value
-                skill["value"] = value
+            for kind in skills_value.keys():
+                if skill["console_name"] in skills_value[kind].keys():
+                    skill_value = skills_value[kind][skill["console_name"]]
+                    if skill_value == "":
+                        value = ""
+                    else:
+                        value = skill_value
+                    skill[kind + "_value"] = value
 
 
 def correct_post(post, race):
     unpacked_post = unpack_post(post)
-    default, desired = extract_skills(unpacked_post)
-    default_skills = CharacterService.default_race_skills_update(race)
-    desired_skills = CharacterService.default_race_skills_update(race)
-    set_skills_values(default, default_skills)
-    set_skills_values(desired, desired_skills)
+    skills = extract_skills(unpacked_post)
+    default_race = CharacterService.default_race_skills_update(race)
+    set_skills_values(skills, default_race)
 
     post ={
         **unpacked_post,
-        "default_skills": default_skills,
-        "desired_skills": desired_skills,
+        "skills": default_race,
     }
     return post

@@ -10,20 +10,21 @@ class CharacterServiceTest(TestCase):
     @staticmethod
     def set_up_default_nord():
         skills = copy.deepcopy(DEFAULT_SKILLS)
-        skills["Combat"]["Two-handed"]["value"] += 10
-        skills["Stealth"]["Speech"]["value"] += 5
-        skills["Stealth"]["Light Armor"]["value"] += 5
+        skills["Combat"]["Two-handed"]["default_value"] += 10
+        skills["Stealth"]["Speech"]["default_value"] += 5
+        skills["Stealth"]["Light Armor"]["default_value"] += 5
         for skill in ["Block", "One-handed", "Smithing"]:
-            skills["Combat"][skill]["value"] += 5
+            skills["Combat"][skill]["default_value"] += 5
         return skills
 
     @staticmethod
     def set_up_desire_skills():
-        Character.objects.create(race="Altmer", session_key="key")
+        skills = CharacterService.default_race_skills_update("Altmer")
+        skills["Combat"]["Two-handed"]["desired_value"] = 20
+        skills["Stealth"]["Speech"]["desired_value"] = 20
+        skills["Stealth"]["Light Armor"]["desired_value"] = 20
+        Character.objects.create(race="Altmer", session_key="key", skills=skills)
         character = CharacterService("key")
-        character.desired_skills["Combat"]["Two-handed"]["value"] = 20
-        character.desired_skills["Stealth"]["Speech"]["value"] = 20
-        character.desired_skills["Stealth"]["Light Armor"]["value"] = 20
         return character
 
     def test_can_be_used_to_pass_data(self):
@@ -53,18 +54,15 @@ class CharacterServiceTest(TestCase):
 
     def test_predict_level(self):
         character = self.set_up_desire_skills()
-        level = character.predict_level(
-            character.default_race_skills_update(character.race),
-            character.desired_skills
-        )
+        level = character.desired_level
         self.assertEqual(level, 3)
 
     def test_commands_list(self):
         character = self.set_up_desire_skills()
         commands_list = [
             "player.advskill twohanded 2525",
-            "player.advskill lightarmor 2525",
             "player.advskill speechcraft 2525",
+            "player.advskill lightarmor 2525",
         ]
         self.assertEqual(character.commands_list(), commands_list)
 
@@ -77,20 +75,20 @@ class CharacterServiceTest(TestCase):
     def test_desired_skills_update_return_correct_object(self):
         character = self.set_up_desire_skills()
         self.assertEqual(
-            character.desired_skills["Stealth"]["Speech"]["value"],
+            character.skills["Stealth"]["Speech"]["desired_value"],
             20
         )
 
     def test_empty_character_desired_skills_return_desired_skills_empty_value(self):
         character = CharacterService(session_key="key")
         self.assertEqual(
-            character.desired_skills["Magic"]["Alteration"]["value"],
+            character.skills["Magic"]["Alteration"]["desired_value"],
             ""
         )
 
     def test_desired_level_is_calculated_against_default_skills(self):
         skills = self.set_up_default_nord()
-        skills["Combat"]["One-handed"]["value"] = 35
-        Character.objects.create(session_key="key", default_skills=skills)
+        skills["Combat"]["One-handed"]["desired_value"] = 35
+        Character.objects.create(session_key="key", skills=skills)
         character = CharacterService(session_key="key")
         self.assertEqual(character.desired_level, 4)

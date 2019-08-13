@@ -47,7 +47,7 @@
 
 <form action="{% url 'tec:character' %}" method="post">
     <div class="row">
-        {% for category, category_skills in character.default_skills.items %}
+        {% for category, category_skills in character.skills.items %}
             <div class="col-lg-4">
                 <table class="table table-dark text-info">
                     <thead>
@@ -66,10 +66,12 @@
                             </label></td>
                         <td>{{ skill }}</td>
                         <td id="id_{{ item.console_name}}_value"><label>
-                            <input class="base_values" name="{{ item.console_name }}_base" value="{{ item.value }}">
+                            <input class="base_values" name="{{ item.console_name }}_base"
+                                   value="{{ item.default_value }}">
                         </label></td>
                         <td id="id_{{ item.console_name }}_new_value"><label>
-                            <input class="new_values" name="{{ item.console_name }}_new">
+                            <input class="new_values" name="{{ item.console_name }}_new"
+                                   value="{{ item.desired_value }}">
                         </label></td>
                         </tr>
                     {% endfor %}
