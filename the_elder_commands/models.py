@@ -9,6 +9,7 @@ class Character(models.Model):
     skills = JSONField(default=dict)
     desired_level = models.IntegerField(default=1, null=True)
     priority_multiplier = models.FloatField(default=1.5)
+    fill_skills = models.BooleanField(default=False)
 
     @staticmethod
     def get_absolute_url():

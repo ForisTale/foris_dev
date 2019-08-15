@@ -35,7 +35,7 @@ def unpack_post(post):
 
 
 def extract_skills(post):
-    skills = {"default": {}, "desired": {}}
+    skills = {"default": {}, "desired": {}, "multiplier": {}}
     keys = []
     keys += post.keys()
     for key in keys:
@@ -48,7 +48,8 @@ def extract_skills(post):
                 skills["default"][skill] = value
             elif ending == "_new":
                 skills["desired"][skill] = value
-
+            elif ending == "_multiplier":
+                skills["multiplier"][skill] = True
     return skills
 
 
@@ -58,6 +59,9 @@ def set_skills_values(skills_value, dictionary):
             for kind in skills_value.keys():
                 if skill["console_name"] in skills_value[kind].keys():
                     skill_value = skills_value[kind][skill["console_name"]]
+                    if skill_value is True:
+                        skill["multiplier"] = True
+                        continue
                     if skill_value == "":
                         value = ""
                     else:
@@ -71,7 +75,7 @@ def correct_post(post, race):
     default_race = CharacterService.default_race_skills_update(race)
     set_skills_values(skills, default_race)
 
-    post ={
+    post = {
         **unpacked_post,
         "skills": default_race,
     }

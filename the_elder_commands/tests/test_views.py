@@ -123,6 +123,7 @@ class ExtractSkillsTest(TestCase):
             "item": "item",
             "alteration_base": "11",
             "heavyarmor_new": "44",
+            "alteration_multiplier": "on"
         }
         extract_skills(post)
         self.assertEqual(post, {"item": "item"})
@@ -132,12 +133,14 @@ class ExtractSkillsTest(TestCase):
             "item": "item",
             "alteration_base": "11",
             "heavyarmor_new": "44",
+            "alteration_multiplier": "on",
         }
         skills = extract_skills(post)
         self.assertEqual(
             skills,
             {"default": {"alteration": "11"},
-             "desired": {"heavyarmor": "44"}}
+             "desired": {"heavyarmor": "44"},
+             "multiplier": {"alteration": True}}
         )
 
 
@@ -146,8 +149,9 @@ class SetSkillsValuesTest(TestCase):
     def test_will_return_two_correct_dicts(self):
         result = CharacterService.default_race_skills_update("Nord")
         dictionary = CharacterService.default_race_skills_update("Nord")
-        set_skills_values({"default": {"alteration": "45"}}, dictionary)
+        set_skills_values({"default": {"alteration": "45"}, "priority": {"alteration": True}}, dictionary)
         result["Magic"]["Alteration"]["default_value"] = "45"
+        result["Magic"]["Alteration"]["multiplier"] = True
 
         self.assertEqual(dictionary, result)
 

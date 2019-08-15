@@ -1,6 +1,5 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from the_elder_commands.inventory import DEFAULT_SKILLS
-import time
 
 
 class CharacterTest(FunctionalTest):
@@ -8,6 +7,14 @@ class CharacterTest(FunctionalTest):
         super().setUp()
         # Foris open The elder commands website.
         self.driver.get(self.live_server_url)
+
+    def fill_default_values(self):
+        self.driver.find_element_by_name("sneak_base").clear()
+        self.driver.find_element_by_name("sneak_base").send_keys("30")
+        self.driver.find_element_by_name("smithing_base").clear()
+        self.driver.find_element_by_name("smithing_base").send_keys("22")
+        self.driver.find_element_by_name("marksman_base").clear()
+        self.driver.find_element_by_name("marksman_base").send_keys("26")
 
     def test_default_look_and_values(self):
         # And in title Foris sees website name.
@@ -57,7 +64,11 @@ class CharacterTest(FunctionalTest):
                 )
 
         # There are empty checkboxes next to values
-                self.equal_find_element_by_id(f"id_{items['console_name']}_priority", "")
+                self.assertEqual(
+                    self.driver.find_element_by_name(f"{items['console_name']}_multiplier")
+                        .get_attribute("value"),
+                    "on"
+                )
 
         # and place for skill new value
                 self.assertEqual(
@@ -65,8 +76,8 @@ class CharacterTest(FunctionalTest):
                     ""
                 )
 
-        # Below is adjustment priority
-        self.equal_find_element_by_id("id_priority_multiplier", "")
+        # Below is adjustment multiplier
+        self.equal_find_element_by_id("id_multiplier", "")
 
         # next to it are two boxes with calculated lvl
         self.equal_find_element_by_id("id_calculated_level", "Calculated level: 1")
@@ -125,7 +136,7 @@ class CharacterTest(FunctionalTest):
         self.driver.find_element_by_id("id_calculate").click()
 
         # desired level and calculated level are correct
-        self.wait_for(lambda:self.assertEqual(
+        self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_id("id_calculated_level").text,
             "Calculated level: 4"
         ))
@@ -135,7 +146,71 @@ class CharacterTest(FunctionalTest):
             "8"
         )
 
-    def test_calculate_level(self):
+    def test_set_multiplier_and_desired_level_auto_fill_skills(self):
+        # Foris set some skills multiplier as "on"
+        cases = self.wait_for(lambda: [
+            self.driver.find_element_by_name("block_multiplier"),
+            self.driver.find_element_by_name("illusion_multiplier"),
+            self.driver.find_element_by_name("alchemy_multiplier"),
+        ])
+        for case in cases:
+            case.click()
+
+        # change priority multiplier
+        self.driver.find_element_by_name("priority_multiplier").clear()
+        self.driver.find_element_by_name("priority_multiplier").send_keys("2")
+
+        # put some default values
+        self.fill_default_values()
+
+        # set desired level
+        self.driver.find_element_by_name("desired_level").clear()
+        self.driver.find_element_by_name("desired_level").send_keys("20")
+
+        # and check fill level
+        self.driver.find_element_by_name("fill_skills").click()
+
+        # and then submit form
+        self.driver.find_element_by_id("id_calculate").click()
+
+        # now he sees that desired skills change
+        self.wait_for(lambda: self.assertNotEqual(
+            self.driver.find_element_by_name("sneak_new").get_attribute("value"),
+            ""
+        ))
+
+        # multiplier are still checked
+        cases = self.wait_for(lambda: [
+            self.driver.find_element_by_name("block_multiplier"),
+            self.driver.find_element_by_name("illusion_multiplier"),
+            self.driver.find_element_by_name("alchemy_multiplier"),
+        ])
+        for case in cases:
+            self.wait_for(lambda: self.assertEqual(case.is_selected(), True))
+
+        # and commands list is full of commands
+        list_of_commands = self.driver.find_element_by_id("id_commands_list") \
+            .find_elements_by_tag_name("td")
+        list_of_commands = [row.text for row in list_of_commands]
+        self.assertNotEqual(
+            list_of_commands,
+            []
+        )
+
+    def test_calculate_default_level(self):
+        # Foris set some of default values
+        self.wait_for(lambda: self.fill_default_values())
+        # send form
+        self.driver.find_element_by_id("id_calculate").click()
+        # and default level changed
+        self.wait_for(lambda: self.equal_find_element_by_id("id_calculated_level",
+                                                            "Calculated level: 5"))
+        self.assertEqual(
+            self.driver.find_element_by_id("id_desired_level").get_attribute("value"),
+            "5"
+        )
+
+    def test_calculate_desired_level_and_skills(self):
         # Foris change race to orc
         self.driver.find_element_by_id("id_chose_race").click()
         self.driver.find_element_by_class_name("ork_race").click()
@@ -185,4 +260,3 @@ class CharacterTest(FunctionalTest):
             "player.advskill lightarmor 2525",
         ]
         self.assertEqual(commands, list_of_commands)
-

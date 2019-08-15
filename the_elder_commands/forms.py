@@ -10,12 +10,13 @@ class CharacterForm(forms.models.ModelForm):
         self.fields["skills"].required = False
         self.fields["desired_level"].required = False
         self.fields["priority_multiplier"].required = False
+        self.fields["fill_skills"].required = False
 
     class Meta:
         model = Character
         fields = (
             "race", "skills", "desired_level",
-            "priority_multiplier",
+            "priority_multiplier", "fill_skills",
         )
 
     def clean_desired_level(self):
