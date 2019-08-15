@@ -27,43 +27,36 @@ class CharacterForm(forms.models.ModelForm):
 
     def clean_skills(self):
         form_data = self.cleaned_data["skills"]
-        self.ensure_all_skills_are_integers(form_data)
-        self.check_skills_range(form_data)
-        self.check_desired_is_bigger(form_data)
+        if form_data is not None:
+            for skills in form_data.values():
+                for skill in skills.values():
+                    self.ensure_all_skills_are_integers(skill)
+                    self.check_skills_range(skill)
+                    self.check_desired_is_bigger(skill)
         return form_data
 
     @staticmethod
-    def check_desired_is_bigger(form_data):
-        if form_data is not None:
-            for skills in form_data.values():
-                for skill in skills.values():
-                    if skill["desired_value"] == "":
-                        continue
-                    default_value = skill["default_value"]
-                    if default_value > skill["desired_value"]:
-                        raise forms.ValidationError("New value of skills must be bigger than a value!")
+    def check_desired_is_bigger(skill):
+        if skill["desired_value"] == "":
+            return
+        if skill["default_value"] > skill["desired_value"]:
+            raise forms.ValidationError("New value of skills must be bigger than a value!")
 
     @staticmethod
-    def check_skills_range(form_data):
-        if form_data is not None:
-            for skills in form_data.values():
-                for skill in skills.values():
-                    for kind in ["default", "desired"]:
-                        skill_value = skill[kind + "_value"]
-                        if skill_value == "":
-                            continue
-                        if skill_value < 15 or skill_value > 100:
-                            raise forms.ValidationError("The skill need to be a integer between 15 and 100.")
+    def check_skills_range(skill):
+        for kind in ["default", "desired"]:
+            skill_value = skill[kind + "_value"]
+            if skill_value == "":
+                return
+            if skill_value < 15 or skill_value > 100:
+                raise forms.ValidationError("The skill need to be a integer between 15 and 100.")
 
     @staticmethod
-    def ensure_all_skills_are_integers(skills_dict):
-        if skills_dict is not None:
-            for skills in skills_dict.values():
-                for skill in skills.values():
-                    for kind in ["default", "desired"]:
-                        if skill[kind + "_value"] == "":
-                            continue
-                        try:
-                            skill[kind + "_value"] = int(skill[kind + "_value"])
-                        except ValueError:
-                            raise forms.ValidationError("All skills values must be integers!")
+    def ensure_all_skills_are_integers(skill):
+        for kind in ["default", "desired"]:
+            if skill[kind + "_value"] == "":
+                return
+            try:
+                skill[kind + "_value"] = int(skill[kind + "_value"])
+            except ValueError:
+                raise forms.ValidationError("All skills values must be integers!")
