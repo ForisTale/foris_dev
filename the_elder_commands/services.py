@@ -46,20 +46,6 @@ class CharacterService:
         level = (-2.5 + math.sqrt(8 * total_exp + 1225) / 10)
         return int(level)
 
-    def skills_for_desired_level(self):
-        skills_base = {}
-        for category, skills in self.skills.items():
-            skills_base[category] = {}
-            for name, skill in skills.items():
-                skills_base[category][name] = {}
-                desired_value = self.skills[category][name]["value"]
-                default_value = skill["value"]
-                if desired_value == "":
-                    skills_base[category][name]["value"] = default_value
-                if desired_value:
-                    skills_base[category][name]["value"] = desired_value
-        return skills_base
-
     def predict_desired_level(self, character_model):
         predicted_level = self.predict_level("desired")
         target_level = character_model.desired_level
@@ -79,7 +65,7 @@ class CharacterService:
                     skill = self.skills[category][skill_name]
                     while all_skills[category][skill_name]["value"] >= 1:
                         if skill["desired_value"] == 100:
-                            continue
+                            break
                         if skill["desired_value"] == "":
                             skill["desired_value"] = skill["default_value"] + 1
                         else:
@@ -121,7 +107,9 @@ class CharacterService:
                 default_value = skill["default_value"]
                 if skill["desired_value"] > default_value:
                     for skill_level in range(default_value, skill["desired_value"]):
-                        total_exp += skill["sim"] * (skill_level ** 1.95) + skill["sio"]
-                    commands.append(f"player.advskill {skill['console_name']} {int(total_exp) + 1}")
+                        skill_xp = skill["sim"] * (skill_level ** 1.95) + skill["sio"]
+                        total_exp += skill_xp
+                    skill_command_value = total_exp / skill["sum"]
                     total_exp = 0
+                    commands.append(f"player.advskill {skill['console_name']} {int(skill_command_value) + 1}")
         return commands

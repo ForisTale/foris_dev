@@ -255,8 +255,8 @@ class CharacterTest(FunctionalTest):
             .find_elements_by_tag_name("td")
         list_of_commands = [row.text for row in list_of_commands]
         commands = [
-            "player.advskill alteration 2525",
-            "player.advskill speechcraft 2525",
-            "player.advskill lightarmor 2525",
+            "player.advskill alteration 842",
+            "player.advskill speechcraft 7013",
+            "player.advskill lightarmor 632",
         ]
         self.assertEqual(commands, list_of_commands)

@@ -46,9 +46,9 @@ class CharacterServiceTest(TestCase):
     def test_commands_list(self):
         character = self.set_up_desire_skills()
         commands_list = [
-            "player.advskill twohanded 2525",
-            "player.advskill speechcraft 2525",
-            "player.advskill lightarmor 2525",
+            "player.advskill twohanded 425",
+            "player.advskill speechcraft 7013",
+            "player.advskill lightarmor 632",
         ]
         self.assertEqual(character.commands_list(), commands_list)
 
@@ -126,7 +126,9 @@ class CharacterServiceTest(TestCase):
         model.save()
 
         character = CharacterService(session_key="key")
-        self.assertEqual(
-            character.skills["Magic"]["Alteration"]["desired_value"],
-            100
-        )
+        for skill_type in character.skills:
+            for name in character.skills[skill_type]:
+                self.assertEqual(
+                    character.skills[skill_type][name]["desired_value"],
+                    100
+                )

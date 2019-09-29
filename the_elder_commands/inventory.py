@@ -23,6 +23,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 3,
         },
         "Conjuration":  {
             "console_name": "conjuration",
@@ -31,6 +32,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 2.1,
         },
         "Destruction":  {
             "console_name": "destruction",
@@ -39,6 +41,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 1.35,
         },
         "Enchanting":  {
             "console_name": "enchanting",
@@ -47,6 +50,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 1,
             "sio": 170,
+            "sum": 900,
         },
         "Illusion":  {
             "console_name": "illusion",
@@ -55,6 +59,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 4.6,
         },
         "Restoration":  {
             "console_name": "restoration",
@@ -63,6 +68,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 2,
         },
     },
     "Combat": {
@@ -73,6 +79,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 9.3,
         },
         "Block":  {
             "console_name": "block",
@@ -81,6 +88,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 8.1,
         },
         "Heavy Armor":  {
             "console_name": "heavyarmor",
@@ -89,6 +97,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 3.8,
         },
         "One-handed":  {
             "console_name": "onehanded",
@@ -97,6 +106,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 6.3,
         },
         "Smithing":  {
             "console_name": "smithing",
@@ -105,6 +115,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 0.25,
             "sio": 300,
+            "sum": 1,
         },
         "Two-handed":  {
             "console_name": "twohanded",
@@ -113,6 +124,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 5.95,
         },
     },
     "Stealth": {
@@ -123,6 +135,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 1.6,
             "sio": 65,
+            "sum": 0.75,
         },
         "Light Armor":  {
             "console_name": "lightarmor",
@@ -131,6 +144,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 4,
         },
         "Lockpicking":  {
             "console_name": "lockpicking",
@@ -139,6 +153,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 0.25,
             "sio": 300,
+            "sum": 45,
         },
         "Pickpocket":  {
             "console_name": "pickpocket",
@@ -147,6 +162,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 0.25,
             "sio": 250,
+            "sum": 8.1,
         },
         "Sneak":  {
             "console_name": "sneak",
@@ -155,6 +171,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 0.5,
             "sio": 120,
+            "sum": 11.25,
         },
         "Speech":  {
             "console_name": "speechcraft",
@@ -163,6 +180,7 @@ DEFAULT_SKILLS = {
             "multiplier": False,
             "sim": 2,
             "sio": 0,
+            "sum": 0.36,
         },
     },
 }
