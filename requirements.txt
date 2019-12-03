@@ -1,5 +1,13 @@
 djangorestframework
 django
-gunicorn==19.9.0
+gunicorn
 pyyaml
+# psycopg2 need python 64-bit and postgresql installed
 psycopg2
+
+
+# local requirements:
+# ansible on linux
+# fabric3
+# selenium
+# geckodriver set in PATH
