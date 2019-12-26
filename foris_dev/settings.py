@@ -22,8 +22,8 @@ is_deployed = os.path.exists("./deployment_settings.yaml")
 if is_deployed:
     with open("./deployment_settings.yaml", "r") as settings_file:
         settings = yaml.safe_load(settings_file)
-        SECRET_KEY = settings["DJANGO_SECRET_KEY"]
-        ALLOWED_HOSTS = [settings["SITE_NAME"]]
+    SECRET_KEY = settings["DJANGO_SECRET_KEY"]
+    ALLOWED_HOSTS = [settings["SITE_NAME"]]
     DEBUG = False
 else:
     DEBUG = True
@@ -105,15 +105,15 @@ WSGI_APPLICATION = 'foris_dev.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-if not is_deployed and os.name == "nt":
-    with open("D:/secret.txt") as secret_file:
-        secret = secret_file.readline()
+with open("../.secret") as secret_file:
+    secret = yaml.safe_load(secret_file)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'foris_dev',
         'USER': 'postgres',
-        'PASSWORD': secret.strip(),
+        'PASSWORD': secret["postgresql"],
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -163,12 +163,8 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_HOST_USER = "foris.dev@gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-if is_deployed:
-    with open("../.secret") as secret_file:
-        secret = secret_file.readline()
-    EMAIL_HOST_PASSWORD = secret.strip()
-else:
-    EMAIL_HOST_PASSWORD = ""
+EMAIL_HOST_PASSWORD = secret["email_host_pass"]
+
 
 if is_deployed:
     # security tweaks from:
