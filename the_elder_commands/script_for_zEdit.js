@@ -3,8 +3,7 @@ const itemsSignatures = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH",
                          "MISC", "AMMO", "SCRL", "SLGM", "KEYM"],
     magicSignatures = ["SPEL", "WOOP"];
 let pluginName,
-    //waiting for new version of zEdit for ESL support.
-    isEsl = false,
+    isEsl,
     skyrimAndDlc = ["Skyrim", "Dawnguard", "Dragonborn", "HearthFires"];
 
 
@@ -13,6 +12,10 @@ function processSelectedPlugins(){
         const selectedPluginHandle = selectedPlugin.handle,
             signatures = itemsSignatures.concat(magicSignatures);
         pluginName = selectedPlugin.column_values[0].slice(5, -4);
+        let file = xelib.GetElement(0, selectedPlugin.column_values[0].slice(5)),
+        fileHeader = xelib.GetElement(file, "File Header");
+
+        isEsl = xelib.GetRecordFlag(fileHeader, "ESL");
 
         fh.saveJsonFile(fh.jetpack.cwd() + "\\The_Elder_Commands\\" + pluginName + ".json",
             getSignaturesData(signatures, selectedPluginHandle),
