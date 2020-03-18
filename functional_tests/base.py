@@ -49,7 +49,7 @@ class FunctionalTest(StaticLiveServerTestCase):
             for ix, handle in enumerate(self.driver.window_handles):
                 self._windowid = ix
                 # noinspection PyDeprecation
-                self.driver.switch_to_window(handle)
+                self.driver.switch_to.window(handle)
                 self.take_screenshot()
                 self.dump_html()
         self.driver.quit()
