@@ -108,11 +108,16 @@ WSGI_APPLICATION = 'foris_dev.wsgi.application'
 with open("../.secret") as secret_file:
     secret = yaml.safe_load(secret_file)
 
+if is_deployed:
+    database_name = settings["DATABASE_NAME"]
+else:
+    database_name = "test_database"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'foris_dev',
-        'USER': 'postgres',
+        'NAME': database_name,
+        'USER': secret["user_name"],
         'PASSWORD': secret["postgresql"],
         'HOST': 'localhost',
         'PORT': '5432',
