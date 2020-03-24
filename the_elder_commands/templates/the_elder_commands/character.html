@@ -19,10 +19,10 @@
     <div class="btn-group dropright">
         <button class="btn btn-dark dropdown-toggle text-info" type="button" id="id_chose_race"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Chose Race
+            Reset & Change Race
         </button>
         <div class="dropdown-menu" aria-labelledby="id_chose_race">
-            {% for race in character.playable_races %}
+            {% for race in playable_races %}
                 <form action="{% url 'tec:character' %}" method="post">
                     <button class="dropdown-item {{ race.1 }}" value="{{ race.0 }}" name="race" type="submit">
                         {{ race.0 }}

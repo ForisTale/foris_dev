@@ -1,3 +1,5 @@
+{% load static %}
+{% load tec_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,14 +8,27 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="/static/the_elder_commands/base.css" rel="stylesheet">
+    <link rel="shortcut icon" href=" {% static 'favicon.ico' %}">
     <title>The Elder Commands</title>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
-    <div class="container-fluid">
-         <a class="navbar-brand text-info" href="{% url 'main_page:home' %}">Foris.dev</a>
-    </div>
-</nav>
+
+<ul class="nav nav-pills bg-dark justify-content-around">
+    <li class="nav-item">
+        <a class="nav-link text-info" href="{% url 'main_page:home' %}">Foris.dev</a>
+    </li>
+    {% for category in categories %}
+    <li class="nav-item">
+        {% with "tec:"|addstr:category as address_url %}
+        {% if active == category %}
+            <a class="nav-link active" href="{% url address_url %}">{{ category|title }}</a>
+        {% else %}
+            <a class="nav-link text-info" href="{% url address_url %}">{{ category|title }}</a>
+        {% endif %}
+        {% endwith %}
+    </li>
+    {% endfor %}
+</ul>
 <div class="row" style="height: 10px"></div>
 {% block body %}
 {% endblock %}

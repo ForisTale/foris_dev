@@ -21,7 +21,24 @@ def character_view(request):
             form.save()
             return redirect(instance)
     character = CharacterService(session_key=request.session.session_key)
-    return render(request, "the_elder_commands/character.html", {"character": character, "form": form})
+    return render(request, "the_elder_commands/character.html", {"character": character, "form": form,
+                                                                 "active": "character"})
+
+
+def items_view(request):
+    return render(request, "the_elder_commands/items.html", {"active": "items"})
+
+
+def spells_view(request):
+    return render(request, "the_elder_commands/spells.html", {"active": "spells"})
+
+
+def other_view(request):
+    return render(request, "the_elder_commands/other.html", {"active": "other"})
+
+
+def plugins_view(request):
+    return render(request, "the_elder_commands/plugins.html", {"active": "plugins"})
 
 
 def unpack_post(post):
@@ -32,6 +49,19 @@ def unpack_post(post):
         else:
             corrected[key] = value
     return corrected
+
+
+def correct_post(post, race):
+    unpacked_post = unpack_post(post)
+    skills = extract_skills(unpacked_post)
+    default_race = CharacterService.default_race_skills_update(race)
+    set_skills_values(skills, default_race)
+
+    post = {
+        **unpacked_post,
+        "skills": default_race,
+    }
+    return post
 
 
 def extract_skills(post):
@@ -67,16 +97,3 @@ def set_skills_values(skills_value, dictionary):
                     else:
                         value = skill_value
                     skill[kind + "_value"] = value
-
-
-def correct_post(post, race):
-    unpacked_post = unpack_post(post)
-    skills = extract_skills(unpacked_post)
-    default_race = CharacterService.default_race_skills_update(race)
-    set_skills_values(skills, default_race)
-
-    post = {
-        **unpacked_post,
-        "skills": default_race,
-    }
-    return post
