@@ -1,5 +1,5 @@
 from .models import Character
-from .inventory import PLAYABLE_RACES, DEFAULT_SKILLS, RACES_EXTRA_SKILLS
+from .inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
 import copy
 import math
 
@@ -8,7 +8,6 @@ class CharacterService:
     def __init__(self, session_key):
         character, created = Character.objects.get_or_create(session_key=session_key)
 
-        self.playable_races = PLAYABLE_RACES
         self.race = character.race
         if not character.skills:
             self.skills = self.default_race_skills_update(race=character.race)

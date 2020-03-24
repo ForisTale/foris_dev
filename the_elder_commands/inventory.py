@@ -1,12 +1,16 @@
 
 
-PLAYABLE_RACES = [
-    ["Altmer", "altmer_race"], ["Argonian", "argonian_race"],
-    ["Bosmer", "bosmer_race"], ["Breton", "breton_race"],
-    ["Dunmer", "dunmer_race"], ["Imperial", "imperial_race"],
-    ["Khajiit", "khajiit_race"], ["Nord", "nord_race"],
-    ["Ork", "ork_race"], ["Redguard", "redguard_race"],
-]
+def template_variables(request):
+    return {
+        "playable_races": [
+            ["Altmer", "altmer_race"], ["Argonian", "argonian_race"],
+            ["Bosmer", "bosmer_race"], ["Breton", "breton_race"],
+            ["Dunmer", "dunmer_race"], ["Imperial", "imperial_race"],
+            ["Khajiit", "khajiit_race"], ["Nord", "nord_race"],
+            ["Ork", "ork_race"], ["Redguard", "redguard_race"],
+        ],
+    }
+
 
 SKILLS_CONSOLE_NAME = [
     'alteration', 'conjuration', 'destruction', 'enchanting',
