@@ -132,3 +132,16 @@ class CharacterServiceTest(TestCase):
                     character.skills[skill_type][name]["desired_value"],
                     100
                 )
+
+    def test_desired_level_did_not_have_infinity_loop(self):
+        skills = copy.deepcopy(DEFAULT_SKILLS)
+        categories = ["Magic", "Combat", "Stealth"]
+        skills_categories = [['Alteration', 'Conjuration', 'Destruction', 'Enchanting', 'Illusion', 'Restoration'],
+                             ['Archery', 'Block', 'Heavy Armor', 'One-handed', 'Smithing', 'Two-handed'],
+                             ['Alchemy', 'Light Armor', 'Lockpicking', 'Pickpocket', 'Sneak', 'Speech']]
+        for index in range(3):
+            for skill in skills_categories[index]:
+                skills[categories[index]][skill]["default_value"] = 99
+        Character.objects.update_or_create(session_key="key", skills=skills, desired_level=81, fill_skills=True)
+        CharacterService(session_key="key")
+        self.assertTrue(True, "It's not looping!")

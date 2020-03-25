@@ -50,20 +50,22 @@ class CharacterService:
         target_level = character_model.desired_level
         if target_level <= predicted_level:
             return predicted_level
-        elif not character_model.fill_skills:
-            return predicted_level
-        else:
+        elif character_model.fill_skills:
             return self.set_skills_to_desired_level(character_model)
+        else:
+            return predicted_level
 
     def set_skills_to_desired_level(self, character_model):
         total_exp = self.count_needed_exp(character_model)
         all_skills = self.create_multiplier_skill_template(character_model)
         while total_exp > 0:
+            all_skills_filled = 0
             for category, skills in all_skills.items():
                 for skill_name in skills.keys():
                     skill = self.skills[category][skill_name]
                     while all_skills[category][skill_name]["value"] >= 1:
                         if skill["desired_value"] == 100:
+                            all_skills_filled += 1
                             break
                         if skill["desired_value"] == "":
                             skill["desired_value"] = skill["default_value"] + 1
@@ -72,6 +74,8 @@ class CharacterService:
                         total_exp -= skill["desired_value"]
                         all_skills[category][skill_name]["value"] -= 1
                     all_skills[category][skill_name]["value"] += all_skills[category][skill_name]["multiplier"]
+            if all_skills_filled == 18:
+                break
         return character_model.desired_level
 
     def create_multiplier_skill_template(self, character_model):
