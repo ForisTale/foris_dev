@@ -169,18 +169,26 @@ function getItemDescription(record) {
     const defaultItemDescription = xelib.GetValue(record, "DESC");
     if(defaultItemDescription !== "") return defaultItemDescription;
 
-    let itemMagicEffect = xelib.GetValue(record, "EITM");
+    let itemMagicEffect = xelib.GetValue(record, "EITM"),
+        effects;
     if( itemMagicEffect === "") return "";
 
-    const objectEffectFormID = parseInt(sliceOfItself(itemMagicEffect, ":", "]"), 16),
-        enhanceRecord = xelib.GetRecord(0, objectEffectFormID),
+    const objectEffectString = sliceOfItself(itemMagicEffect, "H:", "]"),
+        objectEffectFormID = parseInt(objectEffectString, 16);
+    if (isNaN(objectEffectFormID)) {
+        effects = [];
+    } else {
+        const enhanceRecord = xelib.GetRecord(0, objectEffectFormID);
         effects = getEffects(enhanceRecord);
+    }
+
 
     return getEffectsDescriptions(effects);
 }
 
 function sliceOfItself(string, startString, endString){
-    return string.slice(string.indexOf(startString) + 1, string.indexOf(endString));
+    const startStringLength = startString.length;
+    return string.slice(string.indexOf(startString) + startStringLength, string.indexOf(endString));
 }
 
 function getEffects(record){
@@ -199,11 +207,10 @@ function getEffects(record){
 function getEffectsDescriptions(effects){
     let description = "";
     for (let effect of effects){
-        const formID = parseInt(sliceOfItself(effect, ":", "]"), 16);
-        //Skyrim.esp has error in spell records, it call to non exist effects, possible cause of crash in game.
-        if (formID === 12) return "";
+        const hexID = sliceOfItself(effect, "F:", "]"),
+            formID = parseInt(hexID, 16),
+            effectRecord = xelib.GetRecord(0, formID);
 
-        const effectRecord = xelib.GetRecord(0, formID);
         description += xelib.GetValue(effectRecord, "DNAM - Magic Item Description");
         description += "|";
     }
