@@ -17,7 +17,7 @@ function processSelectedPlugins(){
 
         isEsl = xelib.GetRecordFlag(fileHeader, "ESL");
 
-        fh.saveJsonFile(fh.jetpack.cwd() + "\\The_Elder_Commands\\" + pluginName + ".json",
+        fh.saveJsonFile(fh.jetpack.cwd() + "\\The_Elder_Commands\\" + pluginName + ".tec",
             getSignaturesData(signatures, selectedPluginHandle),
             false);
     }
@@ -77,12 +77,10 @@ function getCommonData(record){
 }
 
 function getFormId(record){
-    if (skyrimAndDlc.includes(pluginName))
-        return xelib.GetHexFormID(record);
-    else if (isEsl)
-        return "FEXXX" + xelib.GetHexFormID(record).slice(5);
+    if (isEsl)
+        return xelib.GetHexFormID(record).slice(5);
     else
-        return "XX" + xelib.GetHexFormID(record).slice(2);
+        return xelib.GetHexFormID(record).slice(2);
 }
 
 function getItemCommonData(record) {
