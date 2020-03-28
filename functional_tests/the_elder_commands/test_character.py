@@ -9,13 +9,13 @@ class CharacterTest(FunctionalTest):
         self.driver.get(self.live_server_url)
 
     def test_look_and_values(self):
-        # On page he sees "Reset & Change Race" button
+        # On page he sees race button
         self.assertEqual(
             self.driver.find_element_by_tag_name("button").text,
             "Reset & Change Race"
         )
 
-        # with selected Nord.
+        # with selected one.
         self.equal_find_element_by_id("id_race_name", "Chosen race:\nNord")
 
         # There is also skill list category,

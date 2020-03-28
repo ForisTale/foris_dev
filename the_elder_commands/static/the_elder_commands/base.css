@@ -8,7 +8,12 @@ body {
     color: #17a2b8;
 }
 
-input {
+.dropdown-item:hover {
+    background-color: #0f0f0f;
+    color: #17a2b8;
+}
+
+input, .form-control, .form-control:focus {
     background-color: black;
     color: #17a2b8;
 }
@@ -22,4 +27,12 @@ input {
 #id_multiplier {
     height: 25px;
     width: 55px;
+}
+
+.nav.nav-tabs.bg-dark.justify-content-around .nav-item .active {
+background-color: transparent;
+}
+
+.row.row-separator {
+    height: 10px;
 }

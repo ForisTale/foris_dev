@@ -5,7 +5,12 @@
 <div class="col-lg-4">
     {% if form %}
         {% for error in form.errors.values %}
-            <h4>{{ error }}</h4>
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <h4><strong>{{ error }}</strong></h4>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
         {% endfor %}
     {% endif %}
 </div>

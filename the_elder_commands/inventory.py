@@ -9,7 +9,7 @@ def template_variables(request):
             ["Khajiit", "khajiit_race"], ["Nord", "nord_race"],
             ["Ork", "ork_race"], ["Redguard", "redguard_race"],
         ],
-        "categories": ["character", "items", "spells", "other", "plugins"],
+        "categories": ["character", "items", "spells", "other", "plugins", "commands"],
     }
 
 

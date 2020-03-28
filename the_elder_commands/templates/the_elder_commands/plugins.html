@@ -1,1 +1,87 @@
 {% extends "the_elder_commands/base.html" %}
+{% block body %}
+<div class="row">
+<div class="col-12">
+<ul class="nav nav-tabs bg-dark justify-content-around" role="tablist">
+<li class="nav-item">
+    <a class="nav-link text-info active show" data-toggle="tab" id="id_plugins" href="#id_plugins_panel" role="tab"
+       aria-controls="id_plugins_panel" aria-selected="true">Plugins</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link text-info" data-toggle="tab" id="id_add_plugin" href="#id_add_plugin_panel" role="tab"
+       aria-controls="id_add_plugin_panel" aria-selected="true">Add Plugin</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="tab-content">
+    <div class="tab-pane active" id="id_plugins_panel" role="tabpanel" aria-labelledby="id_plugins">
+        <div class="row row-separator"></div>
+        <div class="row">
+            <div class="col-8">
+                <table class="table table-dark text-info" id="id_plugin_table">
+                    <thead>
+                    <tr>
+                        <th>Selected?</th>
+                        <th>Plugin Name</th>
+                        <th>Language and version</th>
+                        <th>Plugin Order</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4">
+                <table class="table table-dark text-info" id="id_selected_plugins_table">
+                    <thead>
+                    <tr>
+                        <th>Selected Plugins:</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane" id="id_add_plugin_panel" role="tabpanel" aria-labelledby="id_add_plugin">
+        <form action="{% url 'tec:plugins' %}" method="post">
+            <div class="row row-separator"></div>
+            <div class="form-row">
+                <div class="col-4 col-lg-2">
+                    <label for="id_plugin_name">Plugin name: </label>
+                    <input id="id_plugin_name" class="form-control" name="plugin_name" required>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <label for="id_plugin_version">Mod version: </label>
+                    <input id="id_plugin_version" class="form-control" name="plugin_version" required>
+                </div>
+                <div class="col-4 col-lg-2">
+                    <label for="id_plugin_language">Select a language: </label>
+                    <select class="form-control" id="id_plugin_language">
+                        <option>English</option>
+                        <option>Polish</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-separator"></div>
+            <div class="form-row">
+                <div class="col-2">
+                    <label for="id_plugin_file">Select .tec file: </label>
+                    <input id="id_plugin_file" name="plugin_file" type="file" class="form-control-file" required>
+                </div>
+                <div class="col-2"></div>
+                <div class="col-2">
+                    <button type="submit" id="id_plugin_submit" class="btn btn-dark text-info">Submit</button>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

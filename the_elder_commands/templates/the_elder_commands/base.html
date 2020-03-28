@@ -12,27 +12,27 @@
     <title>The Elder Commands</title>
 </head>
 <body>
-
+<div class="container-fluid">
 <ul class="nav nav-pills bg-dark justify-content-around">
     <li class="nav-item">
-        <a class="nav-link text-info" href="{% url 'main_page:home' %}">Foris.dev</a>
+        <a class="nav-link header-link text-info " href="{% url 'main_page:home' %}">Foris.dev</a>
     </li>
     {% for category in categories %}
     <li class="nav-item">
         {% with "tec:"|addstr:category as address_url %}
         {% if active == category %}
-            <a class="nav-link active" href="{% url address_url %}">{{ category|title }}</a>
+            <a class="nav-link header-link active" href="{% url address_url %}">{{ category|title }}</a>
         {% else %}
-            <a class="nav-link text-info" href="{% url address_url %}">{{ category|title }}</a>
+            <a class="nav-link header-link text-info" href="{% url address_url %}">{{ category|title }}</a>
         {% endif %}
         {% endwith %}
     </li>
     {% endfor %}
 </ul>
-<div class="row" style="height: 10px"></div>
+<div class="row row-separator"></div>
 {% block body %}
 {% endblock %}
-
+</div>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"

@@ -41,6 +41,10 @@ def plugins_view(request):
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins"})
 
 
+def commands_view(request):
+    return render(request, "the_elder_commands/commands.html", {"active": "commands"})
+
+
 def unpack_post(post):
     corrected = {}
     for key, value in post.items():

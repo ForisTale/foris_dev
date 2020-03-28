@@ -18,13 +18,9 @@ class ItemsTest(FunctionalTest):
         self.assertEqual(self.driver.title, "The Elder Commands")
 
         # Then he sees bar with categories,
-        links = [link.text for link in self.driver.find_elements_by_tag_name("a")]
-        categories = ["Character", "Items", "Spells", "Other", "Plugins"]
-        for category in categories:
-            self.assertIn(
-                category,
-                links
-            )
+        links = [link.text for link in self.driver.find_elements_by_class_name("header-link")]
+        categories = ["Foris.dev", "Character", "Items", "Spells", "Other", "Plugins", "Commands"]
+        self.assertListEqual(links, categories)
 
         # he chose "Items".
         base_url = self.driver.current_url
@@ -42,14 +38,11 @@ class ItemsTest(FunctionalTest):
             self.driver.find_element_by_class_name("active").text
         )
 
-        # there is table to chose plugin.
-
-        # Foris select one of the plugins and press select,
-
-        # and after selecting, table hide under button.
-
-        # Now Foris sees items category he can chose from.
+        # Foris sees items category he can chose from.
 
         # Weapons is selected, Foris change to armors.
 
+        self.fail("Finish test!")
+
+    def test_not_selected_plugins_redirect_to_plugins_page_with_message(self):
         self.fail("Finish test!")
