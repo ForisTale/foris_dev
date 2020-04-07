@@ -84,8 +84,14 @@ function getFormId(record){
 }
 
 function getItemCommonData(record) {
-    if (itsItem(record))
-        return {"Weight": xelib.GetWeight(record), "Value": xelib.GetGoldValue(record)};
+    if (itsItem(record)) {
+        let itemWeight = xelib.GetWeight(record),
+            itemValue = xelib.GetGoldValue(record);
+        if (isNaN(itemWeight)) itemWeight = 0;
+        if (isNaN(itemValue)) itemValue = 0;
+
+        return {"Weight": itemWeight, "Value": itemValue};
+    }
     else return {};
 }
 

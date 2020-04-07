@@ -19,17 +19,19 @@
         <div class="row row-separator"></div>
         <div class="row">
             <div class="col-8">
-                <table class="table table-dark text-info" id="id_plugin_table">
+                <table class="table table-dark text-info" id="id_plugins_table">
                     <thead>
                     <tr>
                         <th>Selected?</th>
                         <th>Plugin Name</th>
-                        <th>Language and version</th>
+                        <th>Version and Language</th>
                         <th>Plugin Order</th>
                     </tr>
                     </thead>
-                    <tbody>
-
+                    <tbody class="plugins_table">
+                    <tr>
+                        <td></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -40,8 +42,10 @@
                         <th>Selected Plugins:</th>
                     </tr>
                     </thead>
-                    <tbody>
-
+                    <tbody class="selected_plugins">
+                    <tr>
+                        <td>Placeholder</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -62,9 +66,9 @@
                 </div>
                 <div class="col-4 col-lg-2">
                     <label for="id_plugin_language">Select a language: </label>
-                    <select class="form-control" id="id_plugin_language">
-                        <option>English</option>
-                        <option>Polish</option>
+                    <select class="form-control" id="id_plugin_language" name="plugin_language">
+                        <option value="english">English</option>
+                        <option value="polish">Polish</option>
                     </select>
                 </div>
             </div>
