@@ -1,12 +1,12 @@
 from django.test import TestCase
-from the_elder_commands.forms import CharacterForm
-from the_elder_commands.models import Character
+from the_elder_commands.forms import CharacterForm, PluginsForm
+from the_elder_commands.models import Character, Plugins
 from the_elder_commands.services import CharacterService
 
 
 class CharacterFormTest(TestCase):
 
-    def test_form_passes_data_to_service(self):
+    def test_form_passes_data_to_model(self):
         instance = Character.objects.get_or_create(session_key="key")[0]
         form = CharacterForm(data={"race": "Nord"}, instance=instance)
         self.assertTrue(form.is_valid())
@@ -78,3 +78,23 @@ class CharacterFormValidationTest(TestCase):
         skills["Magic"]["Alteration"]["desired_value"] = 56
         form = CharacterForm(data={"skills": skills}, instance=self.instance)
         self.assertTrue(form.is_valid())
+
+
+class PluginsFormTest(TestCase):
+
+    def test_form_pass_data_to_model(self):
+        data = {
+            "plugin_name": ["test_01"],
+            "plugin_version": ["0.1"],
+            "plugin_language": ["Polish"],
+            "plugin_data": {"test": 1},
+        }
+        form = PluginsForm(data=data)
+
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(Plugins.objects.count(), 1)
+        self.assertEqual(
+            Plugins.objects.get(plugin_name=["test_01"]),
+            Plugins.objects.all()[0]
+        )

@@ -1,8 +1,11 @@
+from django.forms.models import ModelForm
 from django import forms
-from the_elder_commands.models import Character
+from django.forms import ValidationError
+from the_elder_commands.models import Character, Plugins
+import json
 
 
-class CharacterForm(forms.models.ModelForm):
+class CharacterForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,7 +26,7 @@ class CharacterForm(forms.models.ModelForm):
         form_data = self.cleaned_data["desired_level"]
         if form_data is not None:
             if form_data < 1 or form_data > 81:
-                raise forms.ValidationError("The desired level need to be a integer between 1 and 81.")
+                raise ValidationError("The desired level need to be a integer between 1 and 81.")
         return form_data
 
     def clean_skills(self):
@@ -41,7 +44,7 @@ class CharacterForm(forms.models.ModelForm):
         if skill["desired_value"] == "":
             return
         if skill["default_value"] > skill["desired_value"]:
-            raise forms.ValidationError("New value of skills must be bigger than a value!")
+            raise ValidationError("New value of skills must be bigger than a value!")
 
     @staticmethod
     def check_skills_range(skill):
@@ -50,7 +53,7 @@ class CharacterForm(forms.models.ModelForm):
             if skill_value == "":
                 return
             if skill_value < 15 or skill_value > 100:
-                raise forms.ValidationError("The skill need to be a integer between 15 and 100.")
+                raise ValidationError("The skill need to be a integer between 15 and 100.")
 
     @staticmethod
     def ensure_all_skills_are_integers(skill):
@@ -60,4 +63,10 @@ class CharacterForm(forms.models.ModelForm):
             try:
                 skill[kind + "_value"] = int(skill[kind + "_value"])
             except ValueError:
-                raise forms.ValidationError("All skills values must be integers!")
+                raise ValidationError("All skills values must be integers!")
+
+
+class PluginsForm(ModelForm):
+    class Meta:
+        model = Plugins
+        fields = ("plugin_name", "plugin_version", "plugin_language", "plugin_data")

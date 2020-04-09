@@ -269,7 +269,7 @@ RACES_EXTRA_SKILLS = {
     },
 }
 
-PLUGIN_TEST_FILE = {
+PLUGIN_TEST_FILE = '''{
     "WEAP": [
         {
             "fullName": "Stalowy wielki miecz skwaru",
@@ -481,4 +481,4 @@ PLUGIN_TEST_FILE = {
             "Translation": "Ciało"
         },
     ]
-}
+}'''

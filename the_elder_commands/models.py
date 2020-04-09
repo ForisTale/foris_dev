@@ -15,3 +15,10 @@ class Character(models.Model):
     @staticmethod
     def get_absolute_url():
         return reverse("tec:character")
+
+
+class Plugins(models.Model):
+    plugin_name = models.TextField(default="")
+    plugin_version = models.TextField(default="")
+    plugin_language = models.TextField(default="")
+    plugin_data = JSONField(default=dict)

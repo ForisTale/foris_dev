@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
+from django.http import QueryDict
 from .models import Character
-from .forms import CharacterForm
+from .forms import CharacterForm, PluginsForm
 from .services import CharacterService
 from .inventory import SKILLS_CONSOLE_NAME
+import json
 
 
 def character_view(request):
@@ -15,7 +17,7 @@ def character_view(request):
             skills = CharacterService.default_race_skills_update(request.POST["race"])
             post = {**unpack_post(request.POST), "skills": skills}
         else:
-            post = correct_post(request.POST, instance.race)
+            post = correct_character_post(request.POST, instance.race)
         form = CharacterForm(data=post, instance=instance)
         if form.is_valid():
             form.save()
@@ -38,11 +40,31 @@ def other_view(request):
 
 
 def plugins_view(request):
+    if request.method == "POST":
+        data = correct_add_plugin_post(request)
+        form = PluginsForm(data=data)
+        if form.is_valid():
+            form.save()
+            return redirect("tec:plugins")
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins"})
 
 
 def commands_view(request):
     return render(request, "the_elder_commands/commands.html", {"active": "commands"})
+
+
+def correct_add_plugin_post(request):
+    file_content = extract_dict_from_plugin_file(request)
+    new_post = request.POST.copy()
+    new_post["plugin_data"] = file_content
+    new_post._mutable = False
+    return new_post
+
+
+def extract_dict_from_plugin_file(request):
+    file = request.FILES["plugin_file"]
+    converted_to_dict = json.load(file)
+    return converted_to_dict
 
 
 def unpack_post(post):
@@ -55,17 +77,17 @@ def unpack_post(post):
     return corrected
 
 
-def correct_post(post, race):
+def correct_character_post(post, race):
     unpacked_post = unpack_post(post)
     skills = extract_skills(unpacked_post)
     default_race = CharacterService.default_race_skills_update(race)
     set_skills_values(skills, default_race)
 
-    post = {
-        **unpacked_post,
-        "skills": default_race,
-    }
-    return post
+    new_post = QueryDict("", mutable=True)
+    post = {**unpacked_post, "skills": default_race}
+    new_post.update(post)
+    new_post._mutable = False
+    return new_post
 
 
 def extract_skills(post):

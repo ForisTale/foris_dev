@@ -1,7 +1,11 @@
 from django.test import TestCase
-from the_elder_commands.models import Character
+from django.test.utils import tag
+from django.http import QueryDict
+from the_elder_commands.models import Character, Plugins
 from the_elder_commands.services import CharacterService
 from the_elder_commands.views import extract_skills, set_skills_values, unpack_post
+from the_elder_commands.inventory import ManageTestFiles
+from unittest.mock import patch
 
 SKILL_POST = {
     'alteration_base': "15",
@@ -50,14 +54,13 @@ class CharacterViewTest(TestCase):
         self.assertTemplateUsed(response, "the_elder_commands/character.html")
 
     def test_character_view_use_form(self):
-
         response = self.client.get("/the_elder_commands/")
         self.assertIsInstance(
             response.context["character"],
             CharacterService
         )
 
-    def test_redirect_after_post(self):
+    def test_redirect_after_POST(self):
         response = self.client.post(
             "/the_elder_commands/",
             data={}
@@ -97,7 +100,7 @@ class CharacterViewTest(TestCase):
             ""
         )
 
-    def test_after_send_post_character_give_correct_level(self):
+    def test_after_send_POST_character_give_correct_level(self):
         self.client.post("/the_elder_commands/", data={"race": "Ork"})
         data = SKILL_POST.copy()
         data["twohanded_new"] = ["21"]
@@ -123,9 +126,75 @@ class ItemsViewTest(TestCase):
         self.assertTemplateUsed(response, "the_elder_commands/items.html")
 
 
+class PluginsViewTest(TestCase, ManageTestFiles):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ManageTestFiles.__init__(self)
+
+    def setUp(self):
+        super().setUp()
+        data = {"TEC_test_file.tec": '{"test": 1}'}
+        if self.check_test_tag("create_test_file"):
+            self.create_test_files(data)
+
+    def tearDown(self):
+        self.delete_test_files()
+        super().tearDown()
+
+    def send_default_post_and_return_response(self):
+        with open(self.test_files_full_path[0], "r") as file:
+            data = {
+                "plugin_name": ["test 01"],
+                "plugin_version": ["0.1"],
+                "plugin_language": ["Polish"],
+                "plugin_file": file,
+            }
+            return self.client.post("/the_elder_commands/plugins/", data=data)
+
+    def test_plugins_use_template(self):
+        response = self.client.get("/the_elder_commands/plugins/")
+        self.assertTemplateUsed(response, "the_elder_commands/plugins.html")
+
+    @tag("create_test_file")
+    def test_plugins_redirect_after_POST(self):
+        response = self.send_default_post_and_return_response()
+        self.assertRedirects(response, "/the_elder_commands/plugins/")
+
+    @tag("create_test_file")
+    def test_pass_POST_to_form(self):
+        self.send_default_post_and_return_response()
+
+        model = Plugins.objects.first()
+
+        cases = {
+                "plugin_name": "test 01",
+                "plugin_version": "0.1",
+                "plugin_language": "Polish",
+                "plugin_data": {"test": 1},
+            }
+        for field, desired_result in cases.items():
+            self.assertEqual(
+                model.__getattribute__(field),
+                desired_result
+            )
+
+    @tag("create_test_file")
+    @patch("the_elder_commands.views.PluginsForm")
+    def test_file_is_changed_to_dict_before_pass_POST_to_form(self, form_mock):
+        self.send_default_post_and_return_response()
+
+        expected = QueryDict("", mutable=True)
+        expected.update({
+            'plugin_name': 'test 01', 'plugin_version': '0.1',
+            'plugin_language': 'Polish', 'plugin_data': {'test': 1}
+        })
+        form_mock.assert_called_once()
+        form_mock.assert_called_with(data=expected)
+
+
 class ExtractSkillsTest(TestCase):
 
-    def test_will_extract_data_from_post(self):
+    def test_will_extract_data_from_POST(self):
         post = {
             "item": "item",
             "alteration_base": "11",

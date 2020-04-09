@@ -53,7 +53,7 @@
     </div>
 
     <div class="tab-pane" id="id_add_plugin_panel" role="tabpanel" aria-labelledby="id_add_plugin">
-        <form action="{% url 'tec:plugins' %}" method="post">
+        <form action="{% url 'tec:plugins' %}" method="post" enctype="multipart/form-data">
             <div class="row row-separator"></div>
             <div class="form-row">
                 <div class="col-4 col-lg-2">
