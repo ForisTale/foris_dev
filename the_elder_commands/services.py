@@ -1,4 +1,4 @@
-from .models import Character
+from .models import Character, Plugins
 from .inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
 import copy
 import math
@@ -116,3 +116,24 @@ class CharacterService:
                     total_exp = 0
                     commands.append(f"player.advskill {skill['console_name']} {int(skill_command_value) + 1}")
         return commands
+
+
+class PluginsService:
+    def __init__(self, request):
+        self.request = request
+        self.all_plugins = self.get_all_plugins()
+
+    def get_all_plugins(self):
+        all_plugins = []
+        for plugin in Plugins.objects.all():
+            plugin_data = {
+                "plugin_name": plugin.plugin_name,
+                "plugin_version": plugin.plugin_version,
+                "plugin_language": plugin.plugin_language,
+                "plugin_data": plugin.plugin_data,
+                "plugin_selected": self.request.session.get(plugin.plugin_name, ""),
+                "plugin_load_order": self.request.session.get(plugin.plugin_name, "")
+            }
+            all_plugins.append(plugin_data)
+
+        return all_plugins

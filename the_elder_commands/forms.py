@@ -1,8 +1,7 @@
 from django.forms.models import ModelForm
-from django import forms
-from django.forms import ValidationError
+from django.forms import ValidationError, FileInput
 from the_elder_commands.models import Character, Plugins
-import json
+from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE
 
 
 class CharacterForm(ModelForm):
@@ -66,7 +65,22 @@ class CharacterForm(ModelForm):
                 raise ValidationError("All skills values must be integers!")
 
 
-class PluginsForm(ModelForm):
+class AddPluginsForm(ModelForm):
     class Meta:
         model = Plugins
-        fields = ("plugin_name", "plugin_version", "plugin_language", "plugin_data")
+        fields = ("plugin_name", "plugin_usable_name", "plugin_version", "plugin_language", "plugin_data")
+        error_messages = {
+            "plugin_data": {"required": ADD_PLUGIN_FILE_ERROR_MESSAGE}
+        }
+
+    def clean_plugin_data(self):
+        plugin_keys = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH", "MISC",
+                       "AMMO", "SCRL", "SLGM", "KEYM", "SPEL", "WOOP"]
+        form_data = self.cleaned_data["plugin_data"]
+        data_keys = form_data.keys()
+
+        if set(plugin_keys).symmetric_difference(data_keys):
+            raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+
+        return form_data
+

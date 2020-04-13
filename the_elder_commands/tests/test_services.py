@@ -1,6 +1,6 @@
 from django.test import TestCase
-from the_elder_commands.models import Character
-from the_elder_commands.services import CharacterService
+from the_elder_commands.models import Character, Plugins
+from the_elder_commands.services import CharacterService, PluginsService
 from the_elder_commands.inventory import DEFAULT_SKILLS
 import copy
 
@@ -145,3 +145,42 @@ class CharacterServiceTest(TestCase):
         Character.objects.update_or_create(session_key="key", skills=skills, desired_level=81, fill_skills=True)
         CharacterService(session_key="key")
         self.assertTrue(True, "It's not looping!")
+
+
+class PluginsServiceTest(TestCase):
+
+    def test_get_all_plugins_return_all_plugins_from_database(self):
+        for index in range(3):
+            data = {
+                "name": "test 0" + str(index),
+                "version": "0." + str(index),
+                "language": "English",
+                "data": {"test": index}
+            }
+            Plugins.objects.create(
+                plugin_name=data["name"],
+                plugin_version=data["version"],
+                plugin_language=data["language"],
+                plugin_data=data["data"]
+            )
+
+        class Request:
+            def __init__(self):
+                self.session = {}
+
+        plugin_service = PluginsService(request=Request())
+        all_plugins = plugin_service.get_all_plugins()
+        self.assertEqual(len(all_plugins), 3)
+
+        for index in range(3):
+            self.assertEqual(
+                all_plugins[index],
+                {
+                    "plugin_name": "test 0" + str(index),
+                    "plugin_version": "0." + str(index),
+                    "plugin_language": "English",
+                    "plugin_data": {"test": index},
+                    "plugin_selected": "",
+                    "plugin_load_order": "",
+                }
+            )

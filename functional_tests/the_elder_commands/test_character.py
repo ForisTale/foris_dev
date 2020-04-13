@@ -8,6 +8,14 @@ class CharacterTest(FunctionalTest):
         # Foris open The elder commands website.
         self.driver.get(self.live_server_url)
 
+    def fill_default_values(self):
+        self.driver.find_element_by_name("sneak_base").clear()
+        self.driver.find_element_by_name("sneak_base").send_keys("30")
+        self.driver.find_element_by_name("smithing_base").clear()
+        self.driver.find_element_by_name("smithing_base").send_keys("22")
+        self.driver.find_element_by_name("marksman_base").clear()
+        self.driver.find_element_by_name("marksman_base").send_keys("26")
+
     def test_look_and_values(self):
         # On page he sees race button
         self.assertEqual(
@@ -83,14 +91,6 @@ class CharacterTest(FunctionalTest):
         # There is also empty commands lists column.
         self.equal_find_element_by_id("id_commands_list", "Commands List:")
 
-    def fill_default_values(self):
-        self.driver.find_element_by_name("sneak_base").clear()
-        self.driver.find_element_by_name("sneak_base").send_keys("30")
-        self.driver.find_element_by_name("smithing_base").clear()
-        self.driver.find_element_by_name("smithing_base").send_keys("22")
-        self.driver.find_element_by_name("marksman_base").clear()
-        self.driver.find_element_by_name("marksman_base").send_keys("26")
-
     def test_validation(self):
         # Then Foris write some letters into skills
         self.driver.find_element_by_name("block_base").send_keys("dfsds")
@@ -144,7 +144,7 @@ class CharacterTest(FunctionalTest):
         )
 
     def test_set_multiplier_and_desired_level_auto_fill_skills(self):
-        # Foris set some skills multiplier as "on"
+        # Foris set some skills multiplier as checked
         cases = self.wait_for(lambda: [
             self.driver.find_element_by_name("block_multiplier"),
             self.driver.find_element_by_name("illusion_multiplier"),

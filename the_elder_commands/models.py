@@ -19,6 +19,7 @@ class Character(models.Model):
 
 class Plugins(models.Model):
     plugin_name = models.TextField(default="")
+    plugin_usable_name = models.TextField(default="")
     plugin_version = models.TextField(default="")
     plugin_language = models.TextField(default="")
     plugin_data = JSONField(default=dict)

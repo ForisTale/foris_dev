@@ -1,7 +1,9 @@
 from django.test import TestCase
-from the_elder_commands.forms import CharacterForm, PluginsForm
+from django.http import QueryDict
+from the_elder_commands.forms import CharacterForm, AddPluginsForm
 from the_elder_commands.models import Character, Plugins
 from the_elder_commands.services import CharacterService
+from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_DICT
 
 
 class CharacterFormTest(TestCase):
@@ -84,17 +86,49 @@ class PluginsFormTest(TestCase):
 
     def test_form_pass_data_to_model(self):
         data = {
-            "plugin_name": ["test_01"],
+            "plugin_name": ["test 01"],
+            "plugin_usable_name": ["test_01"],
             "plugin_version": ["0.1"],
             "plugin_language": ["Polish"],
-            "plugin_data": {"test": 1},
+            "plugin_data": PLUGIN_TEST_DICT,
         }
-        form = PluginsForm(data=data)
+        form = AddPluginsForm(data=data)
 
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(Plugins.objects.count(), 1)
         self.assertEqual(
-            Plugins.objects.get(plugin_name=["test_01"]),
+            Plugins.objects.get(plugin_usable_name=["test_01"]),
             Plugins.objects.all()[0]
+        )
+
+
+class PluginFormValidationTest(TestCase):
+    def setUp(self):
+        empty_dict = QueryDict("", mutable=True)
+        self.data = empty_dict.copy()
+        self.data.update({
+            "plugin_name": ["test 01"],
+            "plugin_usable_name": ["test_01"],
+            "plugin_version": ["0.1"],
+            "plugin_language": ["Polish"],
+        })
+
+    def test_plugin_data_do_not_take_empty_dict(self):
+        self.data["plugin_data"] = {}
+        form = AddPluginsForm(data=self.data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors,
+            {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
+        )
+
+    def test_plugin_data_have_correct_structure(self):
+        self.data["plugin_data"] = {"test": 1}
+
+        form = AddPluginsForm(data=self.data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors,
+            {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
         )

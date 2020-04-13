@@ -2,9 +2,10 @@ from django.test import TestCase
 from django.test.utils import tag
 from django.http import QueryDict
 from the_elder_commands.models import Character, Plugins
-from the_elder_commands.services import CharacterService
-from the_elder_commands.views import extract_skills, set_skills_values, unpack_post
-from the_elder_commands.inventory import ManageTestFiles
+from the_elder_commands.services import CharacterService, PluginsService
+from the_elder_commands.views import extract_skills, set_skills_values, unpack_post, get_usable_name
+from the_elder_commands.inventory import ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
+    PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE
 from unittest.mock import patch
 
 SKILL_POST = {
@@ -53,7 +54,7 @@ class CharacterViewTest(TestCase):
         response = self.client.get("/the_elder_commands/")
         self.assertTemplateUsed(response, "the_elder_commands/character.html")
 
-    def test_character_view_use_form(self):
+    def test_character_view_use_service(self):
         response = self.client.get("/the_elder_commands/")
         self.assertIsInstance(
             response.context["character"],
@@ -133,18 +134,20 @@ class PluginsViewTest(TestCase, ManageTestFiles):
 
     def setUp(self):
         super().setUp()
-        data = {"TEC_test_file.tec": '{"test": 1}'}
+        data = {"TEC_test_file.tec": PLUGIN_TEST_FILE}
         if self.check_test_tag("create_test_file"):
             self.create_test_files(data)
+        elif self.check_test_tag("create_incorrect_file"):
+            self.create_test_files({"TEC_test_file.ini": {"test": 1}})
 
     def tearDown(self):
         self.delete_test_files()
         super().tearDown()
 
     def send_default_post_and_return_response(self):
-        with open(self.test_files_full_path[0], "r") as file:
+        with open(self.test_files_full_path[0], "r", encoding="utf-8") as file:
             data = {
-                "plugin_name": ["test 01"],
+                "plugin_name": ["test 01'5<>(){}[]a'n\"*"],
                 "plugin_version": ["0.1"],
                 "plugin_language": ["Polish"],
                 "plugin_file": file,
@@ -154,6 +157,48 @@ class PluginsViewTest(TestCase, ManageTestFiles):
     def test_plugins_use_template(self):
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertTemplateUsed(response, "the_elder_commands/plugins.html")
+
+    @tag("create_test_file")
+    def test_view_pass_plugins(self):
+        self.send_default_post_and_return_response()
+        response = self.client.get("/the_elder_commands/plugins/")
+        self.assertEqual(
+            "test 01'5<>(){}[]a'n\"*",
+            response.context["plugins"][0].get("plugin_name", "")
+        )
+
+    @tag("create_test_file")
+    def test_view_pass_messages(self):
+        response = self.client.get("/the_elder_commands/plugins/")
+        self.assertEqual(
+            response.context.get("add_plugin_messages"),
+            []
+        )
+        self.send_default_post_and_return_response()
+        response = self.client.get("/the_elder_commands/plugins/")
+        self.assertEqual(
+            response.context["add_plugin_messages"],
+            [ADD_PLUGIN_SUCCESS_MESSAGE]
+        )
+
+    @tag("create_incorrect_file")
+    def test_view_show_error_message(self):
+        response = self.send_default_post_and_return_response()
+        self.client.get("/the_elder_commands/plugins/")
+        self.assertEqual(
+            response.context["add_plugin_messages"],
+            [ADD_PLUGIN_FILE_ERROR_MESSAGE]
+        )
+
+    @tag("create_test_file")
+    def test_success_message_dont_show_after_reload(self):
+        self.send_default_post_and_return_response()
+        self.client.get("/the_elder_commands/plugins/")
+        response = self.client.get("/the_elder_commands/plugins/")
+        self.assertEqual(
+            response.context["add_plugin_messages"],
+            []
+        )
 
     @tag("create_test_file")
     def test_plugins_redirect_after_POST(self):
@@ -167,10 +212,11 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         model = Plugins.objects.first()
 
         cases = {
-                "plugin_name": "test 01",
-                "plugin_version": "0.1",
-                "plugin_language": "Polish",
-                "plugin_data": {"test": 1},
+            "plugin_name": "test 01'5<>(){}[]a'n\"*",
+            "plugin_usable_name": "test_015an",
+            "plugin_version": "0.1",
+            "plugin_language": "Polish",
+            "plugin_data": PLUGIN_TEST_DICT,
             }
         for field, desired_result in cases.items():
             self.assertEqual(
@@ -179,14 +225,14 @@ class PluginsViewTest(TestCase, ManageTestFiles):
             )
 
     @tag("create_test_file")
-    @patch("the_elder_commands.views.PluginsForm")
+    @patch("the_elder_commands.views.AddPluginsForm")
     def test_file_is_changed_to_dict_before_pass_POST_to_form(self, form_mock):
         self.send_default_post_and_return_response()
 
         expected = QueryDict("", mutable=True)
         expected.update({
-            'plugin_name': 'test 01', 'plugin_version': '0.1',
-            'plugin_language': 'Polish', 'plugin_data': {'test': 1}
+            'plugin_name': 'test 01\'5<>(){}[]a\'n\"*', 'plugin_version': '0.1',
+            'plugin_language': 'Polish', 'plugin_data': PLUGIN_TEST_DICT, "plugin_usable_name": "test_015an"
         })
         form_mock.assert_called_once()
         form_mock.assert_called_with(data=expected)
@@ -254,3 +300,11 @@ class UnpackPOSTTest(TestCase):
             "multi_items": ["one", "two"],
         }
         self.assertEqual(result, expected)
+
+
+class GetUsableNameTest(TestCase):
+
+    def test_return_correct_name(self):
+        raw_name = "Test 5'a <>[]{}()!@#$%^&*sony\"\' raw **"
+        corrected_name = get_usable_name(raw_name)
+        self.assertEqual(corrected_name, "test_5a_sony_raw_")

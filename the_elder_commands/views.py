@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import QueryDict
 from .models import Character
-from .forms import CharacterForm, PluginsForm
-from .services import CharacterService
-from .inventory import SKILLS_CONSOLE_NAME
+from .forms import CharacterForm, AddPluginsForm
+from .services import CharacterService, PluginsService
+from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE
 import json
 
 
@@ -40,13 +40,26 @@ def other_view(request):
 
 
 def plugins_view(request):
+    if "add_plugin_messages" in request.session:
+        add_plugin_messages, request.session["add_plugin_messages"] = request.session["add_plugin_messages"], []
+    else:
+        request.session["add_plugin_messages"] = []
+        add_plugin_messages = []
+
     if request.method == "POST":
         data = correct_add_plugin_post(request)
-        form = PluginsForm(data=data)
+        form = AddPluginsForm(data=data)
         if form.is_valid():
             form.save()
+            request.session["add_plugin_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
             return redirect("tec:plugins")
-    return render(request, "the_elder_commands/plugins.html", {"active": "plugins"})
+        else:
+            for errors in form.errors.values():
+                add_plugin_messages = [*add_plugin_messages, *errors]
+
+    plugins = PluginsService(request)
+    return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "plugins": plugins.all_plugins,
+                                                               "add_plugin_messages": add_plugin_messages})
 
 
 def commands_view(request):
@@ -57,13 +70,30 @@ def correct_add_plugin_post(request):
     file_content = extract_dict_from_plugin_file(request)
     new_post = request.POST.copy()
     new_post["plugin_data"] = file_content
+    new_post["plugin_usable_name"] = get_usable_name(new_post["plugin_name"])
     new_post._mutable = False
     return new_post
 
 
+def get_usable_name(raw_name):
+    converted = ""
+    for letter in raw_name:
+        if letter == " ":
+            converted += "_"
+        elif letter.isalnum():
+            converted += letter.lower()
+        else:
+            converted += ""
+    return converted
+
+
 def extract_dict_from_plugin_file(request):
     file = request.FILES["plugin_file"]
-    converted_to_dict = json.load(file)
+    try:
+        converted_to_dict = json.load(file)
+    except json.decoder.JSONDecodeError as e:
+        print("JSON error in view: ", e.msg)
+        return {}
     return converted_to_dict
 
 
@@ -84,8 +114,7 @@ def correct_character_post(post, race):
     set_skills_values(skills, default_race)
 
     new_post = QueryDict("", mutable=True)
-    post = {**unpacked_post, "skills": default_race}
-    new_post.update(post)
+    new_post.update({**unpacked_post, "skills": default_race})
     new_post._mutable = False
     return new_post
 
