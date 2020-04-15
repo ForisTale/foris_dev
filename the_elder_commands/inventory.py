@@ -43,8 +43,14 @@ ADD_PLUGIN_SUCCESS_MESSAGE = "Plugin was successfully added to database."
 
 ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 
-ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "This plugin exist in database. " \
-                                      "\nPlease check if version and language is set correctly."
+ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Plugin version, Plugin language and " \
+                                        "Plugin instance already exists."
+
+PLUGINS_ERROR_NOT_STRING = "Name is not a string!"
+
+PLUGINS_ERROR_STRING_IS_EMTPY = "Name cannot be empty!"
+
+PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"
 
 SKILLS_CONSOLE_NAME = [
     'alteration', 'conjuration', 'destruction', 'enchanting',
@@ -701,4 +707,19 @@ PLUGIN_TEST_DICT = {
             "Translation": "Ciało"
         }
     ]
+}
+
+PLUGIN_TEST_SIMPLE_DICT = {
+    "WEAP": [],
+    "ARMO": [],
+    "BOOK": [],
+    "INGR": [],
+    "ALCH": [],
+    "MISC": [],
+    "AMMO": [],
+    "SCRL": [],
+    "SLGM": [],
+    "KEYM": [],
+    "SPEL": [],
+    "WOOP": []
 }

@@ -35,6 +35,7 @@
     <div class="tab-pane active" id="id_plugins_panel" role="tabpanel" aria-labelledby="id_plugins">
         <div class="row row-separator"></div>
         <div class="row">
+        <form action="{% url "tec:plugins" %}" method="post">
             <div class="col-8">
                 <table class="table table-dark text-info" id="id_plugins_table">
                     <thead>
@@ -47,22 +48,35 @@
                     </thead>
                     <tbody class="plugins_table">
                     {% for plugin in plugins %}
+                    {% with plugin|get_item:"usable_name" as usable_name %}
                     <tr>
                         <td>
-                            <label><input type="checkbox" name="mod_selected"
-                                          value="{{ plugin|get_item:'plugin_selected' }}"></label>
+                            <label><input type="checkbox" name="{{ usable_name }}_selected"
+                                          {% if plugin|get_item:"selected" %}checked{% endif %}></label>
                         </td>
-                        <td>{{ plugin|get_item:"plugin_name" }}</td>
-                        <td>{{ plugin|get_item:"plugin_version" }} {{ plugin|get_item:"plugin_language"|capfirst }}</td>
+                        <td>{{ plugin|get_item:"name" }}</td>
+                        <td><label for="id_{{ usable_name }}_variant"></label>
+                            <select class="form-control" id="id_{{ usable_name }}_variant"
+                                    name="{{ usable_name }}_variant">
+                                {% for variant in plugin|get_item:"variants" %}
+                                <option value="{{ variant|get_item:"version" }};{{ variant|get_item:"language" }}">
+                                    {{ variant|get_item:"version" }} {{ variant|get_item:"language"|capfirst }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
                         <td>
-                            <label for="id_mod_plugin_order"><input type="text" name="mod_plugin_order"
-                                                            value="{{ plugin|get_item:'plugin_load_order' }}"></label>
+                            <label for="id_{{ usable_name }}_plugin_order">
+                                <input type="text" name="{{ usable_name }}_plugin_order"
+                                       value="{{ plugin|get_item:"load_order" }}">
+                            </label>
                         </td>
                     </tr>
+                    {% endwith %}
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+        </form>
             <div class="col-4">
                 <table class="table table-dark text-info" id="id_selected_plugins_table">
                     <thead>
@@ -81,7 +95,7 @@
     </div>
 
     <div class="tab-pane" id="id_add_plugin_panel" role="tabpanel" aria-labelledby="id_add_plugin">
-        <form action="{% url 'tec:plugins' %}" method="post" enctype="multipart/form-data">
+        <form id="id_add_plugin_form" action="{% url 'tec:plugins' %}" method="post" enctype="multipart/form-data">
             <div class="row row-separator"></div>
             <div class="form-row">
                 <div class="col-4 col-lg-2">

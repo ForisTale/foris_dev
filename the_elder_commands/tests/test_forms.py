@@ -1,9 +1,11 @@
 from django.test import TestCase
 from django.http import QueryDict
-from the_elder_commands.forms import CharacterForm, AddPluginsForm
-from the_elder_commands.models import Character, Plugins
+from the_elder_commands.forms import CharacterForm, PluginsForm, PluginVariantsForm
+from the_elder_commands.models import Character, Plugins, PluginVariants
 from the_elder_commands.services import CharacterService
-from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_DICT
+from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_SIMPLE_DICT, \
+    PLUGINS_ERROR_NOT_STRING, PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
+    ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
 
 
 class CharacterFormTest(TestCase):
@@ -85,50 +87,133 @@ class CharacterFormValidationTest(TestCase):
 class PluginsFormTest(TestCase):
 
     def test_form_pass_data_to_model(self):
-        data = {
-            "plugin_name": ["test 01"],
-            "plugin_usable_name": ["test_01"],
-            "plugin_version": ["0.1"],
-            "plugin_language": ["Polish"],
-            "plugin_data": PLUGIN_TEST_DICT,
-        }
-        form = AddPluginsForm(data=data)
-
+        form = PluginsForm(plugin_name="test 01")
         self.assertTrue(form.is_valid())
-        form.save()
+
         self.assertEqual(Plugins.objects.count(), 1)
         self.assertEqual(
-            Plugins.objects.get(plugin_usable_name=["test_01"]),
+            Plugins.objects.get(plugin_name="test 01"),
             Plugins.objects.all()[0]
         )
 
+    def test_form_clean_name_and_create_usable_name_from_name(self):
+        form = PluginsForm(plugin_name="Test 5'a <>[]{}()!@#$%^&*sony\"\' raw **")
+        self.assertTrue(form.is_valid())
+
+        plugins = Plugins.objects.first()
+        self.assertEqual(plugins.plugin_name, "Test 5a sony raw ")
+        self.assertEqual(plugins.plugin_usable_name, "test_5a_sony_raw_")
+
+    def test_plugin_name_must_be_string(self):
+        form = PluginsForm(plugin_name=1)
+        self.assertEqual(len(Plugins.objects.all()), 0)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors[0], PLUGINS_ERROR_NOT_STRING)
+
+        form = PluginsForm(plugin_name=None)
+        self.assertEqual(len(Plugins.objects.all()), 0)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors[0], PLUGINS_ERROR_NOT_STRING)
+
+    def test_plugin_name_cannot_be_empty_string(self):
+        form = PluginsForm(plugin_name="")
+        self.assertEqual(len(Plugins.objects.all()), 0)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors[0], PLUGINS_ERROR_STRING_IS_EMTPY)
+
+    def test_after_clean_name_and_usable_name_cannot_be_empty(self):
+        form = PluginsForm(plugin_name="## #$")
+        self.assertEqual(len(Plugins.objects.all()), 0)
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors[0], PLUGINS_ERROR_NAME_BECOME_EMPTY)
+
 
 class PluginFormValidationTest(TestCase):
+
     def setUp(self):
         empty_dict = QueryDict("", mutable=True)
         self.data = empty_dict.copy()
-        self.data.update({
-            "plugin_name": ["test 01"],
-            "plugin_usable_name": ["test_01"],
-            "plugin_version": ["0.1"],
-            "plugin_language": ["Polish"],
-        })
+        self.data.update({"plugin": {
+            "plugin_name": "test 01",
+        }})
+        self.data.update({"variant": {
+            "plugin_version": "0.1",
+            "plugin_language": "Polish",
+            "plugin_data": PLUGIN_TEST_SIMPLE_DICT,
+        }})
+
+    def count_plugins_or_variants(self, amount, plugins=True):
+        form = PluginsForm(plugin_name=self.data["plugin"]["plugin_name"])
+        self.assertTrue(form.is_valid())
+
+        variant = PluginVariantsForm(data=self.data["variant"], plugin_instance=form.plugin_instance)
+        variant.save()
+        if plugins:
+            self.assertEqual(len(Plugins.objects.all()), amount)
+        else:
+            self.assertEqual(len(Plugins.objects.all()), 1)
+            self.assertEqual(len(PluginVariants.objects.filter(plugin_instance=form.plugin_instance)), amount)
 
     def test_plugin_data_do_not_take_empty_dict(self):
-        self.data["plugin_data"] = {}
-        form = AddPluginsForm(data=self.data)
-        self.assertFalse(form.is_valid())
+        self.data["variant"]["plugin_data"] = {}
+        form = PluginsForm(plugin_name=self.data["plugin"]["plugin_name"])
+        self.assertTrue(form.is_valid())
+
+        variant_form = PluginVariantsForm(data=self.data["variant"], plugin_instance=form.plugin_instance)
+        self.assertFalse(variant_form.is_valid())
         self.assertEqual(
-            form.errors,
+            variant_form.errors,
             {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
         )
 
     def test_plugin_data_have_correct_structure(self):
-        self.data["plugin_data"] = {"test": 1}
+        self.data["variant"]["plugin_data"] = {"test": 1}
 
-        form = AddPluginsForm(data=self.data)
-        self.assertFalse(form.is_valid())
+        form = PluginsForm(plugin_name=self.data["plugin"]["plugin_name"])
+        variant_form = PluginVariantsForm(data=self.data["variant"], plugin_instance=form.plugin_instance)
+        self.assertFalse(variant_form.is_valid())
         self.assertEqual(
-            form.errors,
+            variant_form.errors,
             {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
         )
+
+    def test_unique_version_language_returns_correct_error(self):
+        plugin = Plugins.objects.create(plugin_name="test", plugin_usable_name="test")
+        plugin.save()
+
+        form = PluginVariantsForm(plugin_instance=plugin, data=self.data["variant"])
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        other_form = PluginVariantsForm(plugin_instance=plugin, data=self.data["variant"])
+        self.assertFalse(other_form.is_valid())
+        self.assertEqual(other_form.errors["__all__"], [ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE])
+
+        plugin = Plugins.objects.create(plugin_name="test 02", plugin_usable_name="test")
+        another_form = PluginVariantsForm(plugin_instance=plugin, data=self.data["variant"])
+        self.assertTrue(another_form.is_valid())
+
+    def test_form_create_new_plugin_only_if_there_is_new_name(self):
+
+        self.count_plugins_or_variants(1, plugins=True)
+
+        self.data["plugin"].update({"plugin_name": "test 02"})
+
+        self.count_plugins_or_variants(2, plugins=True)
+
+        self.data["variant"].update({"plugin_version": "0.2"})
+
+        self.count_plugins_or_variants(2, plugins=True)
+
+    def test_form_create_plugins_variants_for_each_version(self):
+
+        self.count_plugins_or_variants(1, plugins=False)
+
+        self.data["variant"].update({"plugin_version": "0.2"})
+
+        self.count_plugins_or_variants(2, plugins=False)
+
+        self.data["variant"].update({"plugin_language": "English"})
+
+        self.count_plugins_or_variants(3, plugins=False)

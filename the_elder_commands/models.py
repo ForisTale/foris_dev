@@ -18,8 +18,18 @@ class Character(models.Model):
 
 
 class Plugins(models.Model):
-    plugin_name = models.TextField(default="")
+    plugin_name = models.TextField(default="", unique=True)
     plugin_usable_name = models.TextField(default="")
+
+
+class PluginVariants(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["plugin_version", "plugin_language", "plugin_instance"],
+                                    name="unique_variant")
+        ]
+
+    plugin_instance = models.ForeignKey(Plugins, default=None, on_delete=models.CASCADE)
     plugin_version = models.TextField(default="")
     plugin_language = models.TextField(default="")
     plugin_data = JSONField(default=dict)

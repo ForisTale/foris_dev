@@ -1,5 +1,5 @@
 from django.test import TestCase
-from the_elder_commands.models import Character, Plugins
+from the_elder_commands.models import Character, Plugins, PluginVariants
 from the_elder_commands.services import CharacterService, PluginsService
 from the_elder_commands.inventory import DEFAULT_SKILLS
 import copy
@@ -150,37 +150,41 @@ class CharacterServiceTest(TestCase):
 class PluginsServiceTest(TestCase):
 
     def test_get_all_plugins_return_all_plugins_from_database(self):
+        data = {"plugin": {
+            "name": "test 01",
+            "usable_name": "test_01"
+        }}
+
+        plugin = Plugins.objects.create(
+            plugin_name=data["plugin"]["name"],
+            plugin_usable_name=data["plugin"]["usable_name"]
+        )
         for index in range(3):
-            data = {
-                "name": "test 0" + str(index),
+            data["variants"] = {
                 "version": "0." + str(index),
                 "language": "English",
                 "data": {"test": index}
             }
-            Plugins.objects.create(
-                plugin_name=data["name"],
-                plugin_version=data["version"],
-                plugin_language=data["language"],
-                plugin_data=data["data"]
+
+            PluginVariants.objects.create(
+                plugin_version=data["variants"]["version"],
+                plugin_language=data["variants"]["language"],
+                plugin_data=data["variants"]["data"],
+                plugin_instance=plugin
             )
 
         class Request:
             def __init__(self):
-                self.session = {}
+                self.session = {"test_01_selected": "on", "test_01_load_order": "FF"}
 
         plugin_service = PluginsService(request=Request())
-        all_plugins = plugin_service.get_all_plugins()
-        self.assertEqual(len(all_plugins), 3)
-
-        for index in range(3):
-            self.assertEqual(
-                all_plugins[index],
-                {
-                    "plugin_name": "test 0" + str(index),
-                    "plugin_version": "0." + str(index),
-                    "plugin_language": "English",
-                    "plugin_data": {"test": index},
-                    "plugin_selected": "",
-                    "plugin_load_order": "",
-                }
-            )
+        all_plugins = plugin_service.all_plugins
+        self.assertEqual(len(all_plugins), 1)
+        self.assertDictEqual(
+            dict(all_plugins[0]),
+            {'load_order': 'FF', 'name': 'test 01', 'selected': 'on', 'usable_name': 'test_01',
+             'variants': [{'language': 'English', 'version': '0.2'},
+                          {'language': 'English', 'version': '0.1'},
+                          {'language': 'English', 'version': '0.0'}]
+             }
+        )

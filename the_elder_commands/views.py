@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import QueryDict
 from .models import Character
-from .forms import CharacterForm, AddPluginsForm
+from .forms import CharacterForm, PluginsForm, PluginVariantsForm
 from .services import CharacterService, PluginsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE
 import json
@@ -47,15 +47,25 @@ def plugins_view(request):
         add_plugin_messages = []
 
     if request.method == "POST":
-        data = correct_add_plugin_post(request)
-        form = AddPluginsForm(data=data)
-        if form.is_valid():
-            form.save()
-            request.session["add_plugin_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
-            return redirect("tec:plugins")
+        plugin_custom_form = PluginsForm(plugin_name=request.POST.get("plugin_name", ""))
+
+        if plugin_custom_form.is_valid():
+
+            plugin_variants_data = plugin_variants_post(request)
+            plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
+                                                      plugin_instance=plugin_custom_form.plugin_instance)
+
+            if plugin_variants_form.is_valid():
+
+                plugin_variants_form.save()
+                request.session["add_plugin_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
+                return redirect("tec:plugins")
+            else:
+                for error in plugin_variants_form.errors.values():
+                    add_plugin_messages = [*add_plugin_messages, *error]
         else:
-            for errors in form.errors.values():
-                add_plugin_messages = [*add_plugin_messages, *errors]
+            for error in plugin_custom_form.errors:
+                add_plugin_messages = [*add_plugin_messages, *error]
 
     plugins = PluginsService(request)
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "plugins": plugins.all_plugins,
@@ -66,25 +76,13 @@ def commands_view(request):
     return render(request, "the_elder_commands/commands.html", {"active": "commands"})
 
 
-def correct_add_plugin_post(request):
+def plugin_variants_post(request):
     file_content = extract_dict_from_plugin_file(request)
-    new_post = request.POST.copy()
-    new_post["plugin_data"] = file_content
-    new_post["plugin_usable_name"] = get_usable_name(new_post["plugin_name"])
-    new_post._mutable = False
-    return new_post
-
-
-def get_usable_name(raw_name):
-    converted = ""
-    for letter in raw_name:
-        if letter == " ":
-            converted += "_"
-        elif letter.isalnum():
-            converted += letter.lower()
-        else:
-            converted += ""
-    return converted
+    post = QueryDict("", mutable=True)
+    post["plugin_version"] = request.POST.get("plugin_version")
+    post["plugin_language"] = request.POST.get("plugin_language")
+    post["plugin_data"] = file_content
+    return post
 
 
 def extract_dict_from_plugin_file(request):

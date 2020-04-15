@@ -33,7 +33,7 @@ class PluginsTest(FunctionalTest):
         self.check_is_active("id_add_plugin")
 
         # there he sees form
-        form_text = self.driver.find_element_by_tag_name("form").text
+        form_text = self.driver.find_element_by_id("id_add_plugin_form").text
         cases = ["Plugin name", "Select a language", "Mod version", "Select .tec file", "Submit"]
         for case in cases:
             self.assertIn(
@@ -99,17 +99,17 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
 
         # in table he sees plugin that he add
         self.assertEqual(
-            "test mod 0.1 Polish",
+            "test mod\n0.1 Polish",
             self.driver.find_element_by_class_name("plugins_table").text
         )
 
         # with "Selected?" unchecked and empty "Plugin Order"
         self.assertTrue(True if
-                        self.driver.find_element_by_name("mod_selected").get_attribute("value") == "on" or
-                        self.driver.find_element_by_name("mod_selected").get_attribute("value") == ""
+                        self.driver.find_element_by_name("test_mod_selected").get_attribute("value") == "on" or
+                        self.driver.find_element_by_name("test_mod_selected").get_attribute("value") == ""
                         else False)
         self.assertEqual(
-            self.driver.find_element_by_name("mod_plugin_order").get_attribute("value"),
+            self.driver.find_element_by_name("test_mod_plugin_order").get_attribute("value"),
             ""
         )
 
@@ -152,7 +152,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
 
         # then he can chose between variants
         self.wait_for(lambda: self.assertEqual(
-            "test mod 0.2 English",
+            "test mod\n0.2 English\n0.2 Polish\n0.1 English\n0.1 Polish",
             self.driver.find_element_by_class_name("plugins_table").text
         ))
 
@@ -163,7 +163,8 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
             1
         )
 
-        self.driver.find_element_by_id("id_test_mod_version_language").click()
-        options = self.driver.find_elements_by_name("test_mod_version_language")
-        expected = ["0.2 English", "0.1 English", "0.2 Polish", "0.1 Polish"]
+        self.driver.find_element_by_id("id_test_mod_variant").click()
+        options = self.driver.find_elements_by_name("test_mod_variant")
+        options = [option.text for option in options]
+        expected = ['0.2 English\n0.2 Polish\n0.1 English\n0.1 Polish']
         self.assertEqual(options, expected)

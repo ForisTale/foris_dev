@@ -1,7 +1,8 @@
 from django.forms.models import ModelForm
-from django.forms import ValidationError, FileInput
-from the_elder_commands.models import Character, Plugins
-from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE
+from django.forms import ValidationError
+from the_elder_commands.models import Character, Plugins, PluginVariants
+from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGINS_ERROR_NOT_STRING, \
+    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
 
 
 class CharacterForm(ModelForm):
@@ -65,12 +66,75 @@ class CharacterForm(ModelForm):
                 raise ValidationError("All skills values must be integers!")
 
 
-class AddPluginsForm(ModelForm):
+class PluginsForm:
+    def __init__(self, plugin_name):
+        self.plugin_name = plugin_name
+        self.errors = []
+
+        if self.is_valid():
+            self.plugin_name = self.get_name(plugin_name)
+            self.plugin_usable_name = self.get_usable_name()
+            self.plugin_instance, created = Plugins.objects.get_or_create(plugin_name=self.plugin_name,
+                                                                          plugin_usable_name=self.plugin_usable_name)
+
+    def is_valid(self):
+        if isinstance(self.plugin_name, str):
+            if self.plugin_name == "":
+                self.errors.append(PLUGINS_ERROR_STRING_IS_EMTPY)
+                return False
+            else:
+                if self.name_become_empty():
+                    self.errors.append(PLUGINS_ERROR_NAME_BECOME_EMPTY)
+                    return False
+                else:
+                    return True
+        else:
+            self.errors.append(PLUGINS_ERROR_NOT_STRING)
+            return False
+
+    def name_become_empty(self):
+        name = self.get_name(self.plugin_name)
+        name = name.strip()
+        if name == "":
+            return True
+        else:
+            return False
+
+    def get_name(self, raw_name):
+        converted = self.cut_special_letters(raw_name)
+        return converted
+
+    @staticmethod
+    def cut_special_letters(raw_string):
+        converted = ""
+        for letter in raw_string:
+            if letter.isalnum() or letter == " ":
+                converted += letter
+            else:
+                converted += ""
+        return converted
+
+    def get_usable_name(self):
+        converted = ""
+        for letter in self.plugin_name:
+            if letter == " ":
+                converted += "_"
+            else:
+                converted += letter.lower()
+        return converted
+
+
+class PluginVariantsForm(ModelForm):
+    def __init__(self, plugin_instance, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data["plugin_instance"] = plugin_instance
+
     class Meta:
-        model = Plugins
-        fields = ("plugin_name", "plugin_usable_name", "plugin_version", "plugin_language", "plugin_data")
+        model = PluginVariants
+        fields = ("plugin_version", "plugin_language", "plugin_data", "plugin_instance")
+
         error_messages = {
-            "plugin_data": {"required": ADD_PLUGIN_FILE_ERROR_MESSAGE}
+            "plugin_data": {"required": ADD_PLUGIN_FILE_ERROR_MESSAGE},
         }
 
     def clean_plugin_data(self):
@@ -83,4 +147,3 @@ class AddPluginsForm(ModelForm):
             raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
 
         return form_data
-

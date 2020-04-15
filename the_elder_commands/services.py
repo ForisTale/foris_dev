@@ -1,4 +1,4 @@
-from .models import Character, Plugins
+from .models import Character, PluginVariants
 from .inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
 import copy
 import math
@@ -121,19 +121,26 @@ class CharacterService:
 class PluginsService:
     def __init__(self, request):
         self.request = request
+        self.all_plugins_instances = [name.plugin_instance for name in
+                                      PluginVariants.objects.all().distinct("plugin_instance__plugin_name")]
         self.all_plugins = self.get_all_plugins()
 
     def get_all_plugins(self):
-        all_plugins = []
-        for plugin in Plugins.objects.all():
-            plugin_data = {
-                "plugin_name": plugin.plugin_name,
-                "plugin_version": plugin.plugin_version,
-                "plugin_language": plugin.plugin_language,
-                "plugin_data": plugin.plugin_data,
-                "plugin_selected": self.request.session.get(plugin.plugin_name, ""),
-                "plugin_load_order": self.request.session.get(plugin.plugin_name, "")
-            }
-            all_plugins.append(plugin_data)
+        plugins = []
+        for instance in self.all_plugins_instances:
+            plugin_variants = []
+            variants_filter = PluginVariants.objects.filter(
+                plugin_instance__plugin_name=instance.plugin_name).order_by("-plugin_version", "plugin_language")
 
-        return all_plugins
+            for variant in variants_filter:
+                plugin_variants.append({"version": variant.plugin_version, "language": variant.plugin_language})
+
+            plugins.append({
+                "name": instance.plugin_name,
+                "usable_name": instance.plugin_usable_name,
+                "selected": self.request.session.get(instance.plugin_usable_name + "_selected", ""),
+                "load_order": self.request.session.get(instance.plugin_usable_name + "_load_order", ""),
+                "variants": plugin_variants
+            })
+
+        return plugins

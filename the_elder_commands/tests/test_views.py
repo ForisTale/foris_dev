@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.test.utils import tag
 from django.http import QueryDict
-from the_elder_commands.models import Character, Plugins
-from the_elder_commands.services import CharacterService, PluginsService
-from the_elder_commands.views import extract_skills, set_skills_values, unpack_post, get_usable_name
+from the_elder_commands.models import Character, Plugins, PluginVariants
+from the_elder_commands.services import CharacterService
+from the_elder_commands.views import extract_skills, set_skills_values, unpack_post
 from the_elder_commands.inventory import ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
     PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE
 from unittest.mock import patch
@@ -134,9 +134,9 @@ class PluginsViewTest(TestCase, ManageTestFiles):
 
     def setUp(self):
         super().setUp()
-        data = {"TEC_test_file.tec": PLUGIN_TEST_FILE}
+
         if self.check_test_tag("create_test_file"):
-            self.create_test_files(data)
+            self.create_test_files({"TEC_test_file.tec": PLUGIN_TEST_FILE})
         elif self.check_test_tag("create_incorrect_file"):
             self.create_test_files({"TEC_test_file.ini": {"test": 1}})
 
@@ -163,8 +163,8 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         self.send_default_post_and_return_response()
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
-            "test 01'5<>(){}[]a'n\"*",
-            response.context["plugins"][0].get("plugin_name", "")
+            "test 015an",
+            response.context["plugins"][0].get("name", "")
         )
 
     @tag("create_test_file")
@@ -206,36 +206,45 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         self.assertRedirects(response, "/the_elder_commands/plugins/")
 
     @tag("create_test_file")
-    def test_pass_POST_to_form(self):
+    def test_pass_POST_to_model(self):
         self.send_default_post_and_return_response()
 
-        model = Plugins.objects.first()
+        plugin_model = Plugins.objects.first()
+        variants_model = PluginVariants.objects.first()
 
-        cases = {
-            "plugin_name": "test 01'5<>(){}[]a'n\"*",
+        plugin_cases = {
+            "plugin_name": "test 015an",
             "plugin_usable_name": "test_015an",
+            }
+        for field, desired_result in plugin_cases.items():
+            self.assertEqual(
+                plugin_model.__getattribute__(field),
+                desired_result
+            )
+
+        variants_cases = {
             "plugin_version": "0.1",
             "plugin_language": "Polish",
             "plugin_data": PLUGIN_TEST_DICT,
-            }
-        for field, desired_result in cases.items():
+        }
+        for field, desired_result in variants_cases.items():
             self.assertEqual(
-                model.__getattribute__(field),
+                variants_model.__getattribute__(field),
                 desired_result
             )
 
     @tag("create_test_file")
-    @patch("the_elder_commands.views.AddPluginsForm")
+    @patch("the_elder_commands.views.PluginVariantsForm")
     def test_file_is_changed_to_dict_before_pass_POST_to_form(self, form_mock):
         self.send_default_post_and_return_response()
 
         expected = QueryDict("", mutable=True)
+        plugin = Plugins.objects.first()
         expected.update({
-            'plugin_name': 'test 01\'5<>(){}[]a\'n\"*', 'plugin_version': '0.1',
-            'plugin_language': 'Polish', 'plugin_data': PLUGIN_TEST_DICT, "plugin_usable_name": "test_015an"
+            'plugin_version': '0.1', 'plugin_language': 'Polish', 'plugin_data': PLUGIN_TEST_DICT
         })
         form_mock.assert_called_once()
-        form_mock.assert_called_with(data=expected)
+        form_mock.assert_called_with(data=expected, plugin_instance=plugin)
 
 
 class ExtractSkillsTest(TestCase):
@@ -300,11 +309,3 @@ class UnpackPOSTTest(TestCase):
             "multi_items": ["one", "two"],
         }
         self.assertEqual(result, expected)
-
-
-class GetUsableNameTest(TestCase):
-
-    def test_return_correct_name(self):
-        raw_name = "Test 5'a <>[]{}()!@#$%^&*sony\"\' raw **"
-        corrected_name = get_usable_name(raw_name)
-        self.assertEqual(corrected_name, "test_5a_sony_raw_")
