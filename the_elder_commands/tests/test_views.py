@@ -213,8 +213,8 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         variants_model = PluginVariants.objects.first()
 
         plugin_cases = {
-            "plugin_name": "test 015an",
-            "plugin_usable_name": "test_015an",
+            "name": "test 015an",
+            "usable_name": "test_015an",
             }
         for field, desired_result in plugin_cases.items():
             self.assertEqual(
@@ -223,8 +223,8 @@ class PluginsViewTest(TestCase, ManageTestFiles):
             )
 
         variants_cases = {
-            "plugin_version": "0.1",
-            "plugin_language": "Polish",
+            "version": "0.1",
+            "language": "Polish",
             "plugin_data": PLUGIN_TEST_DICT,
         }
         for field, desired_result in variants_cases.items():
@@ -241,10 +241,10 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         expected = QueryDict("", mutable=True)
         plugin = Plugins.objects.first()
         expected.update({
-            'plugin_version': '0.1', 'plugin_language': 'Polish', 'plugin_data': PLUGIN_TEST_DICT
+            'version': '0.1', 'language': 'Polish', 'plugin_data': PLUGIN_TEST_DICT
         })
         form_mock.assert_called_once()
-        form_mock.assert_called_with(data=expected, plugin_instance=plugin)
+        form_mock.assert_called_with(data=expected, instance=plugin)
 
 
 class ExtractSkillsTest(TestCase):

@@ -47,13 +47,13 @@ def plugins_view(request):
         add_plugin_messages = []
 
     if request.method == "POST":
-        plugin_custom_form = PluginsForm(plugin_name=request.POST.get("plugin_name", ""))
+        plugin_custom_form = PluginsForm(name=request.POST.get("plugin_name", ""))
 
         if plugin_custom_form.is_valid():
 
             plugin_variants_data = plugin_variants_post(request)
             plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
-                                                      plugin_instance=plugin_custom_form.plugin_instance)
+                                                      instance=plugin_custom_form.instance)
 
             if plugin_variants_form.is_valid():
 
@@ -79,8 +79,8 @@ def commands_view(request):
 def plugin_variants_post(request):
     file_content = extract_dict_from_plugin_file(request)
     post = QueryDict("", mutable=True)
-    post["plugin_version"] = request.POST.get("plugin_version")
-    post["plugin_language"] = request.POST.get("plugin_language")
+    post["version"] = request.POST.get("plugin_version")
+    post["language"] = request.POST.get("plugin_language")
     post["plugin_data"] = file_content
     return post
 

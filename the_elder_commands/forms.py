@@ -1,5 +1,6 @@
 from django.forms.models import ModelForm
 from django.forms import ValidationError
+from django.db import IntegrityError
 from the_elder_commands.models import Character, Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGINS_ERROR_NOT_STRING, \
     PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
@@ -67,19 +68,19 @@ class CharacterForm(ModelForm):
 
 
 class PluginsForm:
-    def __init__(self, plugin_name):
-        self.plugin_name = plugin_name
+    def __init__(self, name):
+        self.name = name
         self.errors = []
 
         if self.is_valid():
-            self.plugin_name = self.get_name(plugin_name)
-            self.plugin_usable_name = self.get_usable_name()
-            self.plugin_instance, created = Plugins.objects.get_or_create(plugin_name=self.plugin_name,
-                                                                          plugin_usable_name=self.plugin_usable_name)
+            self.name = self.get_name(name)
+            self.usable_name = self.get_usable_name()
+            self.instance, created = Plugins.objects.get_or_create(name=self.name,
+                                                                   usable_name=self.usable_name)
 
     def is_valid(self):
-        if isinstance(self.plugin_name, str):
-            if self.plugin_name == "":
+        if isinstance(self.name, str):
+            if self.name == "":
                 self.errors.append(PLUGINS_ERROR_STRING_IS_EMTPY)
                 return False
             else:
@@ -93,7 +94,7 @@ class PluginsForm:
             return False
 
     def name_become_empty(self):
-        name = self.get_name(self.plugin_name)
+        name = self.get_name(self.name)
         name = name.strip()
         if name == "":
             return True
@@ -116,7 +117,7 @@ class PluginsForm:
 
     def get_usable_name(self):
         converted = ""
-        for letter in self.plugin_name:
+        for letter in self.name:
             if letter == " ":
                 converted += "_"
             else:
@@ -125,17 +126,28 @@ class PluginsForm:
 
 
 class PluginVariantsForm(ModelForm):
-    def __init__(self, plugin_instance, *args, **kwargs):
+    def __init__(self, instance, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data["plugin_instance"] = plugin_instance
+        self.data["instance"] = instance
 
     class Meta:
         model = PluginVariants
-        fields = ("plugin_version", "plugin_language", "plugin_data", "plugin_instance")
+        fields = ("version", "language", "plugin_data", "instance")
 
         error_messages = {
             "plugin_data": {"required": ADD_PLUGIN_FILE_ERROR_MESSAGE},
         }
+
+    def clean_version(self):
+        form_data = self.cleaned_data["version"]
+        new_version = ""
+        for letter in form_data:
+            if letter.isalnum():
+                new_version += letter
+            elif letter in "_-;:,.":
+                new_version += letter
+
+        return new_version
 
     def clean_plugin_data(self):
         plugin_keys = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH", "MISC",

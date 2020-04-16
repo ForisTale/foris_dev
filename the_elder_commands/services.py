@@ -121,8 +121,8 @@ class CharacterService:
 class PluginsService:
     def __init__(self, request):
         self.request = request
-        self.all_plugins_instances = [name.plugin_instance for name in
-                                      PluginVariants.objects.all().distinct("plugin_instance__plugin_name")]
+        self.all_plugins_instances = [name.instance for name in
+                                      PluginVariants.objects.all().distinct("instance__name")]
         self.all_plugins = self.get_all_plugins()
 
     def get_all_plugins(self):
@@ -130,16 +130,16 @@ class PluginsService:
         for instance in self.all_plugins_instances:
             plugin_variants = []
             variants_filter = PluginVariants.objects.filter(
-                plugin_instance__plugin_name=instance.plugin_name).order_by("-plugin_version", "plugin_language")
+                instance__name=instance.name).order_by("-version", "language")
 
             for variant in variants_filter:
-                plugin_variants.append({"version": variant.plugin_version, "language": variant.plugin_language})
+                plugin_variants.append({"version": variant.version, "language": variant.language})
 
             plugins.append({
-                "name": instance.plugin_name,
-                "usable_name": instance.plugin_usable_name,
-                "selected": self.request.session.get(instance.plugin_usable_name + "_selected", ""),
-                "load_order": self.request.session.get(instance.plugin_usable_name + "_load_order", ""),
+                "name": instance.name,
+                "usable_name": instance.usable_name,
+                "selected": self.request.session.get(instance.usable_name + "_selected", ""),
+                "load_order": self.request.session.get(instance.usable_name + "_load_order", ""),
                 "variants": plugin_variants
             })
 

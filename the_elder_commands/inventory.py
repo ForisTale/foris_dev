@@ -43,8 +43,8 @@ ADD_PLUGIN_SUCCESS_MESSAGE = "Plugin was successfully added to database."
 
 ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 
-ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Plugin version, Plugin language and " \
-                                        "Plugin instance already exists."
+ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language and " \
+                                        "Instance already exists."
 
 PLUGINS_ERROR_NOT_STRING = "Name is not a string!"
 

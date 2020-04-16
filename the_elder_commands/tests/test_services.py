@@ -156,8 +156,8 @@ class PluginsServiceTest(TestCase):
         }}
 
         plugin = Plugins.objects.create(
-            plugin_name=data["plugin"]["name"],
-            plugin_usable_name=data["plugin"]["usable_name"]
+            name=data["plugin"]["name"],
+            usable_name=data["plugin"]["usable_name"]
         )
         for index in range(3):
             data["variants"] = {
@@ -167,10 +167,10 @@ class PluginsServiceTest(TestCase):
             }
 
             PluginVariants.objects.create(
-                plugin_version=data["variants"]["version"],
-                plugin_language=data["variants"]["language"],
+                version=data["variants"]["version"],
+                language=data["variants"]["language"],
                 plugin_data=data["variants"]["data"],
-                plugin_instance=plugin
+                instance=plugin
             )
 
         class Request:

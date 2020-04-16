@@ -19,21 +19,21 @@ class CharacterModelTest(TestCase):
 class PluginsModelTest(TestCase):
 
     def test_name_is_unique(self):
-        Plugins.objects.create(plugin_name="test")
+        Plugins.objects.create(name="test")
         with self.assertRaises(IntegrityError):
-            Plugins.objects.create(plugin_name="test")
+            Plugins.objects.create(name="test")
 
 
 class PluginVariantsTest(TestCase):
 
     def test_version_and_language_are_unique_for_plugin(self):
-        plugin = Plugins.objects.create(plugin_name="test", plugin_usable_name="test")
-        PluginVariants.objects.create(plugin_language="English", plugin_version="0.1", plugin_instance=plugin)
-        PluginVariants.objects.create(plugin_language="English", plugin_version="0.2", plugin_instance=plugin)
+        plugin = Plugins.objects.create(name="test", usable_name="test")
+        PluginVariants.objects.create(language="English", version="0.1", instance=plugin)
+        PluginVariants.objects.create(language="English", version="0.2", instance=plugin)
 
-        other_plugin = Plugins.objects.create(plugin_name="test 2", plugin_usable_name="test_2")
-        PluginVariants.objects.create(plugin_language="English", plugin_version="0.1",
-                                      plugin_instance=other_plugin)  # should not raise
+        other_plugin = Plugins.objects.create(name="test 2", usable_name="test_2")
+        PluginVariants.objects.create(language="English", version="0.1",
+                                      instance=other_plugin)  # should not raise
 
         with self.assertRaises(IntegrityError):
-            PluginVariants.objects.create(plugin_language="English", plugin_version="0.1", plugin_instance=plugin)
+            PluginVariants.objects.create(language="English", version="0.1", instance=plugin)
