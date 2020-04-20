@@ -1,4 +1,5 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
+from the_elder_commands.models import Plugins, PluginVariants
 from selenium.webdriver.support.ui import Select
 from the_elder_commands.inventory import PLUGIN_TEST_FILE, ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
     ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
@@ -63,12 +64,17 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
 
     def setUp(self):
         super().setUp()
-        data = {"TEC_plugin_test_file.tec": PLUGIN_TEST_FILE}
-        incorrect_data = {"TEC_incorrect_file.ini": b'3432342343'}
+
         if self.check_test_tag("create_test_file"):
+            data = {"TEC_plugin_test_file.tec": PLUGIN_TEST_FILE}
             self.create_test_files(data)
-        elif self.check_test_tag("create_incorrect_file"):
+        if self.check_test_tag("create_incorrect_file"):
+            incorrect_data = {"TEC_incorrect_file.ini": b'3432342343'}
             self.create_test_files(incorrect_data)
+        if self.check_test_tag("populate_plugins_table"):
+            self.populate_plugins_table()
+        if self.check_test_tag("generate_selected_plugins"):
+            self.generate_selected_plugins()
 
         # Foris open plugins section of TEC,
         self.driver.get(self.live_server_url + "/plugins/")
@@ -90,7 +96,32 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         upload_window = self.driver.find_element_by_id("id_plugin_file")
         upload_window.send_keys(file_full_path)
 
-        self.driver.find_element_by_id("id_plugin_submit").click()
+        self.driver.find_element_by_id("id_add_plugin_submit").click()
+
+    @staticmethod
+    def populate_plugins_table():
+        for index in range(4):
+            plugin = Plugins.objects.create(name="test " + str(index), usable_name="test_" + str(index))
+            plugin.save()
+            form = PluginVariants.objects.create(
+                instance=plugin,
+                version=str(index),
+                language="english"
+            )
+            form.save()
+
+    @staticmethod
+    def generate_selected_plugins():
+        pass
+
+    def check_errors_messages(self, list_of_messages):
+        errors_messages = self.wait_for(lambda: self.driver.find_elements_by_class_name("errors_messages"))
+        errors_messages = [error.text for error in errors_messages]
+        for index in range(len(errors_messages)):
+            try:
+                self.assertEqual(errors_messages[index], list_of_messages[index] + "\n×")
+            except IndexError:
+                self.fail(f"There is more or less errors than expected! Errors:\n{errors_messages}")
 
     @tag("create_test_file")
     def test_add_plugin_to_database_and_show_in_plugins_table(self):
@@ -104,31 +135,19 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         )
 
         # with "Selected?" unchecked and empty "Plugin Order"
-        self.assertTrue(True if
-                        self.driver.find_element_by_name("test_mod_selected").get_attribute("value") == "on" or
-                        self.driver.find_element_by_name("test_mod_selected").get_attribute("value") == ""
-                        else False)
-        self.assertEqual(
-            self.driver.find_element_by_name("test_mod_plugin_order").get_attribute("value"),
-            ""
-        )
+        self.assertFalse(self.driver.find_element_by_class_name("test_mod").is_selected())
+        self.assertEqual(self.driver.find_element_by_name("test_mod_load_order").get_attribute("value"), "")
 
         # after that he sees message with information of successfully added plugin
-        self.wait_for(lambda: self.assertIn(
-            ADD_PLUGIN_SUCCESS_MESSAGE,
-            self.driver.find_element_by_tag_name("body").text
-        ))
+        self.check_errors_messages([ADD_PLUGIN_SUCCESS_MESSAGE])
 
     @tag("create_incorrect_file")
     def test_add_plugin_give_error_message_when_file_is_incorrect(self):
         # He fill form and submit it
-        self.submit_add_file("test mod", "0.1", "Polish", self.test_files_full_path[0])
+        self.submit_add_file("test mod", "0.1", "English", self.test_files_full_path[0])
 
         # but he get message that file was incorrect
-        self.wait_for(lambda: self.assertIn(
-            ADD_PLUGIN_FILE_ERROR_MESSAGE,
-            self.driver.find_element_by_tag_name("body").text
-        ))
+        self.check_errors_messages([ADD_PLUGIN_FILE_ERROR_MESSAGE])
 
     @tag("create_test_file")
     def test_files_with_same_data_return_error(self):
@@ -137,10 +156,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         self.submit_add_file("test mod", "0.1", "Polish", self.test_files_full_path[0])
 
         # and he sees error.
-        self.wait_for(lambda: self.assertIn(
-            ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE,
-            self.driver.find_element_by_tag_name("body").text
-        ))
+        self.check_errors_messages([ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE])
 
     @tag("create_test_file")
     def test_plugins_with_same_name_show_options_to_chose_variants(self):
@@ -168,3 +184,35 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         options = [option.text for option in options]
         expected = ['0.2 English\n0.2 Polish\n0.1 English\n0.1 Polish']
         self.assertEqual(options, expected)
+
+    @tag("populate_plugins_table")
+    def test_can_chose_plugins_to_select_and_selected_plugins_are_show_in_table(self):
+        # Foris chose few plugins and fill their load order
+        self.wait_for(lambda: self.driver.find_element_by_class_name("test_0").click())
+        self.driver.find_element_by_name("test_0_load_order").send_keys("01")
+        self.driver.find_element_by_class_name("test_2").click()
+        self.driver.find_element_by_name("test_2_load_order").send_keys("02")
+
+        # then he submit them
+        self.driver.find_element_by_id("id_select_plugin_submit").click()
+
+        # and after reload selected plugins appear in table on the side
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("selected_plugins").text,
+            "test 0 0 English\ntest 2 2 English"
+        ))
+
+    @tag("populate_plugins_table")
+    @tag("generate_selected_plugins")
+    def test_selected_plugins_can_be_unselect_from_selected_table(self):
+        # Foris have few plugins selected but he decide thant hi don't need one of them
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("selected_plugins").text,
+            "test 0 0 English\ntest 2 2 English"
+        ))
+
+        self.fail("Finish test!")
+
+    def test_load_order_is_required_for_selected_plugins(self):
+        #
+        self.fail("Finish test!")

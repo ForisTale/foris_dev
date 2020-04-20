@@ -124,6 +124,7 @@ class PluginsService:
         self.all_plugins_instances = [name.instance for name in
                                       PluginVariants.objects.all().distinct("instance__name")]
         self.all_plugins = self.get_all_plugins()
+        self.selected = request.session.get("selected", [])
 
     def get_all_plugins(self):
         plugins = []
@@ -131,15 +132,27 @@ class PluginsService:
             plugin_variants = []
             variants_filter = PluginVariants.objects.filter(
                 instance__name=instance.name).order_by("-version", "language")
+            selected_data = {"selected": ""}
+
+            for plugin in self.request.session.get("selected", []):
+                if plugin.get("usable_name") == instance.usable_name:
+                    selected_data.update(plugin)
+                    selected_data.update({"selected": "on"})
+                    break
 
             for variant in variants_filter:
-                plugin_variants.append({"version": variant.version, "language": variant.language})
+                if variant.version == selected_data.get("version", "") and \
+                        variant.language == selected_data.get("language", ""):
+                    selected = "on"
+                else:
+                    selected = ""
+                plugin_variants.append({"version": variant.version, "language": variant.language, "selected": selected})
 
             plugins.append({
                 "name": instance.name,
                 "usable_name": instance.usable_name,
-                "selected": self.request.session.get(instance.usable_name + "_selected", ""),
-                "load_order": self.request.session.get(instance.usable_name + "_load_order", ""),
+                "selected": selected_data.get("selected"),
+                "load_order": selected_data.get("load_order", ""),
                 "variants": plugin_variants
             })
 

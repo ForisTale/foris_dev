@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.http import QueryDict
-from the_elder_commands.forms import CharacterForm, PluginsForm, PluginVariantsForm
+from the_elder_commands.forms import CharacterForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from the_elder_commands.models import Character, Plugins, PluginVariants
 from the_elder_commands.services import CharacterService
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_SIMPLE_DICT, \
-    PLUGINS_ERROR_NOT_STRING, PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
-    ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
+    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, \
+    INCORRECT_LOAD_ORDER
 
 
 class CharacterFormTest(TestCase):
@@ -103,17 +103,6 @@ class PluginsFormTest(TestCase):
         plugins = Plugins.objects.first()
         self.assertEqual(plugins.name, "Test 5a sony raw ")
         self.assertEqual(plugins.usable_name, "test_5a_sony_raw_")
-
-    def test_plugin_name_must_be_string(self):
-        form = PluginsForm(name=1)
-        self.assertEqual(len(Plugins.objects.all()), 0)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[0], PLUGINS_ERROR_NOT_STRING)
-
-        form = PluginsForm(name=None)
-        self.assertEqual(len(Plugins.objects.all()), 0)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[0], PLUGINS_ERROR_NOT_STRING)
 
     def test_plugin_name_cannot_be_empty_string(self):
         form = PluginsForm(name="")
@@ -226,3 +215,44 @@ class PluginFormValidationTest(TestCase):
         form.save()
         plugin_variant = PluginVariants.objects.first()
         self.assertEqual(plugin_variant.version, "a_-;:,.")
+
+
+class SelectPluginFormTest(TestCase):
+    def setUp(self):
+        self.data = QueryDict("", mutable=True)
+        self.data.update({"selected": "test_01", "test_01_variant": "0.1&english",
+                          "test_01_load_order": "01"})
+        Plugins.objects.create(name="test 01", usable_name="test_01")
+
+    def test_validate_load_order(self):
+        cases = {"A1": True, "*s": False, "AA1": False, "": False, "3": True, "#": False}
+
+        class FakeRequest:
+            POST = self.data
+            session = {}
+
+        for case, result in cases.items():
+            self.data["test_01_load_order"] = case
+            form = SelectedPluginsForm(request=FakeRequest)
+            self.assertEqual(form.is_valid(), result, msg=f"{case} {result} {form.errors}")
+            if result is False:
+                self.assertEqual(form.errors[0], INCORRECT_LOAD_ORDER)
+            if case == "3":
+                self.assertEqual(form.data["test_01_load_order"], "03", msg="Should have 0 in front.")
+
+    def test_form_process_data(self):
+        class FakeRequest:
+            POST = self.data
+            session = {}
+
+        request = FakeRequest
+
+        SelectedPluginsForm(request=request)
+        expected = [{
+            "name": "test 01",
+            "usable_name": "test_01",
+            "version": "0.1",
+            "language": "english",
+            "load_order": "01"
+        }]
+        self.assertDictEqual(request.session.get("selected", [])[0], expected[0])

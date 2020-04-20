@@ -46,7 +46,7 @@ ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language and " \
                                         "Instance already exists."
 
-PLUGINS_ERROR_NOT_STRING = "Name is not a string!"
+INCORRECT_LOAD_ORDER = "Load order need to be hex number between 00 and FF!"
 
 PLUGINS_ERROR_STRING_IS_EMTPY = "Name cannot be empty!"
 

@@ -162,7 +162,7 @@ class PluginsServiceTest(TestCase):
         for index in range(3):
             data["variants"] = {
                 "version": "0." + str(index),
-                "language": "English",
+                "language": "english",
                 "data": {"test": index}
             }
 
@@ -175,16 +175,23 @@ class PluginsServiceTest(TestCase):
 
         class Request:
             def __init__(self):
-                self.session = {"test_01_selected": "on", "test_01_load_order": "FF"}
+                self.session = {"selected": [{
+                    "usable_name": "test_01",
+                    "version": "0.2",
+                    "language": "english",
+                    "load_order": "FF"
+                }]}
 
         plugin_service = PluginsService(request=Request())
         all_plugins = plugin_service.all_plugins
         self.assertEqual(len(all_plugins), 1)
+
+        self.maxDiff = None
         self.assertDictEqual(
             dict(all_plugins[0]),
             {'load_order': 'FF', 'name': 'test 01', 'selected': 'on', 'usable_name': 'test_01',
-             'variants': [{'language': 'English', 'version': '0.2'},
-                          {'language': 'English', 'version': '0.1'},
-                          {'language': 'English', 'version': '0.0'}]
+             'variants': [{'language': 'english', 'version': '0.2', "selected": "on"},
+                          {'language': 'english', 'version': '0.1', "selected": ""},
+                          {'language': 'english', 'version': '0.0', "selected": ""}]
              }
         )

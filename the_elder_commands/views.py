@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import QueryDict
 from .models import Character
-from .forms import CharacterForm, PluginsForm, PluginVariantsForm
+from .forms import CharacterForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from .services import CharacterService, PluginsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE
 import json
@@ -40,40 +40,53 @@ def other_view(request):
 
 
 def plugins_view(request):
-    if "add_plugin_messages" in request.session:
-        add_plugin_messages, request.session["add_plugin_messages"] = request.session["add_plugin_messages"], []
-    else:
-        request.session["add_plugin_messages"] = []
-        add_plugin_messages = []
+    get_plugins_messages(request)
 
     if request.method == "POST":
-        plugin_custom_form = PluginsForm(name=request.POST.get("plugin_name", ""))
-
-        if plugin_custom_form.is_valid():
-
-            plugin_variants_data = plugin_variants_post(request)
-            plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
-                                                      instance=plugin_custom_form.instance)
-
-            if plugin_variants_form.is_valid():
-
-                plugin_variants_form.save()
-                request.session["add_plugin_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
+        if "plugin_name" in request.POST:
+            success = handle_add_plugin_post(request)
+            if success:
+                return redirect("tec:plugins")
+        elif "selected" in request.POST:
+            form = SelectedPluginsForm(request=request)
+            if form.is_valid():
                 return redirect("tec:plugins")
             else:
-                for error in plugin_variants_form.errors.values():
-                    add_plugin_messages = [*add_plugin_messages, *error]
-        else:
-            for error in plugin_custom_form.errors:
-                add_plugin_messages = [*add_plugin_messages, *error]
+                for error in form.errors:
+                    request.session["plugins_messages"] += [error]
 
-    plugins = PluginsService(request)
-    return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "plugins": plugins.all_plugins,
-                                                               "add_plugin_messages": add_plugin_messages})
+    service = PluginsService(request)
+    return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
+                                                               "plugins_messages": request.session["plugins_messages"]})
 
 
 def commands_view(request):
     return render(request, "the_elder_commands/commands.html", {"active": "commands"})
+
+
+def get_plugins_messages(request):
+    request.session["plugins_messages"] = []
+    request.session["plugins_messages"] += request.session.get("add_plugins_messages", [])
+    request.session["add_plugins_messages"] = []
+
+
+def handle_add_plugin_post(request):
+    plugin_custom_form = PluginsForm(name=request.POST.get("plugin_name", ""))
+    if plugin_custom_form.is_valid():
+
+        plugin_variants_data = plugin_variants_post(request)
+        plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
+                                                  instance=plugin_custom_form.instance)
+        if plugin_variants_form.is_valid():
+            plugin_variants_form.save()
+            request.session["add_plugins_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
+            return "Success!"
+        else:
+            for error in plugin_variants_form.errors.values():
+                request.session["plugins_messages"] += [*error]
+    else:
+        for error in plugin_custom_form.errors:
+            request.session["plugins_messages"] += [*error]
 
 
 def plugin_variants_post(request):

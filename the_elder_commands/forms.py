@@ -1,8 +1,7 @@
 from django.forms.models import ModelForm
 from django.forms import ValidationError
-from django.db import IntegrityError
 from the_elder_commands.models import Character, Plugins, PluginVariants
-from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGINS_ERROR_NOT_STRING, \
+from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
     PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
 
 
@@ -72,26 +71,25 @@ class PluginsForm:
         self.name = name
         self.errors = []
 
+        self.clean_name()
         if self.is_valid():
             self.name = self.get_name(name)
             self.usable_name = self.get_usable_name()
             self.instance, created = Plugins.objects.get_or_create(name=self.name,
                                                                    usable_name=self.usable_name)
 
-    def is_valid(self):
-        if isinstance(self.name, str):
-            if self.name == "":
-                self.errors.append(PLUGINS_ERROR_STRING_IS_EMTPY)
-                return False
-            else:
-                if self.name_become_empty():
-                    self.errors.append(PLUGINS_ERROR_NAME_BECOME_EMPTY)
-                    return False
-                else:
-                    return True
+    def clean_name(self):
+        if self.name == "":
+            self.errors.append(PLUGINS_ERROR_STRING_IS_EMTPY)
         else:
-            self.errors.append(PLUGINS_ERROR_NOT_STRING)
+            if self.name_become_empty():
+                self.errors.append(PLUGINS_ERROR_NAME_BECOME_EMPTY)
+
+    def is_valid(self):
+        if self.errors:
             return False
+        else:
+            return True
 
     def name_become_empty(self):
         name = self.get_name(self.name)
@@ -159,3 +157,69 @@ class PluginVariantsForm(ModelForm):
             raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
 
         return form_data
+
+
+class SelectedPluginsForm:
+    def __init__(self, request):
+        self.data = request.POST
+        self.request = request
+        self.errors = []
+
+        self.clean_load_order()
+        if self.is_valid():
+            self.collect_selected()
+
+    def clean_load_order(self):
+        selected = self.data.getlist("selected", [])
+        for usable_name in selected:
+            load_order = self.data.get(f"{usable_name}_load_order", "")
+            if load_order == "":
+                self.errors.append(INCORRECT_LOAD_ORDER)
+                return
+            elif len(load_order) > 2 or len(load_order) <= 0:
+                self.errors.append(INCORRECT_LOAD_ORDER)
+                return
+            else:
+                if load_order.isalnum():
+                    if len(load_order) == 1:
+                        self.data[f"{usable_name}_load_order"] = "0" + self.data[f"{usable_name}_load_order"]
+
+                    return
+
+                else:
+                    self.errors.append(INCORRECT_LOAD_ORDER)
+                    return
+
+    def is_valid(self):
+        if self.errors:
+            return False
+        else:
+            return True
+
+    def collect_selected(self):
+        selected = self.request.POST.getlist("selected", [])
+        collected = []
+        for usable_name in selected:
+            collected.append({
+                "name": self.get_name(usable_name),
+                "usable_name": usable_name,
+                "version": self.get_version(usable_name),
+                "language": self.get_language(usable_name),
+                "load_order": self.request.POST.get(f"{usable_name}_load_order")
+            })
+        self.request.session["selected"] = collected
+
+    def get_version(self, usable_name):
+        variant = self.request.POST.get(f"{usable_name}_variant")
+        version = variant[:variant.find("&")]
+        return version
+
+    def get_language(self, usable_name):
+        variant = self.request.POST.get(f"{usable_name}_variant")
+        language = variant[variant.find("&") + 1:]
+        return language
+
+    @staticmethod
+    def get_name(usable_name):
+        plugin = Plugins.objects.get(usable_name=usable_name)
+        return plugin.name

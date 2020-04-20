@@ -164,20 +164,20 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
             "test 015an",
-            response.context["plugins"][0].get("name", "")
+            response.context["service"].all_plugins[0].get("name", "")
         )
 
     @tag("create_test_file")
     def test_view_pass_messages(self):
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
-            response.context.get("add_plugin_messages"),
+            response.context.get("plugins_messages"),
             []
         )
         self.send_default_post_and_return_response()
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
-            response.context["add_plugin_messages"],
+            response.context["plugins_messages"],
             [ADD_PLUGIN_SUCCESS_MESSAGE]
         )
 
@@ -186,7 +186,7 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         response = self.send_default_post_and_return_response()
         self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
-            response.context["add_plugin_messages"],
+            response.context["plugins_messages"],
             [ADD_PLUGIN_FILE_ERROR_MESSAGE]
         )
 
@@ -196,13 +196,17 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         self.client.get("/the_elder_commands/plugins/")
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
-            response.context["add_plugin_messages"],
+            response.context["plugins_messages"],
             []
         )
 
     @tag("create_test_file")
     def test_plugins_redirect_after_POST(self):
         response = self.send_default_post_and_return_response()
+        self.assertRedirects(response, "/the_elder_commands/plugins/")
+
+        post = {"selected": "test_015an", "test_015an_variant": "0.1;polish", "test_015an_load_order": "01"}
+        response = self.client.post("/the_elder_commands/plugins/", data=post)
         self.assertRedirects(response, "/the_elder_commands/plugins/")
 
     @tag("create_test_file")
@@ -245,6 +249,15 @@ class PluginsViewTest(TestCase, ManageTestFiles):
         })
         form_mock.assert_called_once()
         form_mock.assert_called_with(data=expected, instance=plugin)
+
+    @patch("the_elder_commands.views.SelectedPluginsForm")
+    def test_select_post_is_managed_by_correct_form(self, form_mock):
+        post = {"selected": "", "test_01_selected": "", "test_01_variant": "0.1;english", "test_01_load_order": "01"}
+        self.client.post("/the_elder_commands/plugins/", data=post)
+        expected = QueryDict("", mutable=True)
+        expected.update(post)
+
+        form_mock.assert_called_once()
 
 
 class ExtractSkillsTest(TestCase):

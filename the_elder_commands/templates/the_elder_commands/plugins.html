@@ -16,9 +16,9 @@
 </div>
 </div>
 
-{% if add_plugin_messages %}
-{% for message in add_plugin_messages %}
-    <div class="row">
+{% if plugins_messages %}
+{% for message in plugins_messages %}
+    <div class="row errors_messages">
     <div class="col-auto">
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             <h4><strong>{{ message }}</strong></h4>
@@ -47,26 +47,27 @@
                     </tr>
                     </thead>
                     <tbody class="plugins_table">
-                    {% for plugin in plugins %}
+                    {% for plugin in service.all_plugins %}
                     {% with plugin|get_item:"usable_name" as usable_name %}
                     <tr>
                         <td>
-                            <label><input type="checkbox" name="{{ usable_name }}_selected"
+                            <label><input type="checkbox" name="selected" class="{{ usable_name }}" value="{{ usable_name }}"
                                           {% if plugin|get_item:"selected" %}checked{% endif %}></label>
                         </td>
                         <td>{{ plugin|get_item:"name" }}</td>
                         <td><!--suppress HtmlFormInputWithoutLabel -->
                             <select class="form-control" id="id_{{ usable_name }}_variant"
-                                                                                      name="{{ usable_name }}_variant">
+                                    name="{{ usable_name }}_variant">
                                 {% for variant in plugin|get_item:"variants" %}
-                                <option value="{{ variant|get_item:"version" }};{{ variant|get_item:"language" }}">
+                                <option value="{{ variant|get_item:"version" }}&{{ variant|get_item:"language" }}"
+                                {% if variant|get_item:"selected" %}selected="selected"{% endif %}>
                                     {{ variant|get_item:"version" }} {{ variant|get_item:"language"|capfirst }}</option>
                                 {% endfor %}
                             </select>
                         </td>
                         <td>
-                            <label for="id_{{ usable_name }}_plugin_order">
-                                <input type="text" name="{{ usable_name }}_plugin_order"
+                            <label for="id_{{ usable_name }}_load_order">
+                                <input type="text" name="{{ usable_name }}_load_order"
                                        value="{{ plugin|get_item:"load_order" }}">
                             </label>
                         </td>
@@ -94,9 +95,12 @@
                     </tr>
                     </thead>
                     <tbody class="selected_plugins">
+                    {% for selected in service.selected %}
                     <tr>
-                        <td></td>
+                        <td>{{ selected|get_item:"name" }} {{ selected|get_item:"version" }}
+                            {{ selected|get_item:"language"|capfirst }}</td>
                     </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
