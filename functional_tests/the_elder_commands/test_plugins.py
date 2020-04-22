@@ -73,8 +73,6 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
             self.create_test_files(incorrect_data)
         if self.check_test_tag("populate_plugins_table"):
             self.populate_plugins_table()
-        if self.check_test_tag("generate_selected_plugins"):
-            self.generate_selected_plugins()
 
         # Foris open plugins section of TEC,
         self.driver.get(self.live_server_url + "/plugins/")
@@ -109,10 +107,6 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
                 language="english"
             )
             form.save()
-
-    @staticmethod
-    def generate_selected_plugins():
-        pass
 
     def check_errors_messages(self, list_of_messages):
         errors_messages = self.wait_for(lambda: self.driver.find_elements_by_class_name("errors_messages"))
@@ -199,20 +193,32 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         # and after reload selected plugins appear in table on the side
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
-            "test 0 0 English\ntest 2 2 English"
+            "test 0 ver: 0 English\nUnselect\ntest 2 ver: 2 English\nUnselect"
         ))
 
-    @tag("populate_plugins_table")
-    @tag("generate_selected_plugins")
-    def test_selected_plugins_can_be_unselect_from_selected_table(self):
-        # Foris have few plugins selected but he decide thant hi don't need one of them
+        # he decide thant he don't need one of them
+        selected_table = self.wait_for(lambda: self.driver.find_element_by_class_name("selected_plugins"))
+        selected_table.find_element_by_name("unselect").click()
+
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
-            "test 0 0 English\ntest 2 2 English"
+            "test 2 ver: 2 English\nUnselect"
         ))
 
-        self.fail("Finish test!")
+        # then he add one more plugin
+        self.wait_for(lambda: self.driver.find_element_by_class_name("test_3").click())
+        self.driver.find_element_by_name("test_3_load_order").send_keys("03")
+        self.driver.find_element_by_id("id_select_plugin_submit").click()
 
-    def test_load_order_is_required_for_selected_plugins(self):
-        #
-        self.fail("Finish test!")
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("selected_plugins").text,
+            "test 2 ver: 2 English\nUnselect\ntest 3 ver: 3 English\nUnselect"
+        ))
+
+        # but decided that he don't need any of them and unselect all
+        self.wait_for(lambda: self.driver.find_element_by_class_name("unselect_all").click())
+
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("selected_plugins").text,
+            ""
+        ))

@@ -51,7 +51,8 @@
                     {% with plugin|get_item:"usable_name" as usable_name %}
                     <tr>
                         <td>
-                            <label><input type="checkbox" name="selected" class="{{ usable_name }}" value="{{ usable_name }}"
+                            <label><input type="checkbox" name="selected" class="{{ usable_name }}"
+                                          value="{{ usable_name }}"
                                           {% if plugin|get_item:"selected" %}checked{% endif %}></label>
                         </td>
                         <td>{{ plugin|get_item:"name" }}</td>
@@ -91,14 +92,26 @@
                 <table class="table table-dark text-info" id="id_selected_plugins_table">
                     <thead>
                     <tr>
-                        <th>Selected Plugins:</th>
+                        <th><form action="{% url "tec:plugins" %}" method="post"> Selected Plugins:
+                            <span style="float:right"><button type="submit"  name="unselect" value="unselect_all"
+                            class="btn btn-dark text-info btn-sm btn-outline-info unselect_all" >
+                            Unselect All
+                            </button></span>
+                            {% csrf_token %}
+                        </form></th>
                     </tr>
                     </thead>
                     <tbody class="selected_plugins">
                     {% for selected in service.selected %}
                     <tr>
-                        <td>{{ selected|get_item:"name" }} {{ selected|get_item:"version" }}
-                            {{ selected|get_item:"language"|capfirst }}</td>
+                        <td><form action="{% url "tec:plugins" %}" method="post">
+                            {{ selected|get_item:"name" }} ver: {{ selected|get_item:"version" }}
+                            {{ selected|get_item:"language"|capfirst }} <span style="float:right"><button
+                                type="submit" class="btn btn-dark text-info btn-sm btn-outline-info"
+                                value="{{ selected|get_item:"usable_name" }}" name="unselect">Unselect</button></span>
+                            {% csrf_token %}
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -107,7 +120,8 @@
         </div>
     </div>
 
-    <div class="tab-pane col-12 container-fluid" id="id_add_plugin_panel" role="tabpanel" aria-labelledby="id_add_plugin">
+    <div class="tab-pane col-12 container-fluid" id="id_add_plugin_panel" role="tabpanel"
+         aria-labelledby="id_add_plugin">
         <form id="id_add_plugin_form" action="{% url 'tec:plugins' %}" method="post" enctype="multipart/form-data">
             <div class="row row-separator"></div>
             <div class="form-row">

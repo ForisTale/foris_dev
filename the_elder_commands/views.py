@@ -54,6 +54,9 @@ def plugins_view(request):
             else:
                 for error in form.errors:
                     request.session["plugins_messages"] += [error]
+        elif "unselect" in request.POST:
+            unselect(request)
+            return redirect("tec:plugins")
 
     service = PluginsService(request)
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
@@ -87,6 +90,21 @@ def handle_add_plugin_post(request):
     else:
         for error in plugin_custom_form.errors:
             request.session["plugins_messages"] += [*error]
+
+
+def unselect(request):
+    to_unselect = request.POST.getlist("unselect", [])
+    if to_unselect == ["unselect_all"]:
+        request.session.update({"selected": []})
+        return
+
+    all_selected = request.session.get("selected", [])
+    for item in to_unselect:
+        for selected in all_selected:
+            if selected.get("usable_name") == item:
+                all_selected.remove(selected)
+                break
+    request.session.update({"selected": all_selected})
 
 
 def plugin_variants_post(request):

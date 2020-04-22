@@ -86,10 +86,7 @@ class PluginsForm:
                 self.errors.append(PLUGINS_ERROR_NAME_BECOME_EMPTY)
 
     def is_valid(self):
-        if self.errors:
-            return False
-        else:
-            return True
+        return self.errors == []
 
     def name_become_empty(self):
         name = self.get_name(self.name)
@@ -191,10 +188,7 @@ class SelectedPluginsForm:
                     return
 
     def is_valid(self):
-        if self.errors:
-            return False
-        else:
-            return True
+        return self.errors == []
 
     def collect_selected(self):
         selected = self.request.POST.getlist("selected", [])
@@ -207,7 +201,7 @@ class SelectedPluginsForm:
                 "language": self.get_language(usable_name),
                 "load_order": self.request.POST.get(f"{usable_name}_load_order")
             })
-        self.request.session["selected"] = collected
+        self.request.session.update({"selected": collected})
 
     def get_version(self, usable_name):
         variant = self.request.POST.get(f"{usable_name}_variant")
