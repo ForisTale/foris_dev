@@ -10,7 +10,9 @@ def template_variables(request):
             ["Khajiit", "khajiit_race"], ["Nord", "nord_race"],
             ["Ork", "ork_race"], ["Redguard", "redguard_race"],
         ],
-        "categories": ["character", "items", "spells", "other", "plugins", "commands"],
+        "main_categories": ["character", "items", "spells", "other", "plugins", "commands"],
+        "items_categories": ["Weapons", "Armors", "Ammo", "Books", "Ingredients", "Alchemy", "Scrolls", "SoulGems",
+                             "Keys", "Miscellaneous"],
     }
 
 
@@ -46,11 +48,20 @@ ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language and " \
                                         "Instance already exists."
 
-INCORRECT_LOAD_ORDER = "Load order need to be hex number between 00 and FF!"
+ITEMS_COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the commands page."
+
+ITEMS_COMMANDS_POST_EMPTY_MESSAGE = "No items selected!"
+
+ITEMS_CONVERT_POST_ERROR = "Javascript error! Something went wrong! If the error persists, contact Foris."
+
+INCORRECT_LOAD_ORDER = "Load order need to be hex number between 00 and FF for esp files and from FE001 to "\
+                       "FEFFF for esl files!"
 
 PLUGINS_ERROR_STRING_IS_EMTPY = "Name cannot be empty!"
 
 PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"
+
+NO_PLUGIN_SELECTED_ERROR_MESSAGE = "Please select plugin before use Items or Spells."
 
 SKILLS_CONSOLE_NAME = [
     'alteration', 'conjuration', 'destruction', 'enchanting',

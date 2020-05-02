@@ -8,6 +8,13 @@ class CharacterTest(FunctionalTest):
         # Foris open The elder commands website.
         self.driver.get(self.live_server_url)
 
+    def equal_find_element_by_id(self, id_text, value):
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_id(id_text).text,
+            value
+        )
+                      )
+
     def fill_default_values(self):
         self.driver.find_element_by_name("sneak_base").clear()
         self.driver.find_element_by_name("sneak_base").send_keys("30")
@@ -87,9 +94,6 @@ class CharacterTest(FunctionalTest):
             self.driver.find_elements_by_tag_name("button")[-1].text,
             "Calculate"
         )
-
-        # There is also empty commands lists column.
-        self.equal_find_element_by_id("id_commands_list", "Commands List:")
 
     def test_validation(self):
         # Then Foris write some letters into skills
@@ -185,9 +189,12 @@ class CharacterTest(FunctionalTest):
         for case in cases:
             self.wait_for(lambda: self.assertEqual(case.is_selected(), True))
 
-        # and commands list is full of commands
-        list_of_commands = self.driver.find_element_by_id("id_commands_list") \
-            .find_elements_by_tag_name("td")
+        # Foris change to commands page
+        self.driver.find_element_by_link_text("Commands").click()
+
+        # and there commands list is full of commands
+        commands_table = self.driver.find_element_by_id("id_commands_list")
+        list_of_commands = commands_table.find_elements_by_tag_name("td")
         list_of_commands = [row.text for row in list_of_commands]
         self.assertNotEqual(
             list_of_commands,
@@ -241,15 +248,18 @@ class CharacterTest(FunctionalTest):
         # and then press calculate.
         self.driver.find_element_by_id("id_calculate").click()
 
-        # in desired level value changed
+        # in desired level value changed.
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_name("desired_level").get_attribute("value"),
             "3"
         ))
 
+        # Foris change to commands page
+        self.driver.find_element_by_link_text("Commands").click()
+
         # and in commands list he sees list of commands
-        list_of_commands = self.driver.find_element_by_id("id_commands_list")\
-            .find_elements_by_tag_name("td")
+        commands_table = self.driver.find_element_by_id("id_commands_list")
+        list_of_commands = commands_table.find_elements_by_tag_name("td")
         list_of_commands = [row.text for row in list_of_commands]
         commands = [
             "player.advskill alteration 842",

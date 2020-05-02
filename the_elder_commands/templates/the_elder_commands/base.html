@@ -10,6 +10,8 @@
     <link href="/static/the_elder_commands/base.css" rel="stylesheet">
     <link rel="shortcut icon" href=" {% static 'favicon.ico' %}">
     <title>The Elder Commands</title>
+    {% block head %}
+    {% endblock %}
 </head>
 <body>
 <div class="container-fluid">
@@ -17,7 +19,7 @@
     <li class="nav-item">
         <a class="nav-link header-link text-info " href="{% url 'main_page:home' %}">Foris.dev</a>
     </li>
-    {% for category in categories %}
+    {% for category in main_categories %}
     <li class="nav-item">
         {% with "tec:"|addstr:category as address_url %}
         {% if active == category %}
@@ -38,5 +40,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
+{% block scripts %}
+{% endblock %}
 </body>
 </html>

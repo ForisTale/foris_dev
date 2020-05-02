@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1f396fdf-c8e7-4187-b9d6-5a45ac77360e" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/functional_tests/the_elder_commands/test_base_looks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/functional_tests/the_elder_commands/test_items.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/the_elder_commands/templates/the_elder_commands/items.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/foris_dev/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/foris_dev/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functional_tests/the_elder_commands/test_character.py" beforeDir="false" afterPath="$PROJECT_DIR$/functional_tests/the_elder_commands/test_character.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_page/templates/main_page/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/main_page/templates/main_page/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/the_elder_commands/templates/the_elder_commands/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/the_elder_commands/templates/the_elder_commands/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/the_elder_commands/templates/the_elder_commands/character.html" beforeDir="false" afterPath="$PROJECT_DIR$/the_elder_commands/templates/the_elder_commands/character.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/the_elder_commands/tests/test_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/the_elder_commands/tests/test_views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/the_elder_commands/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/the_elder_commands/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/the_elder_commands/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/the_elder_commands/views.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="377" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="CSS File" />
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
+  <component name="ProjectId" id="1P3C2WnIPqWULL9z876DHPtK2d6" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/functional_tests/screendumps/CharacterTest.test_default_look_and_values-window-0-2019-08-03T16.16.24.png&#10;true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/the_elder_commands/templates/the_elder_commands" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="PyCoverageOptionsProvider">
+    <option name="myUseBundledCoveragePy" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="OPEN_URL_DIALOG">
+      <recent name="https://github.com/ForisTale/Django_TDD" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\the_elder_commands\templates\the_elder_commands" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\the_elder_commands" />
+      <recent name="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\" />
+      <recent name="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\functional_tests" />
+      <recent name="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\rest_api\tests" />
+      <recent name="C:\Users\Tale\Dropbox\projects\[!]_Django\foris_dev\rest_api" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Django tests.Test: functional_tests.superlists.test_my_lists">
+    <configuration name="Test: functional_tests.superlists.test_my_lists" type="DjangoTestsConfigurationType" temporary="true">
+      <module name="foris_dev" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="TARGET" value="functional_tests.superlists.test_my_lists" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Test: functional_tests.the_elder_commands.test_character" type="DjangoTestsConfigurationType" temporary="true">
+      <module name="foris_dev" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="TARGET" value="functional_tests.the_elder_commands.test_character" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Test: functional_tests.the_elder_commands.test_items" type="DjangoTestsConfigurationType" temporary="true">
+      <module name="foris_dev" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="TARGET" value="functional_tests.the_elder_commands.test_items" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Test: the_elder_commands" type="DjangoTestsConfigurationType" temporary="true">
+      <module name="foris_dev" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="TARGET" value="the_elder_commands" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Test: " type="DjangoTestsConfigurationType" temporary="true">
+      <module name="foris_dev" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="TARGET" value="" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Django tests.Test: functional_tests.superlists.test_my_lists" />
+        <item itemvalue="Django tests.Test: " />
+        <item itemvalue="Django tests.Test: functional_tests.the_elder_commands.test_items" />
+        <item itemvalue="Django tests.Test: functional_tests.the_elder_commands.test_character" />
+        <item itemvalue="Django tests.Test: the_elder_commands" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1f396fdf-c8e7-4187-b9d6-5a45ac77360e" name="Default Changelist" comment="" />
+      <created>1562850697580</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1562850697580</updated>
+      <workItem from="1562850699895" duration="837000" />
+      <workItem from="1562851710563" duration="7033000" />
+      <workItem from="1562873609802" duration="3689000" />
+      <workItem from="1562917677006" duration="6481000" />
+      <workItem from="1562934374619" duration="7165000" />
+      <workItem from="1562966775151" duration="237000" />
+      <workItem from="1563008235504" duration="7862000" />
+      <workItem from="1563119499942" duration="1135000" />
+      <workItem from="1563137897587" duration="159000" />
+      <workItem from="1563140544504" duration="19000" />
+      <workItem from="1563214346008" duration="835000" />
+      <workItem from="1563537926746" duration="643000" />
+      <workItem from="1563798232756" duration="130000" />
+      <workItem from="1563863717686" duration="9951000" />
+      <workItem from="1563950196999" duration="3720000" />
+      <workItem from="1564056293225" duration="10911000" />
+      <workItem from="1564126631187" duration="1000000" />
+      <workItem from="1564302896868" duration="10449000" />
+      <workItem from="1564333118371" duration="533000" />
+      <workItem from="1564391275242" duration="6840000" />
+      <workItem from="1564476798564" duration="3933000" />
+      <workItem from="1564494611897" duration="1725000" />
+      <workItem from="1564508061936" duration="3117000" />
+      <workItem from="1564554685836" duration="4605000" />
+      <workItem from="1564567765096" duration="1619000" />
+      <workItem from="1564580551875" duration="1662000" />
+      <workItem from="1564657914710" duration="2977000" />
+      <workItem from="1564752833460" duration="4655000" />
+      <workItem from="1564828522413" duration="18840000" />
+      <workItem from="1564914446696" duration="624000" />
+      <workItem from="1564921350110" duration="16343000" />
+      <workItem from="1564998470610" duration="13363000" />
+      <workItem from="1565027454331" duration="2621000" />
+      <workItem from="1565080029921" duration="12000" />
+      <workItem from="1565093192097" duration="3806000" />
+      <workItem from="1565173700151" duration="20464000" />
+      <workItem from="1565240982989" duration="2610000" />
+      <workItem from="1565350686496" duration="17599000" />
+      <workItem from="1565446005613" duration="32000" />
+      <workItem from="1565446048845" duration="13357000" />
+      <workItem from="1565467008445" duration="841000" />
+      <workItem from="1565520670769" duration="20199000" />
+      <workItem from="1565592025777" duration="19564000" />
+      <workItem from="1565676775071" duration="22840000" />
+      <workItem from="1565785109883" duration="9824000" />
+      <workItem from="1565858572224" duration="20344000" />
+      <workItem from="1566302149278" duration="4240000" />
+      <workItem from="1566553041969" duration="147000" />
+      <workItem from="1568666189152" duration="614000" />
+      <workItem from="1569605182216" duration="717000" />
+      <workItem from="1569750117231" duration="5639000" />
+      <workItem from="1570377743005" duration="3252000" />
+      <workItem from="1570678373630" duration="660000" />
+      <workItem from="1571766636359" duration="2159000" />
+      <workItem from="1571803346024" duration="1792000" />
+      <workItem from="1571853992331" duration="836000" />
+      <workItem from="1571891181482" duration="635000" />
+      <workItem from="1571979232801" duration="2227000" />
+      <workItem from="1572024620860" duration="3565000" />
+      <workItem from="1572101402993" duration="11832000" />
+      <workItem from="1572165001939" duration="4056000" />
+      <workItem from="1572326175322" duration="824000" />
+      <workItem from="1572461236791" duration="637000" />
+      <workItem from="1572585520262" duration="701000" />
+      <workItem from="1572844694489" duration="1800000" />
+      <workItem from="1572930845081" duration="1484000" />
+      <workItem from="1573298788827" duration="1790000" />
+      <workItem from="1574192342410" duration="601000" />
+      <workItem from="1574966655336" duration="200000" />
+      <workItem from="1574973180415" duration="3295000" />
+      <workItem from="1575125614035" duration="8000" />
+      <workItem from="1575125714969" duration="18000" />
+      <workItem from="1575126066102" duration="131000" />
+      <workItem from="1575126214325" duration="931000" />
+      <workItem from="1575128399361" duration="398000" />
+      <workItem from="1575128867945" duration="308000" />
+      <workItem from="1575129782997" duration="31000" />
+      <workItem from="1575223631737" duration="2400000" />
+      <workItem from="1575273762706" duration="14887000" />
+      <workItem from="1575306526789" duration="1778000" />
+      <workItem from="1575308325656" duration="89000" />
+      <workItem from="1575308427528" duration="623000" />
+      <workItem from="1575315772415" duration="5868000" />
+      <workItem from="1575370825165" duration="5739000" />
+      <workItem from="1575382374025" duration="803000" />
+      <workItem from="1575400325828" duration="25000" />
+      <workItem from="1575400358097" duration="1061000" />
+      <workItem from="1576525979403" duration="518000" />
+      <workItem from="1576527010943" duration="1220000" />
+      <workItem from="1576611510365" duration="1699000" />
+      <workItem from="1577195236054" duration="16000" />
+      <workItem from="1577256564697" duration="312000" />
+      <workItem from="1577302989022" duration="2206000" />
+      <workItem from="1577350095425" duration="1617000" />
+      <workItem from="1577378258462" duration="2842000" />
+      <workItem from="1579154295645" duration="1468000" />
+      <workItem from="1579550138850" duration="3097000" />
+      <workItem from="1579632334506" duration="201000" />
+      <workItem from="1579632740932" duration="1785000" />
+      <workItem from="1579672255001" duration="1063000" />
+      <workItem from="1579804836822" duration="94000" />
+      <workItem from="1579804954222" duration="783000" />
+      <workItem from="1580363161226" duration="1050000" />
+      <workItem from="1580932836272" duration="821000" />
+      <workItem from="1581021416697" duration="332000" />
+      <workItem from="1581627087797" duration="1261000" />
+      <workItem from="1582465959458" duration="1024000" />
+      <workItem from="1582611604201" duration="346000" />
+      <workItem from="1583075143220" duration="600000" />
+      <workItem from="1583611101154" duration="2038000" />
+      <workItem from="1583682055955" duration="550000" />
+      <workItem from="1584206304716" duration="937000" />
+      <workItem from="1584269940177" duration="1901000" />
+      <workItem from="1584557274866" duration="4925000" />
+      <workItem from="1584720724655" duration="1888000" />
+      <workItem from="1584787941421" duration="4451000" />
+      <workItem from="1584815738232" duration="934000" />
+    </task>
+    <task id="LOCAL-00001" summary="Copy most of files from Django_TDD before adjustments.">
+      <created>1562851822158</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1562851822158</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Namespace for static files, and improve about_me text">
+      <created>1562851867985</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1562851867985</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Namespace for static files, and improve about_me text">
+      <created>1562855057438</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1562855057438</updated>
+    </task>
+    <task id="LOCAL-00004" summary="adjust apps and tests, all tests passed">
+      <created>1562855791163</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1562855791163</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Connect main page with lists.">
+      <created>1562861194552</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1562861194552</updated>
+    </task>
+    <task id="LOCAL-00006" summary="add validation for share lists and change to use yaml for secret key">
+      <created>1562877294028</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1562877294028</updated>
+    </task>
+    <task id="LOCAL-00007" summary="disable redundant admin panel">
+      <created>1562931178424</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1562931178424</updated>
+    </task>
+    <task id="LOCAL-00008" summary="complete basic look and text">
+      <created>1562938222233</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1562938222233</updated>
+    </task>
+    <task id="LOCAL-00009" summary="adjustment for FT">
+      <created>1562945853671</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1562945853671</updated>
+    </task>
+    <task id="LOCAL-00010" summary="security tweaks">
+      <created>1562947058149</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1562947058149</updated>
+    </task>
+    <task id="LOCAL-00011" summary="security tweaks">
+      <created>1562947315261</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1562947315261</updated>
+    </task>
+    <task id="LOCAL-00012" summary="security tweaks will work only in deployment, change looks in main page">
+      <created>1563011268351</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1563011268351</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Little change to site look">
+      <created>1563121588565</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1563121588565</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Disable redundant setting and change to site text.">
+      <created>1563798305882</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1563798305882</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Play with javascript">
+      <created>1563973151954</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1563973151954</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Small fix for load scripts, and adjust FT message.">
+      <created>1564057512593</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1564057512593</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Small fix for load scripts, and adjust FT message.">
+      <created>1564057824558</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1564057824558</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Rest api from scratch.">
+      <created>1564310743022</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1564310743022</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Rest api, with django rest framework.">
+      <created>1564568770959</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1564568770959</updated>
+    </task>
+    <task id="LOCAL-00020" summary="restore list load in case JS is disabled">
+      <created>1564662314359</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1564662314359</updated>
+    </task>
+    <task id="LOCAL-00021" summary="refactor FT, separate base into main and specific for app">
+      <created>1564758162337</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1564758162337</updated>
+    </task>
+    <task id="LOCAL-00022" summary="new app The Elder Commands, first FT for app">
+      <created>1564837322007</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1564837322008</updated>
+    </task>
+    <task id="LOCAL-00023" summary="base for character page, and better links for bootstrap css">
+      <created>1564923159508</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1564923159508</updated>
+    </task>
+    <task id="LOCAL-00024" summary="give character page proper looks">
+      <created>1564938610980</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1564938610980</updated>
+    </task>
+    <task id="LOCAL-00025" summary="change database to postgres">
+      <created>1565121435693</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1565121435693</updated>
+    </task>
+    <task id="LOCAL-00026" summary="disable detail error messages, FT for calculate level">
+      <created>1565458442971</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1565458442971</updated>
+    </task>
+    <task id="LOCAL-00027" summary="model, view, form and service, partly done, migrations, inventory, tests&#10;&#10;view: few helper functions, manage POST &#10;form: set fields with default as not required &#10;model: Character, with migrations&#10;service: passes data for html">
+      <created>1565459287044</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1565459287044</updated>
+    </task>
+    <task id="LOCAL-00028" summary="function test calculate level passed, enable error messages">
+      <created>1565553287542</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1565553287542</updated>
+    </task>
+    <task id="LOCAL-00029" summary="function test calculate level passed, enable error messages">
+      <created>1565553415446</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1565553415446</updated>
+    </task>
+    <task id="LOCAL-00030" summary="refactoring">
+      <created>1565605172699</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1565605172699</updated>
+    </task>
+    <task id="LOCAL-00031" summary="form validations">
+      <created>1565634401582</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1565634401582</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Correctly calculate desired level">
+      <created>1565701016884</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1565701016884</updated>
+    </task>
+    <task id="LOCAL-00033" summary="refactoring: merge desired and default skills">
+      <created>1565712882521</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1565712882521</updated>
+    </task>
+    <task id="LOCAL-00034" summary="refactoring: merge desired and default skills">
+      <created>1565712957427</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1565712957427</updated>
+    </task>
+    <task id="LOCAL-00035" summary="optimization of form validation">
+      <created>1565877115970</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1565877115970</updated>
+    </task>
+    <task id="LOCAL-00036" summary="fill skills to desired level is done.">
+      <created>1565895166888</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1565895166888</updated>
+    </task>
+    <task id="LOCAL-00037" summary="link main page with TEC, create base template">
+      <created>1565899759359</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1565899759359</updated>
+    </task>
+    <task id="LOCAL-00038" summary="fix looped test and correct skill command value">
+      <created>1569757041601</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1569757041601</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Add timestamp to character model">
+      <created>1570387131563</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1570387131563</updated>
+    </task>
+    <task id="LOCAL-00040" summary="JS script for zEdit. Without ESL support.">
+      <created>1575373892014</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1575373892014</updated>
+    </task>
+    <task id="LOCAL-00041" summary="requirements update">
+      <created>1575374213057</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1575374213057</updated>
+    </task>
+    <task id="LOCAL-00042" summary="requirements update">
+      <created>1575374922786</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1575374922786</updated>
+    </task>
+    <task id="LOCAL-00043" summary="requirements update">
+      <created>1575382566796</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1575382566796</updated>
+    </task>
+    <task id="LOCAL-00044" summary="requirements update">
+      <created>1575400679687</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1575400679687</updated>
+    </task>
+    <task id="LOCAL-00045" summary="requirements update">
+      <created>1575400719742</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1575400719742</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Change way to get passwords.">
+      <created>1577352402171</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1577352402171</updated>
+    </task>
+    <task id="LOCAL-00047" summary="add support for esl">
+      <created>1584206640628</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1584206640628</updated>
+    </task>
+    <task id="LOCAL-00048" summary="update about_me">
+      <created>1584557498124</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1584557498124</updated>
+    </task>
+    <task id="LOCAL-00049" summary="fix error on fail functional test">
+      <created>1584559056196</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1584559056196</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="restore list load in case JS is disabled" />
+    <MESSAGE value="refactor FT, separate base into main and specific for app" />
+    <MESSAGE value="new app The Elder Commands, first FT for app" />
+    <MESSAGE value="base for character page, and better links for bootstrap css" />
+    <MESSAGE value="give character page proper looks" />
+    <MESSAGE value="change database to postgres" />
+    <MESSAGE value="disable detail error messages, FT for calculate level" />
+    <MESSAGE value="model, view, form and service, partly done, migrations, inventory, tests&#10;&#10;view: few helper functions, manage POST &#10;form: set fields with default as not required &#10;model: Character, with migrations&#10;service: passes data for html" />
+    <MESSAGE value="FT passed," />
+    <MESSAGE value="function test calculate level passed, enable error messages" />
+    <MESSAGE value="refactoring" />
+    <MESSAGE value="form validations" />
+    <MESSAGE value="Correctly calculate desired level" />
+    <MESSAGE value="refactoring: merge desired and default skills" />
+    <MESSAGE value="optimization of form validation" />
+    <MESSAGE value="fill skills to desired level is done." />
+    <MESSAGE value="link main page with TEC, create base template" />
+    <MESSAGE value="fix looped test and correct skill command value" />
+    <MESSAGE value="Add timestamp to character model" />
+    <MESSAGE value="JS script for zEdit. Without ESL support." />
+    <MESSAGE value="requirements update" />
+    <MESSAGE value="Change way to get passwords." />
+    <MESSAGE value="add support for esl" />
+    <MESSAGE value="update about_me" />
+    <MESSAGE value="fix error on fail functional test" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix error on fail functional test" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="570" y="172" width="1309" height="1023" key="CommitChangelistDialog2" timestamp="1584559055806">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="570" y="172" width="1309" height="1023" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1584559055806" />
+    <state width="2517" height="399" key="GridCell.Tab.0.bottom" timestamp="1577305196375">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="2517" height="399" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1577305196375" />
+    <state width="2517" height="399" key="GridCell.Tab.0.center" timestamp="1577305196375">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="2517" height="399" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1577305196375" />
+    <state width="2517" height="399" key="GridCell.Tab.0.left" timestamp="1577305196375">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="2517" height="399" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1577305196375" />
+    <state width="2517" height="399" key="GridCell.Tab.0.right" timestamp="1577305196375">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="2517" height="399" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1577305196375" />
+    <state x="781" y="342" key="SettingsEditor" timestamp="1584284883536">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="781" y="342" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1584284883536" />
+    <state x="92" y="92" width="2376" height="1216" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1580933585764">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="92" y="92" width="2376" height="1216" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1580933585764" />
+    <state x="976" y="523" key="com.intellij.ide.util.TipDialog" timestamp="1584876903629">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="976" y="523" key="com.intellij.ide.util.TipDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1584876903629" />
+    <state x="1021" y="343" key="refactoring.ChangeSignatureDialog" timestamp="1584796124042">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1021" y="343" key="refactoring.ChangeSignatureDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1584796124042" />
+    <state x="943" y="315" width="672" height="678" key="search.everywhere.popup" timestamp="1584560216005">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="943" y="315" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400@0.0.2560.1400" timestamp="1584560216005" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_commands_list.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_commands_list Coverage Results" MODIFIED="1568666663362" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__.coverage" NAME="Test:  Coverage Results" MODIFIED="1577256622004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_desired_level_fill_skills_only_to_100.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_desired_level_fill_skills_only_to_100 Coverage Results" MODIFIED="1569756897499" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_calculate_desired_level.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_calculate_desired_level Coverage Results" MODIFIED="1568666690676" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_if_passes_non_exist_session_key_create_default.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_if_passes_non_exist_session_key_create_default Coverage Results" MODIFIED="1568666671680" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_desired_level_is_calculated_against_default_skills.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_desired_level_is_calculated_against_default_skills Coverage Results" MODIFIED="1568666684672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__functional_tests_superlists_test_my_lists.coverage" NAME="Test: functional_tests.superlists.test_my_lists Coverage Results" MODIFIED="1577303746816" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_if_desired_level_is_bigger_than_calculated_then_change_skills.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_if_desired_level_is_bigger_than_calculated_then_change_skills Coverage Results" MODIFIED="1568666694510" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_desired_skills_update_return_correct_object.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_desired_skills_update_return_correct_object Coverage Results" MODIFIED="1568666675632" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_race_skills_update_depend_on_race.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_race_skills_update_depend_on_race Coverage Results" MODIFIED="1568666637311" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_empty_character_desired_skills_return_desired_skills_empty_value.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_empty_character_desired_skills_return_desired_skills_empty_value Coverage Results" MODIFIED="1568666680145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__functional_tests_the_elder_commands_test_character.coverage" NAME="Test: functional_tests.the_elder_commands.test_character Coverage Results" MODIFIED="1570381355348" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests.coverage" NAME="Test: the_elder_commands.tests Coverage Results" MODIFIED="1568666608300" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands.coverage" NAME="Test: the_elder_commands Coverage Results" MODIFIED="1570381215883" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_predict_desired_level_count_from_default.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_predict_desired_level_count_from_default Coverage Results" MODIFIED="1568666667638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_views_CharacterViewTest_test_view_build_dict_and_pass_it_to_form.coverage" NAME="Test: the_elder_commands.tests.test_views.CharacterViewTest.test_view_build_dict_and_pass_it_to_form Coverage Results" MODIFIED="1565876762976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_forms_CharacterFormValidationTest_test_skills_values_are_numbers.coverage" NAME="Test: the_elder_commands.tests.test_forms.CharacterFormValidationTest.test_skills_values_are_numbers Coverage Results" MODIFIED="1565711608015" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services_CharacterServiceTest_test_predict_level.coverage" NAME="Test: the_elder_commands.tests.test_services.CharacterServiceTest.test_predict_level Coverage Results" MODIFIED="1568666654197" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/foris_dev$Test__the_elder_commands_tests_test_services.coverage" NAME="Test: the_elder_commands.tests.test_services Coverage Results" MODIFIED="1565463808060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
+</project>

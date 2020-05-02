@@ -24,7 +24,9 @@ class CharacterForm(ModelForm):
 
     def clean_desired_level(self):
         form_data = self.cleaned_data["desired_level"]
-        if form_data is not None:
+        if form_data is None:
+            return 1
+        else:
             if form_data < 1 or form_data > 81:
                 raise ValidationError("The desired level need to be a integer between 1 and 81.")
         return form_data
@@ -158,7 +160,7 @@ class PluginVariantsForm(ModelForm):
 
 class SelectedPluginsForm:
     def __init__(self, request):
-        self.data = request.POST
+        self.data = request.POST.copy()
         self.request = request
         self.errors = []
 
@@ -170,28 +172,22 @@ class SelectedPluginsForm:
         selected = self.data.getlist("selected", [])
         for usable_name in selected:
             load_order = self.data.get(f"{usable_name}_load_order", "")
-            if load_order == "":
-                self.errors.append(INCORRECT_LOAD_ORDER)
-                return
-            elif len(load_order) > 2 or len(load_order) <= 0:
-                self.errors.append(INCORRECT_LOAD_ORDER)
-                return
-            else:
+            length = len(load_order)
+            if length == 2 or length == 5:
                 if load_order.isalnum():
-                    if len(load_order) == 1:
-                        self.data[f"{usable_name}_load_order"] = "0" + self.data[f"{usable_name}_load_order"]
-
                     return
-
                 else:
                     self.errors.append(INCORRECT_LOAD_ORDER)
                     return
+            else:
+                self.errors.append(INCORRECT_LOAD_ORDER)
+                return
 
     def is_valid(self):
         return self.errors == []
 
     def collect_selected(self):
-        selected = self.request.POST.getlist("selected", [])
+        selected = self.data.getlist("selected", [])
         collected = []
         for usable_name in selected:
             collected.append({
@@ -199,7 +195,7 @@ class SelectedPluginsForm:
                 "usable_name": usable_name,
                 "version": self.get_version(usable_name),
                 "language": self.get_language(usable_name),
-                "load_order": self.request.POST.get(f"{usable_name}_load_order")
+                "load_order": self.data.get(f"{usable_name}_load_order")
             })
         self.request.session.update({"selected": collected})
 

@@ -8,7 +8,7 @@ from datetime import datetime
 import os
 import time
 
-MAX_WAIT = 2
+MAX_WAIT = 5
 TEST_EMAIL = "staging_test_email@yahoo.com"
 FOR_TEST_EMAIL = "staging_test_email"
 SCREEN_DUMP_LOCATION = os.path.join(

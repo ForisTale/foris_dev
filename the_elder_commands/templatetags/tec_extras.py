@@ -9,5 +9,5 @@ def addstr(arg1, arg2):
 
 
 @register.filter
-def get_item(dictionary, key):
+def get_value(dictionary, key):
     return dictionary.get(key, "")

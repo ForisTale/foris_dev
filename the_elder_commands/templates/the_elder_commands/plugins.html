@@ -4,21 +4,21 @@
 <div class="row">
 <div class="col-12">
 <ul class="nav nav-tabs bg-dark justify-content-around" role="tablist">
-<li class="nav-item">
-    <a class="nav-link text-info active show" data-toggle="tab" id="id_plugins" href="#id_plugins_panel" role="tab"
-       aria-controls="id_plugins_panel" aria-selected="true">Plugins</a>
-</li>
-<li class="nav-item">
-    <a class="nav-link text-info" data-toggle="tab" id="id_add_plugin" href="#id_add_plugin_panel" role="tab"
-       aria-controls="id_add_plugin_panel" aria-selected="true">Add Plugin</a>
-</li>
+    <li class="nav-item">
+        <a class="nav-link text-info active show" data-toggle="tab" id="id_plugins" href="#id_plugins_panel" role="tab"
+           aria-controls="id_plugins_panel" aria-selected="true">Plugins</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-info" data-toggle="tab" id="id_add_plugin" href="#id_add_plugin_panel" role="tab"
+           aria-controls="id_add_plugin_panel" aria-selected="false">Add Plugin</a>
+    </li>
 </ul>
 </div>
 </div>
 
 {% if plugins_messages %}
 {% for message in plugins_messages %}
-    <div class="row errors_messages">
+<div class="row errors_messages">
     <div class="col-auto">
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             <h4><strong>{{ message }}</strong></h4>
@@ -27,9 +27,9 @@
             </button>
         </div>
     </div>
+</div>
 {% endfor %}
 {% endif %}
-</div>
 
 <div class="tab-content container-fluid">
     <div class="tab-pane active" id="id_plugins_panel" role="tabpanel" aria-labelledby="id_plugins">
@@ -48,28 +48,28 @@
                     </thead>
                     <tbody class="plugins_table">
                     {% for plugin in service.all_plugins %}
-                    {% with plugin|get_item:"usable_name" as usable_name %}
+                    {% with plugin|get_value:"usable_name" as usable_name %}
                     <tr>
                         <td>
                             <label><input type="checkbox" name="selected" class="{{ usable_name }}"
                                           value="{{ usable_name }}"
-                                          {% if plugin|get_item:"selected" %}checked{% endif %}></label>
+                                          {% if plugin|get_value:"selected" %}checked{% endif %}></label>
                         </td>
-                        <td>{{ plugin|get_item:"name" }}</td>
+                        <td>{{ plugin|get_value:"name" }}</td>
                         <td><!--suppress HtmlFormInputWithoutLabel -->
                             <select class="form-control" id="id_{{ usable_name }}_variant"
                                     name="{{ usable_name }}_variant">
-                                {% for variant in plugin|get_item:"variants" %}
-                                <option value="{{ variant|get_item:"version" }}&{{ variant|get_item:"language" }}"
-                                {% if variant|get_item:"selected" %}selected="selected"{% endif %}>
-                                    {{ variant|get_item:"version" }} {{ variant|get_item:"language"|capfirst }}</option>
+                                {% for variant in plugin|get_value:"variants" %}
+                                <option value="{{ variant|get_value:"version" }}&{{ variant|get_value:"language" }}"
+                                {% if variant|get_value:"selected" %}selected="selected"{% endif %}>
+                                    {{ variant|get_value:"version" }} {{ variant|get_value:"language"|capfirst }}</option>
                                 {% endfor %}
                             </select>
                         </td>
                         <td>
                             <label for="id_{{ usable_name }}_load_order">
                                 <input type="text" name="{{ usable_name }}_load_order"
-                                       value="{{ plugin|get_item:"load_order" }}">
+                                       value="{{ plugin|get_value:"load_order" }}">
                             </label>
                         </td>
                     </tr>
@@ -105,10 +105,10 @@
                     {% for selected in service.selected %}
                     <tr>
                         <td><form action="{% url "tec:plugins" %}" method="post">
-                            {{ selected|get_item:"name" }} ver: {{ selected|get_item:"version" }}
-                            {{ selected|get_item:"language"|capfirst }} <span style="float:right"><button
+                            {{ selected|get_value:"name" }} ver: {{ selected|get_value:"version" }}
+                            {{ selected|get_value:"language"|capfirst }} <span style="float:right"><button
                                 type="submit" class="btn btn-dark text-info btn-sm btn-outline-info"
-                                value="{{ selected|get_item:"usable_name" }}" name="unselect">Unselect</button></span>
+                                value="{{ selected|get_value:"usable_name" }}" name="unselect">Unselect</button></span>
                             {% csrf_token %}
                             </form>
                         </td>

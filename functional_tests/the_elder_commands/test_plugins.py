@@ -2,8 +2,9 @@ from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from the_elder_commands.models import Plugins, PluginVariants
 from selenium.webdriver.support.ui import Select
 from the_elder_commands.inventory import PLUGIN_TEST_FILE, ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
-    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
+    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_DICT
 from django.test.utils import tag
+import copy
 
 
 class PluginsTest(FunctionalTest):
@@ -53,7 +54,7 @@ class PluginsTest(FunctionalTest):
         )
         self.assertEqual(
             self.driver.find_element_by_id("id_selected_plugins_table").text,
-            "Selected Plugins:"
+            "Selected Plugins:\nUnselect All"
         )
 
 
@@ -99,14 +100,16 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     @staticmethod
     def populate_plugins_table():
         for index in range(4):
-            plugin = Plugins.objects.create(name="test " + str(index), usable_name="test_" + str(index))
+            plugin = Plugins.objects.create(name="test 0" + str(index+1), usable_name="test_0" + str(index+1))
             plugin.save()
-            form = PluginVariants.objects.create(
-                instance=plugin,
-                version=str(index),
-                language="english"
-            )
-            form.save()
+            for num in range(4):
+                form = PluginVariants.objects.create(
+                    instance=plugin,
+                    version="0" + str(num+1),
+                    language="english",
+                    plugin_data=copy.deepcopy(PLUGIN_TEST_DICT)
+                )
+                form.save()
 
     def check_errors_messages(self, list_of_messages):
         errors_messages = self.wait_for(lambda: self.driver.find_elements_by_class_name("errors_messages"))
@@ -182,10 +185,10 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     @tag("populate_plugins_table")
     def test_can_chose_plugins_to_select_and_selected_plugins_are_show_in_table(self):
         # Foris chose few plugins and fill their load order
-        self.wait_for(lambda: self.driver.find_element_by_class_name("test_0").click())
-        self.driver.find_element_by_name("test_0_load_order").send_keys("01")
-        self.driver.find_element_by_class_name("test_2").click()
-        self.driver.find_element_by_name("test_2_load_order").send_keys("02")
+        self.wait_for(lambda: self.driver.find_element_by_class_name("test_01").click())
+        self.driver.find_element_by_name("test_01_load_order").send_keys("01")
+        self.driver.find_element_by_class_name("test_02").click()
+        self.driver.find_element_by_name("test_02_load_order").send_keys("02")
 
         # then he submit them
         self.driver.find_element_by_id("id_select_plugin_submit").click()
@@ -193,7 +196,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         # and after reload selected plugins appear in table on the side
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
-            "test 0 ver: 0 English\nUnselect\ntest 2 ver: 2 English\nUnselect"
+            "test 01 ver: 04 English\nUnselect\ntest 02 ver: 04 English\nUnselect"
         ))
 
         # he decide thant he don't need one of them
@@ -202,17 +205,17 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
 
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
-            "test 2 ver: 2 English\nUnselect"
+            "test 02 ver: 04 English\nUnselect"
         ))
 
         # then he add one more plugin
-        self.wait_for(lambda: self.driver.find_element_by_class_name("test_3").click())
-        self.driver.find_element_by_name("test_3_load_order").send_keys("03")
+        self.wait_for(lambda: self.driver.find_element_by_class_name("test_03").click())
+        self.driver.find_element_by_name("test_03_load_order").send_keys("03")
         self.driver.find_element_by_id("id_select_plugin_submit").click()
 
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
-            "test 2 ver: 2 English\nUnselect\ntest 3 ver: 3 English\nUnselect"
+            "test 02 ver: 04 English\nUnselect\ntest 03 ver: 04 English\nUnselect"
         ))
 
         # but decided that he don't need any of them and unselect all

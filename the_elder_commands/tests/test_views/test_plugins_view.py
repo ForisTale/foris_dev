@@ -21,6 +21,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
 
     def setUp(self):
         super().setUp()
+        self.maxDiff = None
 
         if self.check_test_tag("create_test_file"):
             self.create_test_files({"TEC_test_file.tec": PLUGIN_TEST_FILE})

@@ -110,21 +110,5 @@
 </form>
 </div>
 
-<div class="col-md-2">
-    <table class="table table-dark text-info" id="id_commands_list">
-        <thead>
-        <tr>
-            <th>Commands List:</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for command in character.list_of_character_commands %}
-        <tr>
-            <td>{{ command }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
 </div>
 {% endblock %}
