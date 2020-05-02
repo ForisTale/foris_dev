@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from django.http import QueryDict
+from django.http import QueryDict, JsonResponse
 from .models import Character
 from .forms import CharacterForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
-from .services import CharacterService, PluginsService
-from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE
+from .services import CharacterService, PluginsService, ItemsService
+from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, \
+    ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR
 import json
 
 
@@ -23,12 +24,33 @@ def character_view(request):
             form.save()
             return redirect(instance)
     character = CharacterService(session_key=request.session.session_key)
+    request.session.update({"character_commands": character.commands_list()})
     return render(request, "the_elder_commands/character.html", {"character": character, "form": form,
                                                                  "active": "character"})
 
 
 def items_view(request):
-    return render(request, "the_elder_commands/items.html", {"active": "items"})
+    if request.session.get("selected") is None:
+        request.session.update({"missing_plugin_messages": [NO_PLUGIN_SELECTED_ERROR_MESSAGE]})
+        return redirect("tec:plugins")
+    get_items_messages(request)
+
+    if request.method == "POST":
+        commands = convert_items_post(request)
+        request.session.update({"items_commands": commands})
+        if commands:
+            message_information = ITEMS_COMMANDS_SUCCESS_MESSAGE
+        else:
+            message_information = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
+        message = '<div class="alert alert-primary alert-dismissible fade show" role="alert"> <h4><strong>' \
+                  f'{message_information}</strong></h4> <button type="button" class="close" data-dismiss="alert" ' \
+                  'aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+        return JsonResponse({"message": message})
+
+    service = ItemsService(request)
+    messages = request.session.get("items_messages", [])
+    return render(request, "the_elder_commands/items.html", {"active": "items", "service": service,
+                                                             "items_messages": messages})
 
 
 def spells_view(request):
@@ -59,18 +81,31 @@ def plugins_view(request):
             return redirect("tec:plugins")
 
     service = PluginsService(request)
+    messages = request.session["plugins_messages"]
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
-                                                               "plugins_messages": request.session["plugins_messages"]})
+                                                               "plugins_messages": messages})
 
 
 def commands_view(request):
-    return render(request, "the_elder_commands/commands.html", {"active": "commands"})
+    commands = []
+    commands += request.session.get("character_commands", [])
+    commands += request.session.get("items_commands", [])
+
+    return render(request, "the_elder_commands/commands.html", {"active": "commands", "commands": commands})
 
 
 def get_plugins_messages(request):
     request.session["plugins_messages"] = []
     request.session["plugins_messages"] += request.session.get("add_plugins_messages", [])
+    request.session["plugins_messages"] += request.session.get("missing_plugin_messages", [])
     request.session["add_plugins_messages"] = []
+    request.session["missing_plugin_messages"] = []
+
+
+def get_items_messages(request):
+    request.session["items_messages"] = []
+    request.session["items_messages"] += request.session.get("items_commands_messages", [])
+    request.session["items_commands_messages"] = []
 
 
 def handle_add_plugin_post(request):
@@ -124,6 +159,21 @@ def extract_dict_from_plugin_file(request):
         print("JSON error in view: ", e.msg)
         return {}
     return converted_to_dict
+
+
+def convert_items_post(request):
+    table_input = request.POST.get("table_input")
+    if table_input is None:
+        request.session["items_messages"] += [ITEMS_CONVERT_POST_ERROR]
+        return []
+    separated_input = table_input.split("&")
+    converted = []
+    for item in separated_input:
+        if len(item) <= 9:
+            continue
+        command = "player.additem " + item.replace("=", " ")
+        converted.append(command)
+    return converted
 
 
 def unpack_post(post):

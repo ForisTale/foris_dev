@@ -157,3 +157,23 @@ class PluginsService:
             })
 
         return plugins
+
+
+class ItemsService:
+    def __init__(self, request):
+        self.selected = request.session.get("selected", [])
+        self.items = self.get_items()
+
+    def get_items(self):
+        items = []
+        for selected in self.selected:
+            variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
+                                                 language=selected.get("language"))
+            variant_data = variant.plugin_data
+            for variant_items in variant_data.values():
+                for variant_item in variant_items:
+                    variant_item.update({"formId": f"{selected.get('load_order')}{variant_item.get('formId', '')}",
+                                         "plugin_name": selected.get("name")})
+
+            items.append(variant_data)
+        return items

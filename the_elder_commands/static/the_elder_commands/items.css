@@ -1,0 +1,12 @@
+input {
+    width: 45px;
+}
+
+li.paginate_button.page-item > a, .dataTables_empty {
+    background: #343a40 !important;
+    color: #17a2b8 !important;
+}
+
+.dataTables_info, .dataTables_length, .dataTables_filter {
+    color: #17a2b8 !important;
+}

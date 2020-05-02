@@ -1,2 +1,4 @@
 TODO Change character data from database to cookies.
 TODO psycopg2 need python 64-bot and postgresql installed, UPDATE ANSIBLE
+TODO Correctly handle esl plugins, they give only last 3 digits not 6.
+TODO Move from data jsonField to map of tables?

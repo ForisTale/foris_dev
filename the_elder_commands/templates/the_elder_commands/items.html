@@ -1,1 +1,411 @@
 {% extends "the_elder_commands/base.html" %}
+{% load tec_extras %}
+
+{% block head %}
+<link href="/static/the_elder_commands/items.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/the_elder_commands/items.js"></script>
+<script>$(document).ready( function () { window.TEC.initialize({url: "{% url 'tec:items' %}"}) })</script>
+{% endblock %}
+
+{% block body %}
+
+<div class="row"><div class="col-auto" id="id_error_messages">
+    {% if items_messages %}
+    {% for message in items_messages %}
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            <h4><strong>{{ message }}</strong></h4>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+    {% endif %}
+</div></div>
+
+<div class="row">
+<div class="col">
+    <ul class="nav nav-tabs bg-dark justify-content-around" id="id_items_categories" role="tablist">
+        {% for category in items_categories %}
+        <li class="nav-item">
+            <a class="nav-link text-info {% if category == "Weapons" %}active show{% endif %}"
+               id="id_{{ category|lower }}" data-toggle="tab" role="tab"
+               href="#id_{{ category|lower }}_panel" aria-controls="id_{{ category|lower }}_panel"
+               aria-selected="{% if category == "Weapons" %}true{% else %}false{% endif %}">{{ category }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+
+<form action="{% url 'tec:items' %}" method="post">
+<div class="tab-content">
+<div class="tab-pane fade show active" id="id_weapons_panel" role="tabpanel" aria-labelledby="id_weapons">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info" id="id_weapons_table">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Damage</th>
+                <th>Value</th>
+                <th>Type</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+                <th>Magic</th>
+            </tr>
+            </thead>
+            <tbody id="id_weapons_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"WEAP" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Damage" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Type" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                <td>{{ item|get_value:"Description" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_armors_panel" role="tabpanel" aria-labelledby="id_armors">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Armor</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+                <th>Magic</th>
+            </tr>
+            </thead>
+            <tbody id="id_armors_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"ARMO" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Armor rating" }}</td>
+                <td>{{ item|get_value:"Armor type" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                <td>{{ item|get_value:"Description" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_ammo_panel" role="tabpanel" aria-labelledby="id_ammo">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Damage</th>
+                <th>Value</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+            </tr>
+            </thead>
+            <tbody id="id_ammo_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"AMMO" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Damage" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_books_panel" role="tabpanel" aria-labelledby="id_books">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+            </tr>
+            </thead>
+            <tbody id="id_books_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"BOOK" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_ingredients_panel" role="tabpanel" aria-labelledby="id_ingredients">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+                <th>Effects</th>
+            </tr>
+            </thead>
+            <tbody id="id_ingredients_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"INGR" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                <td>{{ item|get_value:"Effects" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_alchemy_panel" role="tabpanel" aria-labelledby="id_alchemy">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+                <th>Effects</th>
+            </tr>
+            </thead>
+            <tbody id="id_alchemy_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"ALCH" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                <td>{{ item|get_value:"Effects" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_scrolls_panel" role="tabpanel" aria-labelledby="id_scrolls">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+                <th>Effects</th>
+            </tr>
+            </thead>
+            <tbody id="id_scrolls_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"SCRL" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                <td>{{ item|get_value:"Effects" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_soulgems_panel" role="tabpanel" aria-labelledby="id_soulgems">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+            </tr>
+            </thead>
+            <tbody id="id_soulgems_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"SLGM" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_keys_panel" role="tabpanel" aria-labelledby="id_keys">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+            </tr>
+            </thead>
+            <tbody id="id_keys_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"KEYM" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_miscellaneous_panel" role="tabpanel" aria-labelledby="id_miscellaneous">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Item name</th>
+                <th>Value</th>
+                <th>Weight</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+            </tr>
+            </thead>
+            <tbody id="id_miscellaneous_tbody">
+            {% for plugin in service.items %}
+            {% for item in plugin|get_value:"MISC" %}
+                <tr>
+                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td>{{ item|get_value:"fullName" }}</td>
+                <td>{{ item|get_value:"Value" }}</td>
+                <td>{{ item|get_value:"Weight" }}</td>
+                <td>{{ item|get_value:"plugin_name" }}</td>
+                <td>{{ item|get_value:"editorId" }}</td>
+                <td>{{ item|get_value:"formId" }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+
+</div>
+{% csrf_token %}
+</form>
+{% endblock %}

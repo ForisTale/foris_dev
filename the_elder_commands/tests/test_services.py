@@ -1,7 +1,8 @@
 from django.test import TestCase
 from the_elder_commands.models import Character, Plugins, PluginVariants
-from the_elder_commands.services import CharacterService, PluginsService
-from the_elder_commands.inventory import DEFAULT_SKILLS
+from the_elder_commands.services import CharacterService, PluginsService, ItemsService
+from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT
+from functional_tests.the_elder_commands import test_plugins
 import copy
 
 
@@ -195,3 +196,35 @@ class PluginsServiceTest(TestCase):
                           {'language': 'english', 'version': '0.0', "selected": ""}]
              }
         )
+
+    def test_service_handle_esl_and_esp_load_order_properly(self):
+        self.fail("Finish test!")
+
+
+class ItemsServiceTest(TestCase):
+    def setUp(self):
+        test_plugins.AddPluginTest.populate_plugins_table()
+        self.maxDiff = None
+
+    def test_service_pass_selected_plugins(self):
+
+        class FakeRequest:
+            session = {"selected": [{
+                "name": "test 01",
+                "usable_name": "test_01",
+                "version": "03",
+                "language": "english",
+                "load_order": "A5"
+            }]}
+
+        request = FakeRequest()
+        service = ItemsService(request)
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT)
+        for items_list in test_dict.values():
+            for item in items_list:
+                item.update({"formId": f"A5{item.get('formId', '')}", "plugin_name": "test 01"})
+
+        self.assertDictEqual(service.items[0], test_dict)
+
+    def test_get_items_run_only_when_change_in_selected(self):
+        self.fail("Finish test!")

@@ -167,6 +167,9 @@ class PluginFormValidationTest(TestCase):
             {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
         )
 
+    def test_plugin_data_escape_javascript_signs(self):
+        self.fail("Finish test!")
+
     def test_unique_version_language_returns_correct_error(self):
         plugin = Plugins.objects.create(name="test", usable_name="test")
         plugin.save()
@@ -225,7 +228,7 @@ class SelectPluginFormTest(TestCase):
         Plugins.objects.create(name="test 01", usable_name="test_01")
 
     def test_validate_load_order(self):
-        cases = {"A1": True, "*s": False, "AA1": False, "": False, "3": True, "#": False}
+        cases = {"A1": True, "*s": False, "AA1": False, "": False, "3": False, "#": False, "FE001": True, "FE1": False}
 
         class FakeRequest:
             POST = self.data
@@ -237,8 +240,6 @@ class SelectPluginFormTest(TestCase):
             self.assertEqual(form.is_valid(), result, msg=f"{case} {result} {form.errors}")
             if result is False:
                 self.assertEqual(form.errors[0], INCORRECT_LOAD_ORDER)
-            if case == "3":
-                self.assertEqual(form.data["test_01_load_order"], "03", msg="Should have 0 in front.")
 
     def test_form_process_data(self):
         class FakeRequest:
