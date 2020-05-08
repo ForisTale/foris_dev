@@ -39,6 +39,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
                 "plugin_version": ["0.1"],
                 "plugin_language": ["Polish"],
                 "plugin_file": file,
+                "add_plugin": ""
             }
             return self.client.post("/the_elder_commands/plugins/", data=data)
 
@@ -72,8 +73,8 @@ class AddPluginTest(TestCase, ManageTestFiles):
 
     @tag("create_incorrect_file")
     def test_view_show_error_message(self):
-        response = self.send_default_post_and_return_response()
-        self.client.get("/the_elder_commands/plugins/")
+        self.send_default_post_and_return_response()
+        response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
             response.context["plugins_messages"],
             [ADD_PLUGIN_FILE_ERROR_MESSAGE]

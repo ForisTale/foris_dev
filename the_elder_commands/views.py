@@ -4,7 +4,8 @@ from .models import Character
 from .forms import CharacterForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from .services import CharacterService, PluginsService, ItemsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, \
-    ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR
+    ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR, \
+    ADD_PLUGIN_FILE_ERROR_MESSAGE
 import json
 
 
@@ -65,10 +66,9 @@ def plugins_view(request):
     get_plugins_messages(request)
 
     if request.method == "POST":
-        if "plugin_name" in request.POST:
-            success = handle_add_plugin_post(request)
-            if success:
-                return redirect("tec:plugins")
+        if "add_plugin" in request.POST:
+            handle_add_plugin_post(request)
+            return redirect("tec:plugins")
         elif "selected" in request.POST:
             form = SelectedPluginsForm(request=request)
             if form.is_valid():
@@ -111,20 +111,25 @@ def get_items_messages(request):
 def handle_add_plugin_post(request):
     plugin_custom_form = PluginsForm(name=request.POST.get("plugin_name", ""))
     if plugin_custom_form.is_valid():
-
         plugin_variants_data = plugin_variants_post(request)
-        plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
-                                                  instance=plugin_custom_form.instance)
-        if plugin_variants_form.is_valid():
-            plugin_variants_form.save()
-            request.session["add_plugins_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
-            return "Success!"
+        if plugin_variants_data.get("plugin_data", {}) == {}:
+            request.session["add_plugins_messages"].append(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+            return
         else:
-            for error in plugin_variants_form.errors.values():
-                request.session["plugins_messages"] += [*error]
+            plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
+                                                      instance=plugin_custom_form.instance)
+            if plugin_variants_form.is_valid():
+                plugin_variants_form.save()
+                request.session["add_plugins_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
+                return
+            else:
+                for error in plugin_variants_form.errors.values():
+                    request.session["add_plugins_messages"] += [*error]
+                    return
     else:
         for error in plugin_custom_form.errors:
-            request.session["plugins_messages"] += [*error]
+            request.session["add_plugins_messages"] += [*error]
+            return
 
 
 def unselect(request):
@@ -155,8 +160,8 @@ def extract_dict_from_plugin_file(request):
     file = request.FILES["plugin_file"]
     try:
         converted_to_dict = json.load(file)
-    except json.decoder.JSONDecodeError as e:
-        print("JSON error in view: ", e.msg)
+    except (json.decoder.JSONDecodeError, UnicodeDecodeError) as e:
+        print("JSON error in view: ", e)
         return {}
     return converted_to_dict
 

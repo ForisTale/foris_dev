@@ -14,6 +14,7 @@ window.TEC.initialize = (params) => {
         },
         "order": [[1, "asc"]],
         "columnDefs": [{"orderable": false, "targets": 0}],
+        "autoWidth": false,
     });
 
     $('div.dataTables_length').html('<button type="submit" name="submit_table" id="id_submit_table" ' +

@@ -50,7 +50,7 @@ class PluginsTest(FunctionalTest):
         # and there is table
         self.assertEqual(
             self.driver.find_element_by_id("id_plugins_table").text,
-            "Selected? Plugin Name Version and Language Plugin Order"
+            "Plugin Name Version and Language Plugin Order Selected?"
         )
         self.assertEqual(
             self.driver.find_element_by_id("id_selected_plugins_table").text,

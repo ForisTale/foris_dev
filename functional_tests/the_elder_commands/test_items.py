@@ -108,4 +108,9 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         self.assertEqual(commands_list, expected)
 
     def test_ensure_chosen_items_are_in_table_after_change_page_and_category_to_easy_delete_chosen_items(self):
+        # Some items are selected
+        # then Foris change to chosen items tab
+        # and then he sees items that he selected
+        # he unselect one of them
+        # and then unselect all
         self.fail("Finish test!")

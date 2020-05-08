@@ -171,6 +171,8 @@ class SelectedPluginsForm:
     def clean_load_order(self):
         selected = self.data.getlist("selected", [])
         for usable_name in selected:
+            if usable_name == "":
+                continue
             load_order = self.data.get(f"{usable_name}_load_order", "")
             length = len(load_order)
             if length == 2 or length == 5:
@@ -190,6 +192,8 @@ class SelectedPluginsForm:
         selected = self.data.getlist("selected", [])
         collected = []
         for usable_name in selected:
+            if usable_name == "":
+                continue
             collected.append({
                 "name": self.get_name(usable_name),
                 "usable_name": usable_name,
