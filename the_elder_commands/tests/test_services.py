@@ -149,53 +149,105 @@ class CharacterServiceTest(TestCase):
 
 
 class PluginsServiceTest(TestCase):
+    def setUp(self):
+        super().setUp()
+        for plugin_num in range(1, 3):
+            plugin = Plugins.objects.create(name="test 0" + str(plugin_num), usable_name="test_0" + str(plugin_num))
+            for index in range(1, 4):
+                PluginVariants.objects.create(version="0." + str(index), language="english",
+                                              plugin_data={"test": index}, instance=plugin)
+                if index == 2:
+                    PluginVariants.objects.create(version="0." + str(index), language="polish",
+                                                  plugin_data={"test": index}, instance=plugin)
 
-    def test_get_all_plugins_return_all_plugins_from_database(self):
-        data = {"plugin": {
-            "name": "test 01",
-            "usable_name": "test_01"
-        }}
-
-        plugin = Plugins.objects.create(
-            name=data["plugin"]["name"],
-            usable_name=data["plugin"]["usable_name"]
-        )
-        for index in range(3):
-            data["variants"] = {
-                "version": "0." + str(index),
-                "language": "english",
-                "data": {"test": index}
-            }
-
-            PluginVariants.objects.create(
-                version=data["variants"]["version"],
-                language=data["variants"]["language"],
-                plugin_data=data["variants"]["data"],
-                instance=plugin
-            )
-
+    def set_up_fake_request_and_return_plugin_service(self):
         class Request:
             def __init__(self):
                 self.session = {"selected": [{
+                    "name": "test 01",
                     "usable_name": "test_01",
-                    "version": "0.2",
+                    "version": "0.3",
                     "language": "english",
                     "load_order": "FF"
                 }]}
 
-        plugin_service = PluginsService(request=Request())
-        all_plugins = plugin_service.all_plugins
-        self.assertEqual(len(all_plugins), 1)
+        return PluginsService(request=Request())
 
-        self.maxDiff = None
-        self.assertDictEqual(
-            dict(all_plugins[0]),
-            {'load_order': 'FF', 'name': 'test 01', 'selected': 'on', 'usable_name': 'test_01',
-             'variants': [{'language': 'english', 'version': '0.2', "selected": "on"},
-                          {'language': 'english', 'version': '0.1', "selected": ""},
-                          {'language': 'english', 'version': '0.0', "selected": ""}]
-             }
-        )
+    def test_get_all_plugins_return_all_plugins_from_database(self):
+
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        all_plugins = plugin_service.all_plugins
+        self.assertEqual(len(all_plugins), 2)
+
+        actual = all_plugins[0]
+        self.assertIsInstance(actual, PluginsService.Plugin)
+        self.assertEqual(actual.name, "test 01")
+        self.assertEqual(actual.usable_name, "test_01")
+        self.assertEqual(actual.load_order, "FF")
+        self.assertEqual(actual.selected, True)
+        self.assertEqual(len(actual.variants), 4)
+        self.assertEqual(actual.variants[0].language, "english")
+        self.assertEqual(actual.variants[0].version, "0.3")
+        self.assertEqual(actual.variants[0].selected, True)
+        self.assertEqual(actual.variants[1].selected, False)
+        actual = all_plugins[1]
+        self.assertIsInstance(actual, PluginsService.Plugin)
+        self.assertEqual(actual.name, "test 02")
+        self.assertEqual(actual.usable_name, "test_02")
+        self.assertEqual(actual.load_order, "")
+        self.assertEqual(actual.selected, False)
+        self.assertEqual(len(actual.variants), 4)
+        self.assertEqual(actual.variants[0].language, "english")
+        self.assertEqual(actual.variants[0].version, "0.3")
+        self.assertEqual(actual.variants[0].selected, False)
+        self.assertEqual(actual.variants[1].selected, False)
+
+    def test_is_plugin_selected(self):
+
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        self.assertEqual(True, plugin_service.is_plugin_selected("test 01"))
+        self.assertEqual(False, plugin_service.is_plugin_selected("test 02"))
+        self.assertEqual(False, plugin_service.is_plugin_selected("test"))
+
+    def test_get_load_order(self):
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        self.assertEqual("FF", plugin_service.get_load_order("test 01"))
+        self.assertEqual("", plugin_service.get_load_order("test 02"))
+        self.assertEqual("", plugin_service.get_load_order("test"))
+
+    def test_get_variants_return_list_of_variant_object(self):
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        actual = plugin_service.get_variants("test 01")
+        self.assertEqual(len(actual), 4)
+        self.assertIsInstance(actual[0], PluginsService.Variant)
+        self.assertEqual(actual[0].language, "english")
+        self.assertEqual(actual[0].version, "0.3")
+        self.assertEqual(actual[0].selected, True)
+        self.assertEqual(actual[1].selected, False)
+
+    def test_get_variants_is_ordered_by_desc_version_and_asc_language(self):
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        actual = plugin_service.get_variants("test 01")
+        self.assertEqual(actual[0].language, "english")
+        self.assertEqual(actual[0].version, "0.3")
+        self.assertEqual(actual[1].language, "english")
+        self.assertEqual(actual[1].version, "0.2")
+        self.assertEqual(actual[2].language, "polish")
+        self.assertEqual(actual[2].version, "0.2")
+        self.assertEqual(actual[3].language, "english")
+        self.assertEqual(actual[3].version, "0.1")
+
+    def test_is_variant_selected(self):
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        variants = PluginVariants.objects.filter(instance__name="test 01").order_by("-version")
+        self.assertEqual(plugin_service.is_variant_selected(variants[0]), True)
+        self.assertEqual(plugin_service.is_variant_selected(variants[1]), False)
+
+    def test_is_variant_selected_return_true_only_for_correct_plugin(self):
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        variants = PluginVariants.objects.filter(instance__name="test 02").order_by("-version")
+        self.assertEqual(plugin_service.is_variant_selected(variants[0]), False)
+        self.assertEqual(plugin_service.is_variant_selected(variants[1]), False)
 
     def test_service_handle_esl_and_esp_load_order_properly(self):
         self.fail("Finish test!")

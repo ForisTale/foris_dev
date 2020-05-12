@@ -1,4 +1,4 @@
-from .models import Character, PluginVariants
+from .models import Character, PluginVariants, Plugins
 from .inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
 import copy
 import math
@@ -120,43 +120,61 @@ class CharacterService:
 
 class PluginsService:
     def __init__(self, request):
-        self.request = request
-        self.all_plugins_instances = [name.instance for name in
-                                      PluginVariants.objects.all().distinct("instance__name")]
-        self.all_plugins = self.get_all_plugins()
         self.selected = request.session.get("selected", [])
+        self.all_plugins = self.get_all_plugins()
+
+    class Plugin:
+        def __init__(self, name, usable_name, selected, load_order, variants):
+            self.name = name
+            self.usable_name = usable_name
+            self.selected = selected
+            self.load_order = load_order
+            self.variants = variants
+
+    class Variant:
+        def __init__(self, language, version, selected):
+            self.language = language
+            self.version = version
+            self.selected = selected
 
     def get_all_plugins(self):
         plugins = []
-        for instance in self.all_plugins_instances:
-            plugin_variants = []
-            variants_filter = PluginVariants.objects.filter(
-                instance__name=instance.name).order_by("-version", "language")
-            selected_data = {"selected": ""}
-
-            for plugin in self.request.session.get("selected", []):
-                if plugin.get("usable_name") == instance.usable_name:
-                    selected_data.update(plugin)
-                    selected_data.update({"selected": "on"})
-                    break
-
-            for variant in variants_filter:
-                if variant.version == selected_data.get("version", "") and \
-                        variant.language == selected_data.get("language", ""):
-                    selected = "on"
-                else:
-                    selected = ""
-                plugin_variants.append({"version": variant.version, "language": variant.language, "selected": selected})
-
-            plugins.append({
-                "name": instance.name,
-                "usable_name": instance.usable_name,
-                "selected": selected_data.get("selected"),
-                "load_order": selected_data.get("load_order", ""),
-                "variants": plugin_variants
-            })
-
+        for plugin in Plugins.objects.all():
+            plugins.append(self.Plugin(
+                name=plugin.name,
+                usable_name=plugin.usable_name,
+                selected=self.is_plugin_selected(plugin.name),
+                load_order=self.get_load_order(plugin.name),
+                variants=self.get_variants(plugin.name)
+            ))
         return plugins
+
+    def is_plugin_selected(self, plugin_name):
+        for selected in self.selected:
+            if selected.get("name") == plugin_name:
+                return True
+        return False
+
+    def get_load_order(self, plugin_name):
+        for selected in self.selected:
+            if selected.get("name") == plugin_name:
+                return selected.get("load_order")
+        return ""
+
+    def get_variants(self, plugin_name):
+        variants = []
+        for variant in PluginVariants.objects.filter(instance__name=plugin_name).order_by("-version", "language"):
+            variants.append(self.Variant(language=variant.language, version=variant.version,
+                                         selected=self.is_variant_selected(variant)))
+        return variants
+
+    def is_variant_selected(self, variant_instance):
+        for selected in self.selected:
+            if selected.get("version") == variant_instance.version and \
+                    selected.get("language") == variant_instance.language and \
+                    variant_instance.instance.name == selected.get("name"):
+                return True
+        return False
 
 
 class ItemsService:

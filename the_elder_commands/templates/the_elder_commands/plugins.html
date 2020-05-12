@@ -48,32 +48,30 @@
                     </thead>
                     <tbody class="plugins_table">
                     {% for plugin in service.all_plugins %}
-                    {% with plugin|get_value:"usable_name" as usable_name %}
                     <tr>
-                        <td>{{ plugin|get_value:"name" }}</td>
+                        <td>{{ plugin.name }}</td>
                         <td><!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="form-control" id="id_{{ usable_name }}_variant"
-                                    name="{{ usable_name }}_variant">
-                                {% for variant in plugin|get_value:"variants" %}
-                                <option value="{{ variant|get_value:"version" }}&{{ variant|get_value:"language" }}"
-                                {% if variant|get_value:"selected" %}selected="selected"{% endif %}>
-                                    {{ variant|get_value:"version" }} {{ variant|get_value:"language"|capfirst }}</option>
+                            <select class="form-control" id="id_{{ plugin.usable_name }}_variant"
+                                    name="{{ plugin.usable_name }}_variant">
+                                {% for variant in plugin.variants %}
+                                <option value="{{ variant.version }}&{{ variant.language }}"
+                                {% if variant.selected %}selected="selected"{% endif %}>
+                                    {{ variant.version }} {{ variant.language|capfirst }}</option>
                                 {% endfor %}
                             </select>
                         </td>
                         <td>
-                            <label for="id_{{ usable_name }}_load_order">
-                                <input type="text" name="{{ usable_name }}_load_order"
-                                       value="{{ plugin|get_value:"load_order" }}">
+                            <label for="id_{{ plugin.usable_name }}_load_order">
+                                <input type="text" name="{{ plugin.usable_name }}_load_order"
+                                       value="{{ plugin.load_order }}">
                             </label>
-                        <td>
-                            <label><input type="checkbox" name="selected" class="{{ usable_name }}"
-                                          value="{{ usable_name }}"
-                                          {% if plugin|get_value:"selected" %}checked{% endif %}></label>
                         </td>
+                        <td>
+                            <label><input type="checkbox" name="selected" class="{{ plugin.usable_name }}"
+                                          value="{{ plugin.usable_name }}"
+                                          {% if plugin.selected %}checked{% endif %}></label>
                         </td>
                     </tr>
-                    {% endwith %}
                     {% endfor %}
                     </tbody>
                 </table>
