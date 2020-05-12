@@ -2,8 +2,11 @@
 window.TEC = {}
 
 window.TEC.getMessages = (result) => {
-    let jsonResponse = JSON.parse(result);
-    $("#id_error_messages").html(jsonResponse.message).show();
+    let jsonResponse = JSON.parse(result),
+        first_part = '<div class="alert alert-primary alert-dismissible fade show" role="alert"> <h4><strong>',
+        second_part = '</strong></h4> <button type="button" class="close" data-dismiss="alert" ' +
+            'aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+    $("#id_error_messages").html(first_part + jsonResponse.message + second_part).show();
 }
 
 window.TEC.initialize = (params) => {

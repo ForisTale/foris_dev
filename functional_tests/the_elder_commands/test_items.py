@@ -1,5 +1,5 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from functional_tests.the_elder_commands.test_plugins import AddPluginTest
+from functional_tests.the_elder_commands import test_plugins
 from django.test.utils import tag
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, ManageTestFiles, template_variables, \
     ITEMS_COMMANDS_SUCCESS_MESSAGE
@@ -8,11 +8,12 @@ from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, Manag
 class ItemsTest(FunctionalTest, ManageTestFiles):
     def setUp(self):
         super().setUp()
+        self.maxDiff = None
 
         if self.check_test_tag("dont_select"):
             pass
         else:
-            AddPluginTest.populate_plugins_table()
+            test_plugins.AddPluginTest.populate_plugins_table()
             self.select_plugins()
 
         # Foris open The elder commands website.
@@ -30,6 +31,10 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         self.driver.find_element_by_class_name("test_02").click()
         self.driver.find_element_by_name("test_03_load_order").send_keys("03")
         self.driver.find_element_by_id("id_select_plugin_submit").click()
+
+    def submit_items_table(self):
+        table = self.driver.find_element_by_id("id_submit_table")
+        self.driver.execute_script("arguments[0].click()", table)
 
     def test_default_looks(self):
         # Foris see default page of TEC but
@@ -91,8 +96,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
             self.wait_for(lambda: table.find_element_by_tag_name("input").send_keys("1"))
 
         # After that he submit all of them
-        table = self.driver.find_element_by_id("id_submit_table")
-        self.driver.execute_script("arguments[0].click()", table)
+        self.submit_items_table()
 
         # on screen he sees message that all codes will be shown on commands page
         self.wait_for(lambda: self.assertEqual(self.driver.find_element_by_id("id_error_messages").text,
@@ -107,10 +111,39 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
                    "player.additem 0110CC6A 1"
         self.assertEqual(commands_list, expected)
 
-    def test_ensure_chosen_items_are_in_table_after_change_page_and_category_to_easy_delete_chosen_items(self):
-        # Some items are selected
-        # then Foris change to chosen items tab
-        # and then he sees items that he selected
-        # he unselect one of them
-        # and then unselect all
+    def test_chosen_items_are_chosen_after_change_page(self):
+        # Foris chose some items
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
+        table.find_element_by_tag_name("input").send_keys("5")
+        self.driver.find_element_by_link_text("Armors").click()
+
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_armors_tbody"))
+        table.find_element_by_tag_name("input").send_keys("2")
+        self.submit_items_table()
+
+        # then he change page and come back to items page
+        self.driver.find_element_by_link_text("Character").click()
+        self.wait_for(lambda: self.driver.find_element_by_link_text("Items").click())
+
+        # all earlier chosen items are still chosen
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
+        self.assertEqual(
+            table.find_element_by_tag_name("input").get_attribute("value"),
+            "5"
+        )
+
+        self.driver.find_element_by_link_text("Armors").click()
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_armors_tbody"))
+        self.assertEqual(
+            table.find_element_by_tag_name("input").get_attribute("value"),
+            "2"
+        )
+
+    def test_selected_items_are_showed_in_separated_tab(self):
+        # Foris chose some items
+        # then he change tab to chosen items
+        # and there he sees all items that he chose
+        # he decide that in one there is to few
+        # and he don't need other at all
+        # in the end he clear all items
         self.fail("Finish test!")

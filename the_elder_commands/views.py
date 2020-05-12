@@ -31,21 +31,18 @@ def character_view(request):
 
 
 def items_view(request):
-    if request.session.get("selected") is None:
+    if not request.session.get("selected", []):
         request.session.update({"missing_plugin_messages": [NO_PLUGIN_SELECTED_ERROR_MESSAGE]})
         return redirect("tec:plugins")
     get_items_messages(request)
 
     if request.method == "POST":
-        commands = convert_items_post(request)
-        request.session.update({"items_commands": commands})
+        commands = convert_items_from_post(request)
+        request.session.update({"chosen_items": commands})
         if commands:
-            message_information = ITEMS_COMMANDS_SUCCESS_MESSAGE
+            message = ITEMS_COMMANDS_SUCCESS_MESSAGE
         else:
-            message_information = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
-        message = '<div class="alert alert-primary alert-dismissible fade show" role="alert"> <h4><strong>' \
-                  f'{message_information}</strong></h4> <button type="button" class="close" data-dismiss="alert" ' \
-                  'aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+            message = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
         return JsonResponse({"message": message})
 
     service = ItemsService(request)
@@ -89,9 +86,17 @@ def plugins_view(request):
 def commands_view(request):
     commands = []
     commands += request.session.get("character_commands", [])
-    commands += request.session.get("items_commands", [])
+    commands += create_items_commands(request)
 
     return render(request, "the_elder_commands/commands.html", {"active": "commands", "commands": commands})
+
+
+def create_items_commands(request):
+    items = request.session.get("chosen_items", {})
+    commands = []
+    for form_id, amount in items.items():
+        commands.append(f"player.additem {form_id} {amount}")
+    return commands
 
 
 def get_plugins_messages(request):
@@ -166,18 +171,19 @@ def extract_dict_from_plugin_file(request):
     return converted_to_dict
 
 
-def convert_items_post(request):
+def convert_items_from_post(request):
     table_input = request.POST.get("table_input")
     if table_input is None:
         request.session["items_messages"] += [ITEMS_CONVERT_POST_ERROR]
         return []
     separated_input = table_input.split("&")
-    converted = []
+    converted = {}
     for item in separated_input:
         if len(item) <= 9:
             continue
-        command = "player.additem " + item.replace("=", " ")
-        converted.append(command)
+        item = item.split("=")
+        command = {item[0]: item[1]}
+        converted.update(command)
     return converted
 
 

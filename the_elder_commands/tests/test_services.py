@@ -217,8 +217,7 @@ class ItemsServiceTest(TestCase):
                 "load_order": "A5"
             }]}
 
-        request = FakeRequest()
-        service = ItemsService(request)
+        service = ItemsService(FakeRequest)
         test_dict = copy.deepcopy(PLUGIN_TEST_DICT)
         for items_list in test_dict.values():
             for item in items_list:
@@ -228,3 +227,19 @@ class ItemsServiceTest(TestCase):
 
     def test_get_items_run_only_when_change_in_selected(self):
         self.fail("Finish test!")
+
+    def test_service_pass_chosen_items_into_template(self):
+
+        class FakeRequest:
+            session = {"chosen_items": {"test_01": 1, "test_02": "2"}}
+
+        service = ItemsService(FakeRequest)
+        self.assertEqual(service.chosen, {"test_01": 1, "test_02": "2"})
+
+    def test_if_no_items_commands_return_empty_dict(self):
+
+        class FakeRequest:
+            session = {}
+
+        service = ItemsService(FakeRequest)
+        self.assertEqual(service.chosen, {})

@@ -163,6 +163,7 @@ class ItemsService:
     def __init__(self, request):
         self.selected = request.session.get("selected", [])
         self.items = self.get_items()
+        self.chosen = request.session.get("chosen_items", {})
 
     def get_items(self):
         items = []

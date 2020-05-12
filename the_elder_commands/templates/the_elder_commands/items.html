@@ -68,7 +68,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"WEAP" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Damage" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
@@ -108,7 +109,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"ARMO" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Armor rating" }}</td>
                 <td>{{ item|get_value:"Armor type" }}</td>
@@ -145,7 +147,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"AMMO" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Damage" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
@@ -179,7 +182,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"BOOK" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>
@@ -214,7 +218,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"INGR" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>
@@ -250,7 +255,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"ALCH" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>
@@ -286,7 +292,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"SCRL" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>
@@ -321,7 +328,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"SLGM" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>
@@ -355,7 +363,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"KEYM" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>
@@ -389,7 +398,8 @@
             {% for plugin in service.items %}
             {% for item in plugin|get_value:"MISC" %}
                 <tr>
-                <td><label><input type="text" name={{ item|get_value:'formId' }}></label></td>
+                <td><label><input type="text" name="{{ item|get_value:'formId' }}"
+                                  value="{{ service|get_chosen_amount:item }}"></label></td>
                 <td>{{ item|get_value:"fullName" }}</td>
                 <td>{{ item|get_value:"Value" }}</td>
                 <td>{{ item|get_value:"Weight" }}</td>

@@ -1,4 +1,5 @@
 from django.test import TestCase
+from the_elder_commands.views import create_items_commands
 
 
 class CommandsViewTest(TestCase):
@@ -9,11 +10,28 @@ class CommandsViewTest(TestCase):
 
     def test_view_pass_commands_from_other_pages(self):
         session = self.client.session
-        session.update({"items_commands": ["item 01", "item 02"], "character_commands": ["character"]})
+        session.update({"chosen_items": {"item01": "01", "item02": "02"}, "character_commands": ["character"]})
         session.save()
 
         response = self.client.get("/the_elder_commands/commands/")
-        self.assertEqual(response.context["commands"], ["character", "item 01", "item 02"])
+        self.assertEqual(response.context["commands"], ["character", "player.additem item01 01",
+                                                        "player.additem item02 02"])
 
+
+class CreateItemsCommandsTest(TestCase):
+
+    def test_return_list_of_commands(self):
+
+        class FakeRequest:
+            session = {"chosen_items": {"item01": "01", "item02": "02"}}
+
+        actual = create_items_commands(FakeRequest)
+        expected = ["player.additem item01 01", "player.additem item02 02"]
+        self.assertEqual(actual, expected)
+
+    def test_return_empty_list_when_no_commands(self):
+        class FakeRequest:
+            session = {}
+        self.assertEqual(create_items_commands(FakeRequest), [])
 
 
