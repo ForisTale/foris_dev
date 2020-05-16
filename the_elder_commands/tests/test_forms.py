@@ -3,9 +3,10 @@ from django.http import QueryDict
 from the_elder_commands.forms import CharacterForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from the_elder_commands.models import Character, Plugins, PluginVariants
 from the_elder_commands.services import CharacterService
-from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_SIMPLE_DICT, \
+from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_DICT, \
     PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, \
     INCORRECT_LOAD_ORDER
+import copy
 
 
 class CharacterFormTest(TestCase):
@@ -126,10 +127,13 @@ class PluginFormValidationTest(TestCase):
         self.data.update({"plugin": {
             "name": "test 01",
         }})
+        corrected_dict = copy.deepcopy(PLUGIN_TEST_DICT)
+        corrected_dict.pop("isEsl")
         self.data.update({"variant": {
             "version": "0.1",
             "language": "Polish",
-            "plugin_data": PLUGIN_TEST_SIMPLE_DICT,
+            "esl": False,
+            "plugin_data": corrected_dict,
         }})
 
     def count_plugins_or_variants(self, amount, plugins=True):
@@ -137,6 +141,8 @@ class PluginFormValidationTest(TestCase):
         self.assertTrue(form.is_valid())
 
         variant = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
+        if not variant.is_valid():
+            print(variant.errors)
         variant.save()
         if plugins:
             self.assertEqual(len(Plugins.objects.all()), amount)
@@ -166,9 +172,6 @@ class PluginFormValidationTest(TestCase):
             variant_form.errors,
             {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
         )
-
-    def test_plugin_data_escape_javascript_signs(self):
-        self.fail("Finish test!")
 
     def test_unique_version_language_returns_correct_error(self):
         plugin = Plugins.objects.create(name="test", usable_name="test")
@@ -223,12 +226,15 @@ class PluginFormValidationTest(TestCase):
 class SelectPluginFormTest(TestCase):
     def setUp(self):
         self.data = QueryDict("", mutable=True)
-        self.data.update({"selected": "test_01", "test_01_variant": "0.1&english",
-                          "test_01_load_order": "01"})
+        self.data.update({"selected": "test_01", "test_01_variant": "0.1&english&",
+                          "test_02_variant": "0.2&english&esl", "test_01_load_order": "01",
+                          "test_02_load_order": "FE001"})
+        self.data.update({"selected": "test_02"})
         Plugins.objects.create(name="test 01", usable_name="test_01")
+        Plugins.objects.create(name="test 02", usable_name="test_02")
 
-    def test_validate_load_order(self):
-        cases = {"A1": True, "*s": False, "AA1": False, "": False, "3": False, "#": False, "FE001": True, "FE1": False}
+    def test_validate_load_order_for_esp(self):
+        cases = {"A1": True, "*s": False, "AA1": False, "": False, "3": False, "#": False, "FE001": False, "FE1": False}
 
         class FakeRequest:
             POST = self.data
@@ -240,6 +246,30 @@ class SelectPluginFormTest(TestCase):
             self.assertEqual(form.is_valid(), result, msg=f"{case} {result} {form.errors}")
             if result is False:
                 self.assertEqual(form.errors[0], INCORRECT_LOAD_ORDER)
+
+    def test_validate_load_order_for_esl(self):
+        cases = {"A1": False, "*s": False, "AA1": False, "": False, "3": False, "#": False, "FE001": True, "FE1": False,
+                 "AB001": False, "FF001": True}
+
+        class FakeRequest:
+            POST = self.data
+            session = {}
+
+        for case, result in cases.items():
+            self.data["test_02_load_order"] = case
+            form = SelectedPluginsForm(request=FakeRequest)
+            self.assertEqual(form.is_valid(), result, msg=f"{case} {result} {form.errors}")
+            if result is False:
+                self.assertEqual(form.errors[0], INCORRECT_LOAD_ORDER)
+
+    def test_is_esl(self):
+        class FakeRequest:
+            POST = self.data
+            session = {}
+
+        form = SelectedPluginsForm(request=FakeRequest)
+        self.assertEqual(form.is_esl("test_01"), False)
+        self.assertEqual(form.is_esl("test_02"), True)
 
     def test_form_process_data(self):
         class FakeRequest:
@@ -254,6 +284,8 @@ class SelectPluginFormTest(TestCase):
             "usable_name": "test_01",
             "version": "0.1",
             "language": "english",
-            "load_order": "01"
+            "load_order": "01",
+            "esl": "",
         }]
         self.assertDictEqual(request.session.get("selected", [])[0], expected[0])
+        self.assertEqual(request.session.get("selected")[1].get("esl"), "esl")

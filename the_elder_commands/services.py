@@ -132,10 +132,11 @@ class PluginsService:
             self.variants = variants
 
     class Variant:
-        def __init__(self, language, version, selected):
+        def __init__(self, language, version, selected, esl):
             self.language = language
             self.version = version
             self.selected = selected
+            self.esl = esl
 
     def get_all_plugins(self):
         plugins = []
@@ -165,7 +166,7 @@ class PluginsService:
         variants = []
         for variant in PluginVariants.objects.filter(instance__name=plugin_name).order_by("-version", "language"):
             variants.append(self.Variant(language=variant.language, version=variant.version,
-                                         selected=self.is_variant_selected(variant)))
+                                         selected=self.is_variant_selected(variant), esl=self.get_esl(variant)))
         return variants
 
     def is_variant_selected(self, variant_instance):
@@ -175,6 +176,10 @@ class PluginsService:
                     variant_instance.instance.name == selected.get("name"):
                 return True
         return False
+
+    @staticmethod
+    def get_esl(variant):
+        return "esl" if variant.is_esl else ""
 
 
 class ItemsService:

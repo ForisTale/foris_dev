@@ -1,11 +1,13 @@
 from django.test import TestCase
 from django.test.utils import tag
 from django.http import QueryDict
-from the_elder_commands.views import unselect
+from the_elder_commands.views import unselect, extract_dict_from_plugin_file, create_variants_data_post
 from the_elder_commands.models import Plugins, PluginVariants
 from the_elder_commands.inventory import ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
     PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE
 from unittest.mock import patch
+from io import StringIO, BytesIO
+import copy
 
 
 class PluginsTest(TestCase):
@@ -33,7 +35,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         super().tearDown()
 
     def send_default_post_and_return_response(self):
-        with open(self.test_files_full_path[0], "r", encoding="utf-8") as file:
+        with open(self.test_file_full_path, "r", encoding="utf-8") as file:
             data = {
                 "plugin_name": ["test 01'5<>(){}[]a'n\"*"],
                 "plugin_version": ["0.1"],
@@ -54,7 +56,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertEqual(
             "test 015an",
-            response.context["service"].all_plugins[0].get("name", "")
+            response.context["service"].all_plugins[0].name
         )
 
     @tag("create_test_file")
@@ -106,11 +108,12 @@ class AddPluginTest(TestCase, ManageTestFiles):
                 plugin_model.__getattribute__(field),
                 desired_result
             )
-
+        correct_dict = copy.deepcopy(PLUGIN_TEST_DICT)
+        correct_dict.pop("isEsl")
         variants_cases = {
             "version": "0.1",
             "language": "Polish",
-            "plugin_data": PLUGIN_TEST_DICT,
+            "plugin_data": correct_dict,
         }
         for field, desired_result in variants_cases.items():
             self.assertEqual(
@@ -125,11 +128,97 @@ class AddPluginTest(TestCase, ManageTestFiles):
 
         expected = QueryDict("", mutable=True)
         plugin = Plugins.objects.first()
+        correct_dict = copy.deepcopy(PLUGIN_TEST_DICT)
+        correct_dict.pop("isEsl")
         expected.update({
-            'version': '0.1', 'language': 'Polish', 'plugin_data': PLUGIN_TEST_DICT
+            'version': '0.1', 'language': 'Polish', 'plugin_data': correct_dict, "esl": False
         })
         form_mock.assert_called_once()
         form_mock.assert_called_with(data=expected, instance=plugin)
+
+
+class ExtractDictFromPluginFilePost(TestCase):
+
+    def test_can_process_file_into_dict(self):
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+
+            actual = extract_dict_from_plugin_file(FakeRequest)
+
+            self.maxDiff = None
+            self.assertDictEqual(actual, PLUGIN_TEST_DICT)
+
+    def test_catch_json_decode_error(self):
+        with StringIO(" ") as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+
+            request = FakeRequest()
+            extract_dict_from_plugin_file(request)  # Should not raises!
+        self.assertTrue(True)
+
+    def test_catch_json_attribute_error(self):
+        class FakeRequest:
+            FILES = {"plugin_file": 1}
+
+        request = FakeRequest()
+        extract_dict_from_plugin_file(request)  # Should not raises!
+        self.assertTrue(True)
+
+    def test_catch_unicode_error(self):
+        with BytesIO(b"\x81") as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+
+            request = FakeRequest()
+            extract_dict_from_plugin_file(request)  # Should not raises!
+        self.assertTrue(True)
+
+
+class CreateVariantsDataPost(TestCase):
+
+    def test_pass_all_data_correctly(self):
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+                POST = {"plugin_version": 1, "plugin_language": 2}
+            expected_dict = copy.deepcopy(PLUGIN_TEST_DICT)
+            expected_dict.pop("isEsl")
+
+            request = FakeRequest()
+            post = create_variants_data_post(request)
+            self.assertEqual(post.get("version"), 1)
+            self.assertEqual(post.get("language"), 2)
+            self.assertEqual(post.get("esl"), False)
+            self.assertDictEqual(post.get("plugin_data"), expected_dict)
+
+    def test_pop_is_esl_from_extracted_dict(self):
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+                POST = {}
+            expected = copy.deepcopy(PLUGIN_TEST_DICT)
+            expected.pop("isEsl")
+
+            request = FakeRequest()
+            post = create_variants_data_post(request)
+            self.assertDictEqual(post.get("plugin_data"), expected)
+
+    def test_missing_is_esl_key_make_function_return_none(self):
+        with StringIO('{\"test\": []}') as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+                POST = {}
+            self.assertEqual(create_variants_data_post(FakeRequest()), None)
+
+    def test_catch_attribute_error_from_incorrect_file(self):
+        with StringIO(" ") as file:
+            class FakeRequest:
+                FILES = {"plugin_file": file}
+                POST = {}
+            post = create_variants_data_post(FakeRequest())  # Should not raises
+            self.assertEqual(post, None)
 
 
 class SelectedPluginsTest(TestCase):

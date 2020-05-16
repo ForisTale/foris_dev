@@ -28,12 +28,13 @@ class PluginVariantsTest(TestCase):
 
     def test_version_and_language_are_unique_for_plugin(self):
         plugin = Plugins.objects.create(name="test", usable_name="test")
-        PluginVariants.objects.create(language="English", version="0.1", instance=plugin)
-        PluginVariants.objects.create(language="English", version="0.2", instance=plugin)
+        PluginVariants.objects.create(language="English", version="0.1", instance=plugin, esl=True)
+        PluginVariants.objects.create(language="English", version="0.1", instance=plugin, esl=False)
+        PluginVariants.objects.create(language="English", version="0.2", instance=plugin, esl=True)
 
         other_plugin = Plugins.objects.create(name="test 2", usable_name="test_2")
         PluginVariants.objects.create(language="English", version="0.1",
-                                      instance=other_plugin)  # should not raise
+                                      instance=other_plugin, esl=True)  # should not raise
 
         with self.assertRaises(IntegrityError):
-            PluginVariants.objects.create(language="English", version="0.1", instance=plugin)
+            PluginVariants.objects.create(language="English", version="0.1", instance=plugin, esl=True)

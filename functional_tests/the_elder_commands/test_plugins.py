@@ -2,7 +2,8 @@ from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from the_elder_commands.models import Plugins, PluginVariants
 from selenium.webdriver.support.ui import Select
 from the_elder_commands.inventory import PLUGIN_TEST_FILE, ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
-    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_DICT
+    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_DICT, PLUGIN_TEST_ESL_FILE, \
+    INCORRECT_LOAD_ORDER
 from django.test.utils import tag
 import copy
 
@@ -67,13 +68,13 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         super().setUp()
 
         if self.check_test_tag("create_test_file"):
-            data = {"TEC_plugin_test_file.tec": PLUGIN_TEST_FILE}
-            self.create_test_files(data)
+            self.create_test_files({"TEC_plugin_test_file.tec": PLUGIN_TEST_FILE})
         if self.check_test_tag("create_incorrect_file"):
-            incorrect_data = {"TEC_incorrect_file.ini": b'3432342343'}
-            self.create_test_files(incorrect_data)
+            self.create_test_files({"TEC_incorrect_file.ini": b'3432342343'})
         if self.check_test_tag("populate_plugins_table"):
             self.populate_plugins_table()
+        if self.check_test_tag("create_esl_file"):
+            self.create_test_files({"TEC_esl_file.tec": PLUGIN_TEST_ESL_FILE})
 
         # Foris open plugins section of TEC,
         self.driver.get(self.live_server_url + "/plugins/")
@@ -102,12 +103,14 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         for index in range(4):
             plugin = Plugins.objects.create(name="test 0" + str(index+1), usable_name="test_0" + str(index+1))
             plugin.save()
+            corrected_dict = copy.deepcopy(PLUGIN_TEST_DICT)
+            corrected_dict.pop("isEsl")
             for num in range(4):
                 form = PluginVariants.objects.create(
                     instance=plugin,
                     version="0" + str(num+1),
                     language="english",
-                    plugin_data=copy.deepcopy(PLUGIN_TEST_DICT)
+                    plugin_data=corrected_dict
                 )
                 form.save()
 
@@ -123,7 +126,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     @tag("create_test_file")
     def test_add_plugin_to_database_and_show_in_plugins_table(self):
         # He fill form to add plugin and submit it
-        self.submit_add_file("test mod", "0.1", "Polish", self.test_files_full_path[0])
+        self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
 
         # in table he sees plugin that he add
         self.assertEqual(
@@ -141,7 +144,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     @tag("create_incorrect_file")
     def test_add_plugin_give_error_message_when_file_is_incorrect(self):
         # He fill form and submit it
-        self.submit_add_file("test mod", "0.1", "English", self.test_files_full_path[0])
+        self.submit_add_file("test mod", "0.1", "English", self.test_file_full_path)
 
         # but he get message that file was incorrect
         self.check_errors_messages([ADD_PLUGIN_FILE_ERROR_MESSAGE])
@@ -149,8 +152,8 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     @tag("create_test_file")
     def test_files_with_same_data_return_error(self):
         # Foris by mistake send two the same files.
-        self.submit_add_file("test mod", "0.1", "Polish", self.test_files_full_path[0])
-        self.submit_add_file("test mod", "0.1", "Polish", self.test_files_full_path[0])
+        self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
+        self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
 
         # and he sees error.
         self.check_errors_messages([ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE])
@@ -158,10 +161,10 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     @tag("create_test_file")
     def test_plugins_with_same_name_show_options_to_chose_variants(self):
         # Foris submit few mods with different language and version
-        self.submit_add_file("test mod", "0.1", "Polish", self.test_files_full_path[0])
-        self.submit_add_file("test mod", "0.1", "English", self.test_files_full_path[0])
-        self.submit_add_file("test mod", "0.2", "Polish", self.test_files_full_path[0])
-        self.submit_add_file("test mod", "0.2", "English", self.test_files_full_path[0])
+        self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
+        self.submit_add_file("test mod", "0.1", "English", self.test_file_full_path)
+        self.submit_add_file("test mod", "0.2", "Polish", self.test_file_full_path)
+        self.submit_add_file("test mod", "0.2", "English", self.test_file_full_path)
 
         # then he can chose between variants
         self.wait_for(lambda: self.assertEqual(
@@ -224,4 +227,37 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
             ""
+        ))
+
+    @tag("create_esl_file")
+    def test_if_file_is_esl_then_it_show_in_plugin_variant(self):
+        # Foris upload esl file
+        self.submit_add_file("esl", "0.1", "Polish", self.test_file_full_path)
+
+        # then in plugin variant he sees esl info
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("plugins_table").text,
+            "esl\n0.1 Polish esl"
+        ))
+
+        # after he chose it, but write load order for esp
+        self.driver.find_element_by_class_name("esl").click()
+        self.driver.find_element_by_name("esl_load_order").send_keys("02")
+        self.driver.find_element_by_id("id_select_plugin_submit").click()
+
+        # he sees error message,
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("errors_messages").text,
+            INCORRECT_LOAD_ORDER + "\n×"
+        ))
+
+        # then he write correct load order
+        self.driver.find_element_by_class_name("esl").click()
+        self.driver.find_element_by_name("esl_load_order").send_keys("FE001")
+        self.driver.find_element_by_id("id_select_plugin_submit").click()
+
+        # in selected plugin he sees again that there is esl info
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_class_name("selected_plugins").text,
+            "esl ver: 0.1 Polish esl\nUnselect"
         ))

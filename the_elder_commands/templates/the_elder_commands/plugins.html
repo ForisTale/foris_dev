@@ -54,9 +54,9 @@
                             <select class="form-control" id="id_{{ plugin.usable_name }}_variant"
                                     name="{{ plugin.usable_name }}_variant">
                                 {% for variant in plugin.variants %}
-                                <option value="{{ variant.version }}&{{ variant.language }}"
+                                <option value="{{ variant.version }}&{{ variant.language }}&{{ variant.esl }}"
                                 {% if variant.selected %}selected="selected"{% endif %}>
-                                    {{ variant.version }} {{ variant.language|capfirst }}</option>
+                                    {{ variant.version }} {{ variant.language|capfirst }} {{ variant.esl }}</option>
                                 {% endfor %}
                             </select>
                         </td>
@@ -105,7 +105,8 @@
                     <tr>
                         <td><form action="{% url "tec:plugins" %}" method="post">
                             {{ selected|get_value:"name" }} ver: {{ selected|get_value:"version" }}
-                            {{ selected|get_value:"language"|capfirst }} <span style="float:right"><button
+                            {{ selected|get_value:"language"|capfirst }} {{ selected|get_value:"esl" }}
+                            <span style="float:right"><button
                                 type="submit" class="btn btn-dark text-info btn-sm btn-outline-info"
                                 value="{{ selected|get_value:"usable_name" }}" name="unselect">Unselect</button></span>
                             {% csrf_token %}

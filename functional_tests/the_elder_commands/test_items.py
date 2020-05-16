@@ -28,7 +28,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         self.driver.get(self.live_server_url + "/plugins/")
         self.wait_for(lambda: self.driver.find_element_by_class_name("test_01").click())
         self.driver.find_element_by_name("test_01_load_order").send_keys("01")
-        self.driver.find_element_by_class_name("test_02").click()
+        self.driver.find_element_by_class_name("test_03").click()
         self.driver.find_element_by_name("test_03_load_order").send_keys("03")
         self.driver.find_element_by_id("id_select_plugin_submit").click()
 

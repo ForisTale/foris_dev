@@ -129,7 +129,7 @@ class PluginVariantsForm(ModelForm):
 
     class Meta:
         model = PluginVariants
-        fields = ("version", "language", "plugin_data", "instance")
+        fields = ("version", "language", "plugin_data", "instance", "is_esl")
 
         error_messages = {
             "plugin_data": {"required": ADD_PLUGIN_FILE_ERROR_MESSAGE},
@@ -173,17 +173,22 @@ class SelectedPluginsForm:
         for usable_name in selected:
             if usable_name == "":
                 continue
+
             load_order = self.data.get(f"{usable_name}_load_order", "")
             length = len(load_order)
-            if length == 2 or length == 5:
+            if length == 2 and not self.is_esl(usable_name):
                 if load_order.isalnum():
-                    return
-                else:
-                    self.errors.append(INCORRECT_LOAD_ORDER)
-                    return
-            else:
-                self.errors.append(INCORRECT_LOAD_ORDER)
-                return
+                    continue
+            elif length == 5 and self.is_esl(usable_name):
+                if load_order.isalnum():
+                    if load_order[:2] in ["FE", "FF"]:
+                        continue
+
+            self.errors.append(INCORRECT_LOAD_ORDER)
+
+    def is_esl(self, usable_name):
+        variant = self.split_variant(usable_name)
+        return variant[2] == "esl"
 
     def is_valid(self):
         return self.errors == []
@@ -194,24 +199,20 @@ class SelectedPluginsForm:
         for usable_name in selected:
             if usable_name == "":
                 continue
+            variant = self.split_variant(usable_name)
             collected.append({
                 "name": self.get_name(usable_name),
                 "usable_name": usable_name,
-                "version": self.get_version(usable_name),
-                "language": self.get_language(usable_name),
+                "version": variant[0],
+                "language": variant[1],
+                "esl": variant[2],
                 "load_order": self.data.get(f"{usable_name}_load_order")
             })
         self.request.session.update({"selected": collected})
 
-    def get_version(self, usable_name):
+    def split_variant(self, usable_name):
         variant = self.request.POST.get(f"{usable_name}_variant")
-        version = variant[:variant.find("&")]
-        return version
-
-    def get_language(self, usable_name):
-        variant = self.request.POST.get(f"{usable_name}_variant")
-        language = variant[variant.find("&") + 1:]
-        return language
+        return variant.split("&")
 
     @staticmethod
     def get_name(usable_name):

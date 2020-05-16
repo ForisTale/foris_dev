@@ -18,7 +18,7 @@ def template_variables(request):
 
 class ManageTestFiles:
     def __init__(self):
-        self.test_files_full_path = []
+        self.test_file_full_path = None
 
     def check_test_tag(self, tag_string):
         method = getattr(self, self._testMethodName)
@@ -29,24 +29,22 @@ class ManageTestFiles:
     def create_test_files(self, data_dict):
         local_dir = os.path.dirname(os.path.abspath(__file__))
         for key, value in data_dict.items():
-            self.test_files_full_path.append(os.path.join(local_dir, key))
+            self.test_file_full_path = os.path.join(local_dir, key)
             with open(os.path.join(local_dir, key), "w+", encoding="utf-8") as file:
                 file.write(str(value))
 
     def delete_test_files(self):
-        for path in self.test_files_full_path:
-            try:
-                os.remove(path)
-            except FileNotFoundError:
-                pass
+        try:
+            os.remove(self.test_file_full_path)
+        except (FileNotFoundError, TypeError):
+            pass
 
 
 ADD_PLUGIN_SUCCESS_MESSAGE = "Plugin was successfully added to database."
 
 ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 
-ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language and " \
-                                        "Instance already exists."
+ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language, Instance and Esl already exists."
 
 ITEMS_COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the commands page."
 
@@ -294,7 +292,222 @@ RACES_EXTRA_SKILLS = {
     },
 }
 
+PLUGIN_TEST_DICT = {
+    "isEsl": False,
+    "WEAP": [
+        {
+            "fullName": "Stalowy wielki miecz skwaru",
+            "editorId": "DA14DremoraGreatswordFire03",
+            "formId": "017288",
+            "Weight": 17,
+            "Value": 90,
+            "Damage": 17,
+            "Type": "Two Handed",
+            "Description": "Zadaje celowi <mag> pkt. obrażeń od ognia. Płonące cele odnoszą dodatkowe obrażenia.|"
+        },
+        {
+            "fullName": "Daedryczny wielki miecz inferna",
+            "editorId": "EnchDaedricGreatswordDremoraFire06",
+            "formId": "017009",
+            "Weight": 23,
+            "Value": 2500,
+            "Damage": 24,
+            "Type": "Two Handed",
+            "Description": ""
+        }
+    ],
+    "ARMO": [
+        {
+            "fullName": "Buty",
+            "editorId": "DremoraBoots",
+            "formId": "016FFF",
+            "Weight": 1,
+            "Value": 4,
+            "Armor rating": 0,
+            "Armor type": "Clothing",
+            "Description": ""
+        },
+        {
+            "fullName": "Elfia tarcza wybitnego blokowania",
+            "editorId": "EnchArmorElvenShieldBlock04",
+            "formId": "10FC28",
+            "Weight": 4,
+            "Value": 115,
+            "Armor rating": 21,
+            "Armor type": "Light Armor",
+            "Description": "Tarcza blokuje o <mag>% obrażeń więcej.|"
+        }
+    ],
+    "BOOK": [
+        {
+            "fullName": "Księga czarów: Przywołanie Władcy Dremor",
+            "editorId": "SpellTomeConjureDremoraLord",
+            "formId": "10FD60",
+            "Weight": 1,
+            "Value": 730
+        },
+        {
+            "fullName": "Księga czarów: Piorun",
+            "editorId": "SpellTomeThunderbolt",
+            "formId": "10F7F5",
+            "Weight": 1,
+            "Value": 750
+        }
+    ],
+    "INGR": [
+        {
+            "fullName": "Okoń srebrnoboczny",
+            "editorId": "CritterPondFish01Ingredient",
+            "formId": "106E1C",
+            "Weight": 0.25,
+            "Value": 15,
+            "Effects": "Przywrócenie kondycji|Osłabienie regeneracji kondycji|Wyniszczenie zdrowia|Odporność na mróz"
+        },
+        {
+            "fullName": "Abecejski długopłetwiak",
+            "editorId": "CritterPondFish02Ingredient",
+            "formId": "106E1B",
+            "Weight": 0.5,
+            "Value": 15,
+            "Effects": "Podatność na mróz|Premia do skradania|Wrażliwość na trucizny|Premia do przywracania"
+        }
+    ],
+    "ALCH": [
+        {
+            "fullName": "Miód z owocem jałowca",
+            "editorId": "MQ101JuniperMead",
+            "formId": "107A8A",
+            "Weight": 0,
+            "Value": 0,
+            "Effects": "Przywrócenie kondycji|Osłabienie regeneracji kondycji"
+        },
+        {
+            "fullName": "Miód",
+            "editorId": "FoodHoney",
+            "formId": "10394D",
+            "Weight": 0,
+            "Value": 0,
+            "Effects": "Przywrócenie zdrowia"
+        }
+    ],
+    "MISC": [
+        {
+            "fullName": "Wypaczony klejnot duszy",
+            "editorId": "MGRArniel04SoulGem",
+            "formId": "10E44B",
+            "Weight": 0.5,
+            "Value": 0
+        },
+        {
+            "fullName": "Posąg Dibelli",
+            "editorId": "TG01HaelgaStatuePost",
+            "formId": "10CC6A",
+            "Weight": 2,
+            "Value": 100
+        }
+    ],
+    "AMMO": [
+        {
+            "fullName": "Dwemerski bełt",
+            "editorId": "DwarvenSphereBolt02",
+            "formId": "10EC8C",
+            "Weight": 0,
+            "Value": 0,
+            "Damage": 15
+        },
+        {
+            "fullName": "Żelazna strzała",
+            "editorId": "FollowerIronArrow",
+            "formId": "10E2DE",
+            "Weight": 0,
+            "Value": 1,
+            "Damage": 8
+        }
+    ],
+    "SCRL": [
+        {
+            "fullName": "Spostrzeżenia Shalidora: Magia",
+            "editorId": "MGR21ScrollMagicka",
+            "formId": "1076EC",
+            "Weight": 0.5,
+            "Value": 50,
+            "Effects": "Zwiększa magię o <mag> pkt.|Regeneracja magii przyśpieszona o <mag>% przez <dur> s.|"
+        },
+        {
+            "fullName": "Spostrzeżenia Shalidora: Przywołanie",
+            "editorId": "MGR21ScrollConjuration",
+            "formId": "1076EB",
+            "Weight": 0.5,
+            "Value": 50,
+            "Effects": "Zwiększa czas trwania i zmniejsza koszt zaklęć przywołania przez <dur> s.|"
+        }
+    ],
+    "SLGM": [
+        {
+            "fullName": "Klejnot duszy Wylandriah",
+            "editorId": "FFRiften14SoulGem",
+            "formId": "043E26",
+            "Weight": 0,
+            "Value": 0
+        },
+        {
+            "fullName": "Uzdatniony klejnot duszy",
+            "editorId": "WhiterunSoulGem",
+            "formId": "094E40",
+            "Weight": 0.2,
+            "Value": 25
+        }
+    ],
+    "KEYM": [
+        {
+            "fullName": "Klucz do skonfiskowanych towarów",
+            "editorId": "RiftenConfiscatedGoodsChestKey",
+            "formId": "10E7E6",
+            "Weight": 0,
+            "Value": 0
+        },
+        {
+            "fullName": "Klucz do pokoju Malurila",
+            "editorId": "MzinchaleftKey01",
+            "formId": "10BEFF",
+            "Weight": 0,
+            "Value": 0
+        }
+    ],
+    "SPEL": [
+        {
+            "fullName": "Spalenie",
+            "editorId": "IncinerateLeftHand",
+            "formId": "10FD5F",
+            "Effects": "Wybuch ognia zadaje <mag> pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
+            "Spell Mastery": "Ekspert - zniszczenie"
+        },
+        {
+            "fullName": "Płaszcz Płomieni",
+            "editorId": "DragonPriestMaskUltraFlameCloak",
+            "formId": "10FC17",
+            "Effects": "Przez <dur> s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
+            "Spell Mastery": "Czeladnik - zniszczenie"
+        }
+    ],
+    "WOOP": [
+        {
+            "fullName": "Nus",
+            "editorId": "WordNus",
+            "formId": "0602A5",
+            "Translation": "Posąg"
+        },
+        {
+            "fullName": "Slen",
+            "editorId": "WordSlen",
+            "formId": "0602A4",
+            "Translation": "Ciało"
+        }
+    ]
+}
+
 PLUGIN_TEST_FILE = '''{
+    "isEsl": false,
     "WEAP": [
         {
             "fullName": "Stalowy wielki miecz skwaru",
@@ -507,12 +720,13 @@ PLUGIN_TEST_FILE = '''{
     ]
 }'''
 
-PLUGIN_TEST_DICT = {
+PLUGIN_TEST_ESL_FILE = '''{
+    "isEsl": true,
     "WEAP": [
         {
             "fullName": "Stalowy wielki miecz skwaru",
             "editorId": "DA14DremoraGreatswordFire03",
-            "formId": "017288",
+            "formId": "288",
             "Weight": 17,
             "Value": 90,
             "Damage": 17,
@@ -522,7 +736,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Daedryczny wielki miecz inferna",
             "editorId": "EnchDaedricGreatswordDremoraFire06",
-            "formId": "017009",
+            "formId": "009",
             "Weight": 23,
             "Value": 2500,
             "Damage": 24,
@@ -534,7 +748,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Buty",
             "editorId": "DremoraBoots",
-            "formId": "016FFF",
+            "formId": "FFF",
             "Weight": 1,
             "Value": 4,
             "Armor rating": 0,
@@ -544,7 +758,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Elfia tarcza wybitnego blokowania",
             "editorId": "EnchArmorElvenShieldBlock04",
-            "formId": "10FC28",
+            "formId": "C28",
             "Weight": 4,
             "Value": 115,
             "Armor rating": 21,
@@ -556,14 +770,14 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Księga czarów: Przywołanie Władcy Dremor",
             "editorId": "SpellTomeConjureDremoraLord",
-            "formId": "10FD60",
+            "formId": "D60",
             "Weight": 1,
             "Value": 730
         },
         {
             "fullName": "Księga czarów: Piorun",
             "editorId": "SpellTomeThunderbolt",
-            "formId": "10F7F5",
+            "formId": "7F5",
             "Weight": 1,
             "Value": 750
         }
@@ -572,7 +786,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Okoń srebrnoboczny",
             "editorId": "CritterPondFish01Ingredient",
-            "formId": "106E1C",
+            "formId": "E1C",
             "Weight": 0.25,
             "Value": 15,
             "Effects": "Przywrócenie kondycji|Osłabienie regeneracji kondycji|Wyniszczenie zdrowia|Odporność na mróz"
@@ -580,7 +794,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Abecejski długopłetwiak",
             "editorId": "CritterPondFish02Ingredient",
-            "formId": "106E1B",
+            "formId": "E1B",
             "Weight": 0.5,
             "Value": 15,
             "Effects": "Podatność na mróz|Premia do skradania|Wrażliwość na trucizny|Premia do przywracania"
@@ -590,7 +804,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Miód z owocem jałowca",
             "editorId": "MQ101JuniperMead",
-            "formId": "107A8A",
+            "formId": "A8A",
             "Weight": 0,
             "Value": 0,
             "Effects": "Przywrócenie kondycji|Osłabienie regeneracji kondycji"
@@ -598,7 +812,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Miód",
             "editorId": "FoodHoney",
-            "formId": "10394D",
+            "formId": "94D",
             "Weight": 0,
             "Value": 0,
             "Effects": "Przywrócenie zdrowia"
@@ -608,14 +822,14 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Wypaczony klejnot duszy",
             "editorId": "MGRArniel04SoulGem",
-            "formId": "10E44B",
+            "formId": "44B",
             "Weight": 0.5,
             "Value": 0
         },
         {
             "fullName": "Posąg Dibelli",
             "editorId": "TG01HaelgaStatuePost",
-            "formId": "10CC6A",
+            "formId": "C6A",
             "Weight": 2,
             "Value": 100
         }
@@ -624,7 +838,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Dwemerski bełt",
             "editorId": "DwarvenSphereBolt02",
-            "formId": "10EC8C",
+            "formId": "C8C",
             "Weight": 0,
             "Value": 0,
             "Damage": 15
@@ -632,7 +846,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Żelazna strzała",
             "editorId": "FollowerIronArrow",
-            "formId": "10E2DE",
+            "formId": "2DE",
             "Weight": 0,
             "Value": 1,
             "Damage": 8
@@ -642,7 +856,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Spostrzeżenia Shalidora: Magia",
             "editorId": "MGR21ScrollMagicka",
-            "formId": "1076EC",
+            "formId": "6EC",
             "Weight": 0.5,
             "Value": 50,
             "Effects": "Zwiększa magię o <mag> pkt.|Regeneracja magii przyśpieszona o <mag>% przez <dur> s.|"
@@ -650,7 +864,7 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Spostrzeżenia Shalidora: Przywołanie",
             "editorId": "MGR21ScrollConjuration",
-            "formId": "1076EB",
+            "formId": "6EB",
             "Weight": 0.5,
             "Value": 50,
             "Effects": "Zwiększa czas trwania i zmniejsza koszt zaklęć przywołania przez <dur> s.|"
@@ -660,14 +874,14 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Klejnot duszy Wylandriah",
             "editorId": "FFRiften14SoulGem",
-            "formId": "043E26",
+            "formId": "E26",
             "Weight": 0,
             "Value": 0
         },
         {
             "fullName": "Uzdatniony klejnot duszy",
             "editorId": "WhiterunSoulGem",
-            "formId": "094E40",
+            "formId": "E40",
             "Weight": 0.2,
             "Value": 25
         }
@@ -676,14 +890,14 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Klucz do skonfiskowanych towarów",
             "editorId": "RiftenConfiscatedGoodsChestKey",
-            "formId": "10E7E6",
+            "formId": "7E6",
             "Weight": 0,
             "Value": 0
         },
         {
             "fullName": "Klucz do pokoju Malurila",
             "editorId": "MzinchaleftKey01",
-            "formId": "10BEFF",
+            "formId": "EFF",
             "Weight": 0,
             "Value": 0
         }
@@ -692,14 +906,14 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Spalenie",
             "editorId": "IncinerateLeftHand",
-            "formId": "10FD5F",
+            "formId": "D5F",
             "Effects": "Wybuch ognia zadaje <mag> pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
             "Spell Mastery": "Ekspert - zniszczenie"
         },
         {
             "fullName": "Płaszcz Płomieni",
             "editorId": "DragonPriestMaskUltraFlameCloak",
-            "formId": "10FC17",
+            "formId": "C17",
             "Effects": "Przez <dur> s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
             "Spell Mastery": "Czeladnik - zniszczenie"
         }
@@ -708,29 +922,14 @@ PLUGIN_TEST_DICT = {
         {
             "fullName": "Nus",
             "editorId": "WordNus",
-            "formId": "0602A5",
+            "formId": "2A5",
             "Translation": "Posąg"
         },
         {
             "fullName": "Slen",
             "editorId": "WordSlen",
-            "formId": "0602A4",
+            "formId": "2A4",
             "Translation": "Ciało"
         }
     ]
-}
-
-PLUGIN_TEST_SIMPLE_DICT = {
-    "WEAP": [],
-    "ARMO": [],
-    "BOOK": [],
-    "INGR": [],
-    "ALCH": [],
-    "MISC": [],
-    "AMMO": [],
-    "SCRL": [],
-    "SLGM": [],
-    "KEYM": [],
-    "SPEL": [],
-    "WOOP": []
-}
+}'''

@@ -86,6 +86,7 @@ class ConvertItemsFromPostTest(TestCase):
             session = {"items_messages": []}
 
         request = FakeRequest()
-        convert_items_from_post(request)
+        output = convert_items_from_post(request)
         self.assertEqual(request.session.get("items_messages"), [ITEMS_CONVERT_POST_ERROR])
+        self.assertEqual(output, {})
 

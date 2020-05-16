@@ -30,7 +30,7 @@ function getSignaturesData(signatures, pluginHandle) {
         const records = xelib.GetRecords(pluginHandle, category);
         itemsData[category] = processRecords(records);
     }
-
+    itemsData["isEsl"] = isEsl
     return itemsData;
 }
 

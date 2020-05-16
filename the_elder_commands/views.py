@@ -116,11 +116,8 @@ def get_items_messages(request):
 def handle_add_plugin_post(request):
     plugin_custom_form = PluginsForm(name=request.POST.get("plugin_name", ""))
     if plugin_custom_form.is_valid():
-        plugin_variants_data = plugin_variants_post(request)
-        if plugin_variants_data.get("plugin_data", {}) == {}:
-            request.session["add_plugins_messages"].append(ADD_PLUGIN_FILE_ERROR_MESSAGE)
-            return
-        else:
+        plugin_variants_data = create_variants_data_post(request)
+        if plugin_variants_data:
             plugin_variants_form = PluginVariantsForm(data=plugin_variants_data,
                                                       instance=plugin_custom_form.instance)
             if plugin_variants_form.is_valid():
@@ -131,6 +128,9 @@ def handle_add_plugin_post(request):
                 for error in plugin_variants_form.errors.values():
                     request.session["add_plugins_messages"] += [*error]
                     return
+        else:
+            request.session["add_plugins_messages"].append(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+            return
     else:
         for error in plugin_custom_form.errors:
             request.session["add_plugins_messages"] += [*error]
@@ -152,30 +152,31 @@ def unselect(request):
     request.session.update({"selected": all_selected})
 
 
-def plugin_variants_post(request):
+def create_variants_data_post(request):
     file_content = extract_dict_from_plugin_file(request)
+    try:
+        is_esl = file_content.pop("isEsl")
+    except (KeyError, AttributeError):
+        return
     post = QueryDict("", mutable=True)
-    post["version"] = request.POST.get("plugin_version")
-    post["language"] = request.POST.get("plugin_language")
-    post["plugin_data"] = file_content
+    post.update({"version": request.POST.get("plugin_version"), "language": request.POST.get("plugin_language"),
+                 "plugin_data": file_content, "esl": is_esl})
     return post
 
 
 def extract_dict_from_plugin_file(request):
-    file = request.FILES["plugin_file"]
+    file = request.FILES.get("plugin_file")
     try:
-        converted_to_dict = json.load(file)
-    except (json.decoder.JSONDecodeError, UnicodeDecodeError) as e:
-        print("JSON error in view: ", e)
-        return {}
-    return converted_to_dict
+        return json.load(file)
+    except (json.decoder.JSONDecodeError, AttributeError, UnicodeDecodeError):
+        pass
 
 
 def convert_items_from_post(request):
     table_input = request.POST.get("table_input")
     if table_input is None:
         request.session["items_messages"] += [ITEMS_CONVERT_POST_ERROR]
-        return []
+        return {}
     separated_input = table_input.split("&")
     converted = {}
     for item in separated_input:
