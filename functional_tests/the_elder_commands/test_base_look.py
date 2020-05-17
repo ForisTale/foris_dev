@@ -12,5 +12,5 @@ class DefaultLookTest(FunctionalTest):
 
         # Then he sees bar with categories,
         links = [link.text for link in self.driver.find_elements_by_class_name("header-link")]
-        categories = ["Foris.dev", "Character", "Items", "Spells", "Other", "Plugins", "Commands"]
+        categories = ["Foris.dev", "Skills", "Items", "Spells", "Other", "Plugins", "Commands"]
         self.assertListEqual(links, categories)

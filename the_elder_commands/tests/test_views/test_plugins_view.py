@@ -131,7 +131,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         correct_dict = copy.deepcopy(PLUGIN_TEST_DICT)
         correct_dict.pop("isEsl")
         expected.update({
-            'version': '0.1', 'language': 'Polish', 'plugin_data': correct_dict, "esl": False
+            'version': '0.1', 'language': 'Polish', 'plugin_data': correct_dict, "is_esl": False
         })
         form_mock.assert_called_once()
         form_mock.assert_called_with(data=expected, instance=plugin)
@@ -190,7 +190,7 @@ class CreateVariantsDataPost(TestCase):
             post = create_variants_data_post(request)
             self.assertEqual(post.get("version"), 1)
             self.assertEqual(post.get("language"), 2)
-            self.assertEqual(post.get("esl"), False)
+            self.assertEqual(post.get("is_esl"), False)
             self.assertDictEqual(post.get("plugin_data"), expected_dict)
 
     def test_pop_is_esl_from_extracted_dict(self):
@@ -226,13 +226,13 @@ class SelectedPluginsTest(TestCase):
     def test_redirect_after_post(self):
         Plugins.objects.create(name="test 01", usable_name="test_01")
 
-        post = {"selected": "test_01", "test_01_variant": "0.1;polish", "test_01_load_order": "01"}
+        post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
         response = self.client.post("/the_elder_commands/plugins/", data=post)
         self.assertRedirects(response, "/the_elder_commands/plugins/")
 
     @patch("the_elder_commands.views.SelectedPluginsForm")
     def test_select_post_is_managed_by_correct_form(self, form_mock):
-        post = {"selected": "", "test_01_selected": "", "test_01_variant": "0.1;english", "test_01_load_order": "01"}
+        post = {"selected": "", "test_01_selected": "", "test_01_variant": "0.1&english&", "test_01_load_order": "01"}
         self.client.post("/the_elder_commands/plugins/", data=post)
         expected = QueryDict("", mutable=True)
         expected.update(post)

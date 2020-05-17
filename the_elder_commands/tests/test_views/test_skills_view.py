@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from the_elder_commands.models import Character
-from the_elder_commands.services import CharacterService
+from the_elder_commands.models import Skills
+from the_elder_commands.services import SkillsService
 from the_elder_commands.views import extract_skills, set_skills_values, unpack_post
 
 SKILL_POST = {
@@ -44,17 +44,17 @@ SKILL_POST = {
 }
 
 
-class CharacterViewTest(TestCase):
+class SkillsViewTest(TestCase):
 
     def test_tec_use_template(self):
         response = self.client.get("/the_elder_commands/")
-        self.assertTemplateUsed(response, "the_elder_commands/character.html")
+        self.assertTemplateUsed(response, "the_elder_commands/skills.html")
 
     def test_character_view_use_service(self):
         response = self.client.get("/the_elder_commands/")
         self.assertIsInstance(
-            response.context["character"],
-            CharacterService
+            response.context["service"],
+            SkillsService
         )
 
     def test_redirect_after_POST(self):
@@ -67,8 +67,8 @@ class CharacterViewTest(TestCase):
     def test_pass_race_in_url_passed_it_to_form(self):
         self.client.post("/the_elder_commands/", data={"race": "Ork"})
 
-        self.assertEqual(Character.objects.count(), 1)
-        model = Character.objects.first()
+        self.assertEqual(Skills.objects.count(), 1)
+        model = Skills.objects.first()
         self.assertEqual(
             model.race,
             "Ork"
@@ -83,7 +83,7 @@ class CharacterViewTest(TestCase):
             "/the_elder_commands/",
             data=data
         )
-        model = Character.objects.first()
+        model = Skills.objects.first()
         self.assertEqual(
             model.skills["Magic"]["Alteration"]["default_value"],
             35
@@ -108,8 +108,8 @@ class CharacterViewTest(TestCase):
             data=data
         )
 
-        key = Character.objects.first().session_key
-        character = CharacterService(session_key=key)
+        key = Skills.objects.first().session_key
+        character = SkillsService(session_key=key)
         self.assertEqual(
             character.desired_level,
             3
@@ -147,8 +147,8 @@ class ExtractSkillsTest(TestCase):
 class SetSkillsValuesTest(TestCase):
 
     def test_will_return_two_correct_dicts(self):
-        result = CharacterService.default_race_skills_update("Nord")
-        dictionary = CharacterService.default_race_skills_update("Nord")
+        result = SkillsService.default_race_skills_update("Nord")
+        dictionary = SkillsService.default_race_skills_update("Nord")
         set_skills_values({"default": {"alteration": "45"}, "priority": {"alteration": True}}, dictionary)
         result["Magic"]["Alteration"]["default_value"] = "45"
         result["Magic"]["Alteration"]["multiplier"] = True
@@ -156,8 +156,8 @@ class SetSkillsValuesTest(TestCase):
         self.assertEqual(dictionary, result)
 
     def test_empty_value_is_set_as_none(self):
-        result = CharacterService.default_race_skills_update("Nord")
-        dictionary = CharacterService.default_race_skills_update("Nord")
+        result = SkillsService.default_race_skills_update("Nord")
+        dictionary = SkillsService.default_race_skills_update("Nord")
         set_skills_values({"desired": {"heavyarmor": ""}}, dictionary)
         result["Magic"]["Alteration"]["desired_value"] = ""
         self.assertEqual(result, dictionary)

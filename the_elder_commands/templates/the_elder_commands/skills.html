@@ -28,7 +28,7 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="id_chose_race">
             {% for race in playable_races %}
-                <form action="{% url 'tec:character' %}" method="post">
+                <form action="{% url 'tec:skills' %}" method="post">
                     <button class="dropdown-item {{ race.1 }}" value="{{ race.0 }}" name="race" type="submit">
                         {{ race.0 }}
                     </button>
@@ -39,11 +39,11 @@
         </div>
     </div>
 
-    <h6 class="text-info" id="id_race_name">Chosen race:<br>{{ character.race }}</h6>
+    <h6 class="text-info" id="id_race_name">Chosen race:<br>{{ service.race }}</h6>
 
-<form action="{% url 'tec:character' %}" method="post">
+<form action="{% url 'tec:skills' %}" method="post">
     <div class="row">
-        {% for category, category_skills in character.skills.items %}
+        {% for category, category_skills in service.skills.items %}
             <div class="col-lg-4">
                 <table class="table table-dark text-info">
                     <thead>
@@ -82,21 +82,21 @@
         <div class="col-md-4">
             <label>Multiplier:
                 <input id="id_multiplier" name="priority_multiplier"
-                       value="{{ character.priority_multiplier }}" type="number" step="0.1">
+                       value="{{ service.priority_multiplier }}" type="number" step="0.1">
             </label>
 
         </div>
         <div class="col-md-4">
-            <h6 id="id_calculated_level">Calculated level: {{ character.default_level }}</h6>
+            <h6 id="id_calculated_level">Calculated level: {{ service.default_level }}</h6>
         </div>
         <div class="col-md-2">
             <label>Desired level:
-                <input id="id_desired_level" name="desired_level" value="{{ character.desired_level }}">
+                <input id="id_desired_level" name="desired_level" value="{{ service.desired_level }}">
             </label>
         </div>
         <div class="col-md-2">
             <label class="container"><input type="checkbox" name="fill_skills" value="true"
-                        {% if character.fill_skills %}checked{% endif %}> Fill skills to desired level?</label>
+                        {% if service.fill_skills %}checked{% endif %}> Fill skills to desired level?</label>
         </div>
     </div>
     <div class="row">

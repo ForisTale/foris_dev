@@ -1,12 +1,12 @@
-from .models import Character, PluginVariants, Plugins
+from .models import Skills, PluginVariants, Plugins
 from .inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
 import copy
 import math
 
 
-class CharacterService:
+class SkillsService:
     def __init__(self, session_key):
-        character, created = Character.objects.get_or_create(session_key=session_key)
+        character, created = Skills.objects.get_or_create(session_key=session_key)
 
         self.race = character.race
         if not character.skills:

@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.postgres.fields import JSONField
 
 
-class Character(models.Model):
+class Skills(models.Model):
     race = models.TextField(default="Nord")
     session_key = models.TextField(default="", unique=True)
     skills = JSONField(default=dict)
@@ -14,7 +14,7 @@ class Character(models.Model):
 
     @staticmethod
     def get_absolute_url():
-        return reverse("tec:character")
+        return reverse("tec:skills")
 
 
 class Plugins(models.Model):
@@ -25,7 +25,7 @@ class Plugins(models.Model):
 class PluginVariants(models.Model):
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["version", "language", "instance", "esl"],
+            models.UniqueConstraint(fields=["version", "language", "instance", "is_esl"],
                                     name="unique_variant")
         ]
 

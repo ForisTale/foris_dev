@@ -1,33 +1,33 @@
 from django.shortcuts import render, redirect
 from django.http import QueryDict, JsonResponse
-from .models import Character
-from .forms import CharacterForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
-from .services import CharacterService, PluginsService, ItemsService
+from .models import Skills
+from .forms import SkillsForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
+from .services import SkillsService, PluginsService, ItemsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, \
     ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR, \
     ADD_PLUGIN_FILE_ERROR_MESSAGE
 import json
 
 
-def character_view(request):
+def skills_view(request):
     if not request.session.session_key:
         request.session.save()
     form = None
     if request.method == "POST":
-        instance = Character.objects.get_or_create(session_key=request.session.session_key)[0]
+        instance = Skills.objects.get_or_create(session_key=request.session.session_key)[0]
         if "race" in request.POST:
-            skills = CharacterService.default_race_skills_update(request.POST["race"])
+            skills = SkillsService.default_race_skills_update(request.POST["race"])
             post = {**unpack_post(request.POST), "skills": skills}
         else:
             post = correct_character_post(request.POST, instance.race)
-        form = CharacterForm(data=post, instance=instance)
+        form = SkillsForm(data=post, instance=instance)
         if form.is_valid():
             form.save()
             return redirect(instance)
-    character = CharacterService(session_key=request.session.session_key)
-    request.session.update({"character_commands": character.commands_list()})
-    return render(request, "the_elder_commands/character.html", {"character": character, "form": form,
-                                                                 "active": "character"})
+    skills_service = SkillsService(session_key=request.session.session_key)
+    request.session.update({"skills_commands": skills_service.commands_list()})
+    return render(request, "the_elder_commands/skills.html", {"service": skills_service, "form": form,
+                                                              "active": "skills"})
 
 
 def items_view(request):
@@ -85,7 +85,7 @@ def plugins_view(request):
 
 def commands_view(request):
     commands = []
-    commands += request.session.get("character_commands", [])
+    commands += request.session.get("skills_commands", [])
     commands += create_items_commands(request)
 
     return render(request, "the_elder_commands/commands.html", {"active": "commands", "commands": commands})
@@ -160,7 +160,7 @@ def create_variants_data_post(request):
         return
     post = QueryDict("", mutable=True)
     post.update({"version": request.POST.get("plugin_version"), "language": request.POST.get("plugin_language"),
-                 "plugin_data": file_content, "esl": is_esl})
+                 "plugin_data": file_content, "is_esl": is_esl})
     return post
 
 
@@ -201,7 +201,7 @@ def unpack_post(post):
 def correct_character_post(post, race):
     unpacked_post = unpack_post(post)
     skills = extract_skills(unpacked_post)
-    default_race = CharacterService.default_race_skills_update(race)
+    default_race = SkillsService.default_race_skills_update(race)
     set_skills_values(skills, default_race)
 
     new_post = QueryDict("", mutable=True)

@@ -1,11 +1,11 @@
 from django.forms.models import ModelForm
 from django.forms import ValidationError
-from the_elder_commands.models import Character, Plugins, PluginVariants
+from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
     PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
 
 
-class CharacterForm(ModelForm):
+class SkillsForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,7 +16,7 @@ class CharacterForm(ModelForm):
         self.fields["fill_skills"].required = False
 
     class Meta:
-        model = Character
+        model = Skills
         fields = (
             "race", "skills", "desired_level",
             "priority_multiplier", "fill_skills",

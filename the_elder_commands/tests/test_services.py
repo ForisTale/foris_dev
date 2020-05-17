@@ -1,12 +1,12 @@
 from django.test import TestCase
-from the_elder_commands.models import Character, Plugins, PluginVariants
-from the_elder_commands.services import CharacterService, PluginsService, ItemsService
+from the_elder_commands.models import Skills, Plugins, PluginVariants
+from the_elder_commands.services import SkillsService, PluginsService, ItemsService
 from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT
 from functional_tests.the_elder_commands import test_plugins
 import copy
 
 
-class CharacterServiceTest(TestCase):
+class SkillsServiceTest(TestCase):
 
     @staticmethod
     def set_up_default_nord():
@@ -20,16 +20,16 @@ class CharacterServiceTest(TestCase):
 
     @staticmethod
     def set_up_desire_skills():
-        skills = CharacterService.default_race_skills_update("Altmer")
+        skills = SkillsService.default_race_skills_update("Altmer")
         skills["Combat"]["Two-handed"]["desired_value"] = 20
         skills["Stealth"]["Speech"]["desired_value"] = 20
         skills["Stealth"]["Light Armor"]["desired_value"] = 20
-        Character.objects.create(race="Altmer", session_key="key", skills=skills)
-        character = CharacterService("key")
+        Skills.objects.create(race="Altmer", session_key="key", skills=skills)
+        character = SkillsService("key")
         return character
 
     def test_race_skills_update_depend_on_race(self):
-        default_skills = CharacterService.default_race_skills_update("Nord")
+        default_skills = SkillsService.default_race_skills_update("Nord")
         skills = self.set_up_default_nord()
         self.assertEqual(default_skills, skills)
 
@@ -38,9 +38,9 @@ class CharacterServiceTest(TestCase):
         skills["Combat"]["Archery"]["default_value"] = 20
         skills["Stealth"]["Sneak"]["default_value"] = 20
         skills["Stealth"]["Alchemy"]["default_value"] = 20
-        Character.objects.create(session_key="key", skills=skills)
+        Skills.objects.create(session_key="key", skills=skills)
         self.assertEqual(
-            CharacterService(session_key="key").default_level,
+            SkillsService(session_key="key").default_level,
             3
         )
 
@@ -58,14 +58,14 @@ class CharacterServiceTest(TestCase):
         skills["Magic"]["Alteration"]["default_value"] = 32
         skills["Magic"]["Alteration"]["desired_value"] = 40
         skills["Magic"]["Enchanting"]["default_value"] = 40
-        Character.objects.create(session_key="key", skills=skills)
-        character = CharacterService(session_key="key")
+        Skills.objects.create(session_key="key", skills=skills)
+        character = SkillsService(session_key="key")
         self.assertEqual(character.default_level, 7)
         self.assertEqual(character.desired_level, 8)
 
     def test_if_passes_non_exist_session_key_create_default(self):
-        CharacterService(session_key="key")
-        character = Character.objects.first()
+        SkillsService(session_key="key")
+        character = Skills.objects.first()
         self.assertEqual(character.session_key, "key")
 
     def test_desired_skills_update_return_correct_object(self):
@@ -76,7 +76,7 @@ class CharacterServiceTest(TestCase):
         )
 
     def test_empty_character_desired_skills_return_desired_skills_empty_value(self):
-        character = CharacterService(session_key="key")
+        character = SkillsService(session_key="key")
         self.assertEqual(
             character.skills["Magic"]["Alteration"]["desired_value"],
             ""
@@ -86,28 +86,28 @@ class CharacterServiceTest(TestCase):
         skills = self.set_up_default_nord()
         skills["Combat"]["One-handed"]["default_value"] = 25
         skills["Combat"]["One-handed"]["desired_value"] = 35
-        Character.objects.create(session_key="key", skills=skills)
-        character = CharacterService(session_key="key")
+        Skills.objects.create(session_key="key", skills=skills)
+        character = SkillsService(session_key="key")
         self.assertEqual(character.default_level, 2)
         self.assertEqual(character.desired_level, 4)
 
     def test_calculate_desired_level(self):
         character = self.set_up_desire_skills()
         self.assertEqual(character.desired_level, 3)
-        model = Character.objects.get(session_key="key")
+        model = Skills.objects.get(session_key="key")
         model.desired_level = 6
         model.fill_skills = True
         model.save()
-        changed_character = CharacterService(session_key="key")
+        changed_character = SkillsService(session_key="key")
         self.assertEqual(changed_character.desired_level, 6)
 
     def test_if_desired_level_is_bigger_than_calculated_then_change_skills(self):
         self.set_up_desire_skills()
-        model = Character.objects.get(session_key="key")
+        model = Skills.objects.get(session_key="key")
         model.desired_level = 6
         model.fill_skills = True
         model.save()
-        character = CharacterService(session_key="key")
+        character = SkillsService(session_key="key")
         cases = [
             character.skills["Combat"]["Archery"]["desired_value"],
             character.skills["Combat"]["Block"]["desired_value"],
@@ -119,14 +119,14 @@ class CharacterServiceTest(TestCase):
 
     def test_desired_level_fill_skills_only_to_100(self):
         self.set_up_desire_skills()
-        model = Character.objects.get(session_key="key")
+        model = Skills.objects.get(session_key="key")
         model.desired_level = 81
         model.fill_skills = True
         skills = model.skills
         skills["Magic"]["Alteration"]["desired_value"] = 99
         model.save()
 
-        character = CharacterService(session_key="key")
+        character = SkillsService(session_key="key")
         for skill_type in character.skills:
             for name in character.skills[skill_type]:
                 self.assertEqual(
@@ -143,8 +143,8 @@ class CharacterServiceTest(TestCase):
         for index in range(3):
             for skill in skills_categories[index]:
                 skills[categories[index]][skill]["default_value"] = 99
-        Character.objects.update_or_create(session_key="key", skills=skills, desired_level=81, fill_skills=True)
-        CharacterService(session_key="key")
+        Skills.objects.update_or_create(session_key="key", skills=skills, desired_level=81, fill_skills=True)
+        SkillsService(session_key="key")
         self.assertTrue(True, "It's not looping!")
 
 
@@ -154,10 +154,10 @@ class PluginsServiceTest(TestCase):
         for plugin_num in range(1, 3):
             plugin = Plugins.objects.create(name="test 0" + str(plugin_num), usable_name="test_0" + str(plugin_num))
             for index in range(1, 4):
-                PluginVariants.objects.create(version="0." + str(index), language="english", esl=False,
+                PluginVariants.objects.create(version="0." + str(index), language="english", is_esl=False,
                                               plugin_data={"test": index}, instance=plugin)
                 if index == 2:
-                    PluginVariants.objects.create(version="0." + str(index), language="polish", esl=True,
+                    PluginVariants.objects.create(version="0." + str(index), language="polish", is_esl=True,
                                                   plugin_data={"test": index}, instance=plugin)
 
     def set_up_fake_request_and_return_plugin_service(self):
@@ -167,6 +167,7 @@ class PluginsServiceTest(TestCase):
                     "name": "test 01",
                     "usable_name": "test_01",
                     "version": "0.3",
+                    "is_esl": "",
                     "language": "english",
                     "load_order": "FF"
                 }]}
@@ -189,9 +190,9 @@ class PluginsServiceTest(TestCase):
         self.assertEqual(actual.variants[0].language, "english")
         self.assertEqual(actual.variants[0].version, "0.3")
         self.assertEqual(actual.variants[0].selected, True)
-        self.assertEqual(actual.variants[0].is_esl, "")
+        self.assertEqual(actual.variants[0].esl, "")
         self.assertEqual(actual.variants[1].selected, False)
-        self.assertEqual(actual.variants[2].is_esl, "esl")
+        self.assertEqual(actual.variants[2].esl, "esl")
         actual = all_plugins[1]
         self.assertIsInstance(actual, PluginsService.Plugin)
         self.assertEqual(actual.name, "test 02")
@@ -201,10 +202,10 @@ class PluginsServiceTest(TestCase):
         self.assertEqual(len(actual.variants), 4)
         self.assertEqual(actual.variants[0].language, "english")
         self.assertEqual(actual.variants[0].version, "0.3")
-        self.assertEqual(actual.variants[0].is_esl, "")
+        self.assertEqual(actual.variants[0].esl, "")
         self.assertEqual(actual.variants[0].selected, False)
         self.assertEqual(actual.variants[1].selected, False)
-        self.assertEqual(actual.variants[2].is_esl, "esl")
+        self.assertEqual(actual.variants[2].esl, "esl")
 
     def test_is_plugin_selected(self):
 
@@ -227,9 +228,9 @@ class PluginsServiceTest(TestCase):
         self.assertEqual(actual[0].language, "english")
         self.assertEqual(actual[0].version, "0.3")
         self.assertEqual(actual[0].selected, True)
-        self.assertEqual(actual[0].is_esl, "")
+        self.assertEqual(actual[0].esl, "")
         self.assertEqual(actual[1].selected, False)
-        self.assertEqual(actual[2].is_esl, "esl")
+        self.assertEqual(actual[2].esl, "esl")
 
     def test_get_variants_is_ordered_by_desc_version_and_asc_language(self):
         plugin_service = self.set_up_fake_request_and_return_plugin_service()

@@ -10,11 +10,11 @@ class CommandsViewTest(TestCase):
 
     def test_view_pass_commands_from_other_pages(self):
         session = self.client.session
-        session.update({"chosen_items": {"item01": "01", "item02": "02"}, "character_commands": ["character"]})
+        session.update({"chosen_items": {"item01": "01", "item02": "02"}, "skills_commands": ["skills"]})
         session.save()
 
         response = self.client.get("/the_elder_commands/commands/")
-        self.assertEqual(response.context["commands"], ["character", "player.additem item01 01",
+        self.assertEqual(response.context["commands"], ["skills", "player.additem item01 01",
                                                         "player.additem item02 02"])
 
 

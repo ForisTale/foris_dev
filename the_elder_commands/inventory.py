@@ -10,7 +10,7 @@ def template_variables(request):
             ["Khajiit", "khajiit_race"], ["Nord", "nord_race"],
             ["Ork", "ork_race"], ["Redguard", "redguard_race"],
         ],
-        "main_categories": ["character", "items", "spells", "other", "plugins", "commands"],
+        "main_categories": ["skills", "items", "spells", "other", "plugins", "commands"],
         "items_categories": ["Weapons", "Armors", "Ammo", "Books", "Ingredients", "Alchemy", "Scrolls", "SoulGems",
                              "Keys", "Miscellaneous"],
     }
@@ -44,7 +44,8 @@ ADD_PLUGIN_SUCCESS_MESSAGE = "Plugin was successfully added to database."
 
 ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 
-ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language, Instance and Esl already exists."
+ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language, Instance and Is esl already " \
+                                        "exists."
 
 ITEMS_COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the commands page."
 

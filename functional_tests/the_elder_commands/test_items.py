@@ -123,7 +123,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         self.submit_items_table()
 
         # then he change page and come back to items page
-        self.driver.find_element_by_link_text("Character").click()
+        self.driver.find_element_by_link_text("Skills").click()
         self.wait_for(lambda: self.driver.find_element_by_link_text("Items").click())
 
         # all earlier chosen items are still chosen
