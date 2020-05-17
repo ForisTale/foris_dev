@@ -3,6 +3,7 @@ from functional_tests.the_elder_commands import test_plugins
 from django.test.utils import tag
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, ManageTestFiles, template_variables, \
     ITEMS_COMMANDS_SUCCESS_MESSAGE
+from unittest import skip
 
 
 class ItemsTest(FunctionalTest, ManageTestFiles):
@@ -139,11 +140,64 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
             "2"
         )
 
+    @skip("Not sure if I want it like that.")
     def test_selected_items_are_showed_in_separated_tab(self):
         # Foris chose some items
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
+        table.find_element_by_tag_name("input").send_keys("12")
+
+        self.driver.find_element_by_link_text("Armors").click()
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_armors_tbody"))
+        table.find_element_by_tag_name("input").send_keys("5")
+        self.driver.find_element_by_link_text("Books").click()
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_books_tbody"))
+        table.find_element_by_tag_name("input").send_keys("5")
+        self.submit_items_table()
+
         # then he change tab to chosen items
+        self.driver.find_element_by_link_text("Selected").click()
+
         # and there he sees all items that he chose
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_selected_tbody"))
+        self.assertEqual(table.text, "placeholder")
+
         # he decide that in one there is to few
+        table.find_element_by_tag_name("input").clear()
+        table.find_element_by_tag_name("input").send_keys("20")
+
         # and he don't need other at all
-        # in the end he clear all items
-        self.fail("Finish test!")
+        table.find_elements_by_link_text("unselect")[1].click()
+        self.submit_items_table()
+
+        # now he sees items after update
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
+        self.assertEqual(
+            table.find_element_by_tag_name("input").get_attribute("value"),
+            "20"
+        )
+
+        self.driver.find_element_by_link_text("Armors").click()
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_armors_tbody"))
+        self.assertEqual(
+            table.find_element_by_tag_name("input").get_attribute("value"),
+            ""
+        )
+        self.driver.find_element_by_link_text("Selected").click()
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_id("id_selected_tbody").text,
+            "placeholder"
+        ))
+
+        # but  in the end he clear all items
+        self.driver.find_element_by_link_text("Selected").click()
+        self.driver.find_element_by_link_text("Unselect all!").click()
+        table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
+        self.assertEqual(
+            table.find_element_by_tag_name("input").get_attribute("value"),
+            ""
+        )
+        self.driver.find_element_by_link_text("Selected").click()
+        self.wait_for(lambda: self.assertEqual(
+            self.driver.find_element_by_id("id_selected_tbody").text,
+            ""
+        ))
