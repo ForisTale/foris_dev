@@ -3,9 +3,8 @@ window.TEC = {}
 window.TEC.initialize = (params) => {
 
     let table = window.TEC.initializeDataTable();
-
+    window.TEC.adjustWrapper();
     window.TEC.createSubmitButton();
-
     window.TEC.sendAjaxPOST(table, params.url);
 };
 
@@ -21,9 +20,17 @@ window.TEC.initializeDataTable = () => {
     })
 };
 
+window.TEC.adjustWrapper = () => {
+    let wrapperCols = $(".dataTables_wrapper > div:nth-child(1) > div");
+    wrapperCols.removeClass("col-md-6");
+    wrapperCols.addClass("col-md-2");
+    let wrapperFirstCols = $(".dataTables_wrapper > div:nth-child(1) > div:first-child");
+    wrapperFirstCols.after('<div class="col-md-8 col-12"><div class="row" id="id_wrapper"></div></div>');
+}
+
 window.TEC.createSubmitButton = () => {
-    $('div.dataTables_length').html('<button type="submit" name="submit_table" id="id_submit_table" ' +
-        'class="btn btn-dark text-info">Generate<br>Commands</button>')
+    $('#id_wrapper').append('<div class="col-1"><button type="submit" name="submit_table" id="id_submit_table" ' +
+        'class="btn btn-dark text-info">Generate<br>Commands</button></div>')
 };
 
 window.TEC.sendAjaxPOST = (table, url) => {
@@ -46,11 +53,8 @@ window.TEC.sendAjaxPOST = (table, url) => {
 
 window.TEC.createMessage = (result) => {
     let jsonResponse = JSON.parse(result),
-        first_part = '<div class="alert alert-primary alert-dismissible fade show" role="alert"> <h4><strong>',
+        first_part = '<div class=" col-5 alert alert-primary alert-dismissible fade show" role="alert"> <h4><strong>',
         second_part = '</strong></h4> <button type="button" class="close" data-dismiss="alert" ' +
             'aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-    $("#id_error_messages").html(first_part + jsonResponse.message + second_part).show();
+    $("#id_wrapper").append(first_part + jsonResponse.message + second_part).show();
 };
-
-
-window.TEC_test = {}
