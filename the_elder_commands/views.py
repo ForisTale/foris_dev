@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import QueryDict, JsonResponse
 from .models import Skills
 from .forms import SkillsForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
-from .services import SkillsService, PluginsService, ItemsService
+from .services import SkillsService, PluginsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, \
     ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR, \
     ADD_PLUGIN_FILE_ERROR_MESSAGE
@@ -45,10 +45,8 @@ def items_view(request):
             message = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
         return JsonResponse({"message": message})
 
-    service = ItemsService(request)
     messages = request.session.get("items_messages", [])
-    return render(request, "the_elder_commands/items.html", {"active": "items", "service": service,
-                                                             "items_messages": messages})
+    return render(request, "the_elder_commands/items.html", {"active": "items", "items_messages": messages})
 
 
 def spells_view(request):
@@ -177,13 +175,13 @@ def convert_items_from_post(request):
     if table_input is None:
         request.session["items_messages"] += [ITEMS_CONVERT_POST_ERROR]
         return {}
-    separated_input = table_input.split("&")
+    parsed_input = json.loads(table_input)
+
     converted = {}
-    for item in separated_input:
-        if len(item) <= 9:
+    for item in parsed_input:
+        if item.get("value") == "":
             continue
-        item = item.split("=")
-        command = {item[0]: item[1]}
+        command = {item.get("name"): item.get("value")}
         converted.update(command)
     return converted
 

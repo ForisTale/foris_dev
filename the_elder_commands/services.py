@@ -17,7 +17,6 @@ class SkillsService:
         self.fill_skills = character.fill_skills
         self.desired_level = self.predict_desired_level(character_model=character)
         self.default_level = self.predict_level("default")
-        self.list_of_character_commands = self.commands_list()
 
     @staticmethod
     def default_race_skills_update(race):
@@ -183,21 +182,22 @@ class PluginsService:
 
 
 class ItemsService:
-    def __init__(self, request):
-        self.selected = request.session.get("selected", [])
-        self.items = self.get_items()
+    def __init__(self, request, category):
         self.chosen = request.session.get("chosen_items", {})
+        self.selected = request.session.get("selected", [])
+        self.items = self.get_items(category)
 
-    def get_items(self):
+    def get_items(self, category):
         items = []
         for selected in self.selected:
             variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
                                                  language=selected.get("language"))
-            variant_data = variant.plugin_data
-            for variant_items in variant_data.values():
-                for variant_item in variant_items:
-                    variant_item.update({"formId": f"{selected.get('load_order')}{variant_item.get('formId', '')}",
-                                         "plugin_name": selected.get("name")})
+            variant_items = variant.plugin_data.get(category)
+            for item in variant_items:
+                form_id = f"{selected.get('load_order')}{item.get('formId')}"
+                quantity = self.chosen.get(form_id, "")
+                item.update({"formId": form_id, "plugin_name": selected.get("name"), "quantity": quantity,
+                             "selected": quantity != ""})
+                items.append(item)
 
-            items.append(variant_data)
         return items

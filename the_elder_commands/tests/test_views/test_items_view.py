@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
 from functional_tests.the_elder_commands import test_plugins
-from the_elder_commands.services import ItemsService
 from the_elder_commands.inventory import ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
     ITEMS_CONVERT_POST_ERROR, ManageTestFiles
 from the_elder_commands.views import convert_items_from_post
@@ -39,19 +38,14 @@ class ItemsViewTest(TestCase, ManageTestFiles):
         response = self.client.get("/the_elder_commands/items/")
         self.assertRedirects(response, "/the_elder_commands/plugins/")
 
-    def test_view_pass_items_service_to_template(self):
-
-        response = self.client.get("/the_elder_commands/items/")
-        self.assertIsInstance(response.context["service"], ItemsService)
-
     def test_return_json_response_after_post(self):
-        post = {"table_input": ["00BB00BB=12&00CC00CC="]}
+        post = {"table_input": ['[{"name":"010282E9","value":"12"}]']}
         response = self.client.post("/the_elder_commands/items/", data=post)
         self.assertIsInstance(response, JsonResponse)
 
     def test_view_convert_post_to_console_codes(self):
-        cases = {"00AA00AA=&00BB00BB=12&00CC00CC=": {"00BB00BB": "12"},
-                 "00AA00AA=&00BB00BB=&00CC00CC=": {}}
+        cases = {'[{"name":"010282E9","value":"12"}]': {"010282E9": "12"},
+                 '[{"name":"010282E9","value":""}]': {}}
         for table_input, expected in cases.items():
             post = {"table_input": [table_input]}
             self.client.post("/the_elder_commands/items/", data=post)
@@ -60,12 +54,13 @@ class ItemsViewTest(TestCase, ManageTestFiles):
             self.assertEqual(codes, expected)
 
     def test_successful_post_give_message_to_view(self):
-        post = {"table_input": ["00AA00AA=1"]}
+        post = {"table_input": ['[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"}]']}
         response = self.client.post("/the_elder_commands/items/", data=post)
         self.assertIn(ITEMS_COMMANDS_SUCCESS_MESSAGE, response.json().get("message"))
 
     def test_give_empty_post_message_after_empty_POST(self):
-        post = {"table_input": ["00AA00AA=&00BB00BB=&00CC00CC="]}
+        post = {"table_input": ['[{"name":"0101BFEF","value":""},{"name":"010282E9","value":""}, '
+                                '{"name":"010282E6","value":""}]']}
         response = self.client.post("/the_elder_commands/items/", data=post)
         self.assertIn(ITEMS_COMMANDS_POST_EMPTY_MESSAGE, response.json().get("message"))
 
@@ -74,10 +69,11 @@ class ConvertItemsFromPostTest(TestCase):
     def test_convert_post_to_list_of_formid_and_amount(self):
 
         class FakeRequest:
-            POST = {"table_input": "00AA00AA=1&00BB00BB=12&00CC00CC="}
+            POST = {"table_input": '[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"},'
+                    '{"name":"010282E6","value":""}]'}
 
         result = convert_items_from_post(FakeRequest())
-        self.assertEqual(result, {"00AA00AA": "1", "00BB00BB": "12"})
+        self.assertEqual(result, {"0101BFEF": "1", "010282E9": "12"})
 
     def test_incorrect_post_give_error_message(self):
 

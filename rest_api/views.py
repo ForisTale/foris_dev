@@ -1,7 +1,9 @@
+from rest_api.serializers import ItemSerializer, ListSerializer
 from lists.models import List, Item
 from rest_framework import viewsets
 
-from rest_api.serializers import ItemSerializer, ListSerializer
+from django.http import JsonResponse
+from the_elder_commands.services import ItemsService
 
 
 class ListViewSet(viewsets.ModelViewSet):
@@ -14,4 +16,7 @@ class ItemViewSet(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
 
 
+def api_items(request, category):
+    items_service = ItemsService(request, category)
+    return JsonResponse(items_service.items, safe=False)
 

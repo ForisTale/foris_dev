@@ -274,14 +274,13 @@ class ItemsServiceTest(TestCase):
                 "load_order": "A5"
             }]}
 
-        service = ItemsService(FakeRequest)
-        test_dict = copy.deepcopy(PLUGIN_TEST_DICT)
-        test_dict.pop("isEsl")
-        for items_list in test_dict.values():
-            for item in items_list:
-                item.update({"formId": f"A5{item.get('formId', '')}", "plugin_name": "test 01"})
+        service = ItemsService(FakeRequest, "WEAP")
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT.get("WEAP"))
+        for item in test_dict:
+            item.update({"formId": f"A5{item.get('formId', '')}", "plugin_name": "test 01", "quantity": "",
+                         "selected": False})
 
-        self.assertDictEqual(service.items[0], test_dict)
+        self.assertDictEqual({1: service.items}, {1: test_dict})
 
     def test_get_items_run_only_when_change_in_selected(self):
         self.fail("Finish test!")
@@ -291,7 +290,7 @@ class ItemsServiceTest(TestCase):
         class FakeRequest:
             session = {"chosen_items": {"test_01": 1, "test_02": "2"}}
 
-        service = ItemsService(FakeRequest)
+        service = ItemsService(FakeRequest, "WEAP")
         self.assertEqual(service.chosen, {"test_01": 1, "test_02": "2"})
 
     def test_if_no_items_commands_return_empty_dict(self):
@@ -299,5 +298,5 @@ class ItemsServiceTest(TestCase):
         class FakeRequest:
             session = {}
 
-        service = ItemsService(FakeRequest)
+        service = ItemsService(FakeRequest, "WEAP")
         self.assertEqual(service.chosen, {})

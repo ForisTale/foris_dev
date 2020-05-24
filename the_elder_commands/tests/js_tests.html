@@ -1,39 +1,33 @@
-{% extends "the_elder_commands/base.html" %}
-{% load tec_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript Tests</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.10.0.css"
+          integrity="sha256-0qVb1rgTvRqgmXb5us49Z/TADxRfGlAWvjxUqrgCnYQ=" crossorigin="anonymous">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+</head>
+<body>
 
-{% block head %}
-<link href="/static/the_elder_commands/items.css" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-<script src="/static/the_elder_commands/items.js"></script>
-<script>$(document).ready( function () { window.TEC.initialize({url: "{% url 'tec:items' %}",
-    messages: {{ items_messages }}}) });</script>
-{% endblock %}
-
-{% block body %}
-
+<div id="qunit"></div>
+<div id="qunit-fixture">
 
 <div class="row">
-<div class="col">
-    <ul class="nav nav-tabs bg-dark justify-content-around" id="id_items_categories" role="tablist">
-        {% for category in items_categories %}
-        <li class="nav-item">
-            <a class="nav-link text-info {% if category == "Weapons" %}active show{% endif %}"
-               id="id_{{ category|lower }}" data-toggle="tab" role="tab"
-               href="#id_{{ category|lower }}_panel" aria-controls="id_{{ category|lower }}_panel"
-               aria-selected="{% if category == "Weapons" %}true{% else %}false{% endif %}">{{ category }}</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="col">
+        <ul class="nav nav-tabs bg-dark justify-content-around" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link text-info active show" data-toggle="tab" id="id_weapons" role="tab" href="#id_weapons_panel"
+                aria-controls="id_weapons_panel" aria-selected="true">First</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-info" data-toggle="tab" id="id_armors" role="tab" href="#id_armors_panel"
+                aria-controls="id_armors_panel" aria-selected="true">Second</a>
+            </li>
+        </ul>
+    </div>
 </div>
-</div>
-
-<div class="row row-separator"></div>
 
 <div class="tab-content">
 <div class="tab-pane fade show active" id="id_weapons_panel" role="tabpanel" aria-labelledby="id_weapons">
@@ -256,6 +250,25 @@
     </div>
 </div>
 </div>
+<input type="hidden" name="csrfmiddlewaretoken" value="fakeToken">
+</div>
 
-{% csrf_token %}
-{% endblock %}
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+<script src="https://code.jquery.com/qunit/qunit-2.10.0.js"
+        integrity="sha256-X1fQXHSYGxa4V2bqkEAQW0DQGSxJrKveasahr959o28=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sinon.js/9.0.2/sinon.js"></script>
+
+<script src="../static/the_elder_commands/items.js" type="application/javascript"></script>
+<script src="js_tests.js" type="text/javascript"></script>
+</body>
+</html>
