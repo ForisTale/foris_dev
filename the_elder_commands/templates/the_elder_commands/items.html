@@ -10,9 +10,9 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
 <script type="text/javascript" charset="utf8"
         src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-<script src="/static/the_elder_commands/items.js"></script>
+<script src="/static/the_elder_commands/TEC.js"></script>
 <script>$(document).ready( function () { window.TEC.initialize({url: "{% url 'tec:items' %}",
-    messages: {{ items_messages }}}) });</script>
+    messages: {{ items_messages }}, site: "items"}) });</script>
 {% endblock %}
 
 {% block body %}

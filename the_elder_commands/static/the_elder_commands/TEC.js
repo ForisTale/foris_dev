@@ -4,21 +4,30 @@ window.TEC = {};
 
 window.TEC.initialize = function(templateVariable) {
 
-    let tables = this.initializeDataTables();
+    let tables = this.initializeDataTables(templateVariable.site);
     this.adjustWrapper();
     this.createSubmitButton();
-    this.checkForMessages(templateVariable.messages)
-    this.sendAjaxPOST(tables, templateVariable.url)
+    this.createHideButton();
+    this.checkForMessages(templateVariable.messages);
+    this.sendAjaxPOST(tables, templateVariable.url);
+    this.hideButton(tables);
+    this.reactionToInput(tables);
+
     return tables
 };
 
 
-window.TEC.initializeDataTables = function() {
-    let items = this.getItems(),
+window.TEC.initializeDataTables = function(site) {
+    let tableCategories,
         tables = [];
+    switch (site) {
+        case "items":
+            tableCategories = this.getItems();
+            break;
+    }
 
-    for (let item of items) {
-        tables.push(this.initializeDataTable(item));
+    for (let category of tableCategories) {
+        tables.push(this.initializeDataTable(category));
     }
     return tables;
 };
@@ -52,9 +61,79 @@ window.TEC.adjustWrapper = function() {
 
 
 window.TEC.createSubmitButton = function() {
-    $('.table_wrapper').append('<div class="col-1"><button type="submit" name="submit_table" ' +
+    $('.table_wrapper').append('<div class="col-1"><button type="button" ' +
         'class="btn btn-dark text-info submit_table">Generate<br>Commands</button></div>');
 };
+
+window.TEC.createShowButton = function() {
+    $(".table_wrapper > div:first-child").after('<div class="col-1"><button type="button" ' +
+        'class="btn btn-dark text-info show_all btn-block">Show<br>All</button></div>');
+};
+
+window.TEC.createHideButton = function() {
+    $(".table_wrapper > div:first-child").after('<div class="col-1"><button type="button" ' +
+        'class="btn btn-dark text-info hide_not_selected">Hide&nbspWithout<br>Quantity</button></div>');
+};
+
+window.TEC.removeHideButton = function() {
+    let show = $(".hide_not_selected");
+    show.parent().remove();
+};
+
+window.TEC.removeShowButton = function() {
+    let hide = $(".show_all");
+    hide.parent().remove();
+};
+
+window.TEC.hideButton = function(tables) {
+    $(".hide_not_selected").click(function () {
+        window.TEC.removeHideButton();
+        window.TEC.createShowButton();
+        window.TEC.showButton(tables);
+        window.TEC.searchSelected(tables);
+    });
+};
+
+window.TEC.showButton = function(tables) {
+    $(".show_all").click(function () {
+        window.TEC.removeShowButton();
+        window.TEC.createHideButton();
+        window.TEC.hideButton(tables);
+        window.TEC.clearSearch(tables);
+    });
+};
+
+window.TEC.searchSelected = function(tables) {
+    for (let table of tables) {
+        table.api().column(-1).search("true").draw();
+    }
+};
+
+window.TEC.clearSearch = function(tables) {
+    for (let table of tables) {
+        table.api().column(-1).search("").draw();
+    }
+};
+
+window.TEC.reactionToInput = function(tables) {
+    for (let table of tables) {
+        table.on("keyup", "input", function () {
+            let inputValue = $(this).closest("tr").find("input").val();
+            if (inputValue === "") {
+                let row = $(this).parents("tr"),
+                col = table.api().column(-1),
+                cell = table.api().cell(row, col);
+                cell.data("false").draw();
+            } else {
+                let row = $(this).parents("tr"),
+                col = table.api().column(-1),
+                cell = table.api().cell(row, col);
+                cell.data("true").draw();
+            }
+            $(this).focus();
+        });
+    }
+}
 
 
 window.TEC.checkForMessages = function(messages) {

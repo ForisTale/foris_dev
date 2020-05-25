@@ -13,66 +13,8 @@ QUnit.testDone(function () {
 });
 
 
-function fakeResponse() {
-    server.respondWith("GET", "/api/tec/items/WEAP/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.WEAP),
-    ]);
-    server.respondWith("GET", "/api/tec/items/ARMO/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.ARMO),
-    ]);
-    server.respondWith("GET", "/api/tec/items/AMMO/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.AMMO),
-    ]);
-    server.respondWith("GET", "/api/tec/items/BOOK/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.BOOK),
-    ]);
-    server.respondWith("GET", "/api/tec/items/INGR/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.INGR),
-    ]);
-    server.respondWith("GET", "/api/tec/items/ALCH/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.ALCH),
-    ]);
-    server.respondWith("GET", "/api/tec/items/SCRL/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.SCRL),
-    ]);
-    server.respondWith("GET", "/api/tec/items/SLGM/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.SLGM),
-    ]);
-    server.respondWith("GET", "/api/tec/items/KEYM/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.KEYM),
-    ]);
-    server.respondWith("GET", "/api/tec/items/MISC/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.MISC),
-    ]);
-
-
-    window.TEC.initialize(parameters);
-    server.respond();
-}
-
-
 QUnit.test("InitializeDatatable call ajax with correct url", function (assert) {
-    window.TEC.initializeDataTables();
+    window.TEC.initializeDataTables("items");
     assert.equal(server.requests.length, 10);
     let request = server.requests[0];
 
@@ -196,16 +138,144 @@ QUnit.test("Test sending ajax post", function (assert) {
 });
 
 
-QUnit.skip("Test button to show/hide false from column selected.", function (assert) {
+QUnit.test("Test buttons hide not selected and show all, click on one remove it and show other.", function (assert) {
+    fakeResponse();
+    let only_test_table = $(".tab-content"),
+        wrapper = $(".table_wrapper > .col-1 >", only_test_table);
+
+    assert.equal(wrapper.length, 20);
+    assert.equal(wrapper[1].outerHTML.includes('hide_not_selected'), true);
+
+    wrapper[1].click();
+
+    wrapper = $(".table_wrapper > .col-1 >", only_test_table);
+
+    assert.equal(wrapper.length, 20);
+    assert.equal(wrapper[1].outerHTML.includes('show_all'), true);
+
+    wrapper[1].click();
+
+    wrapper = $(".table_wrapper > .col-1 >", only_test_table);
+
+    assert.equal(wrapper.length, 20);
+    assert.equal(wrapper[1].outerHTML.includes('hide_not_selected'), true);
+});
+
+
+QUnit.test("test show and hide search on selected column", function (assert) {
+    fakeResponse();
+    let only_test_table = $(".tab-content"),
+        entries = $("tbody > tr", only_test_table);
+    assert.equal(entries.length, 28);
+
+    $(".hide_not_selected")[0].click();
+
+    entries = $("tbody > tr", only_test_table);
+    assert.equal(entries.length, 19);
+
+    $(".show_all")[0].click();
+
+    entries = $("tbody > tr", only_test_table);
+    assert.equal(entries.length, 28);
+
 
 });
 
+
+QUnit.test("test give quantity change selected column to true, empty string change it to false", function (assert) {
+    let tables = fakeResponse(),
+        table = tables[0],
+        row, col, cell,
+        simpleTable = $("#id_weapons_table"),
+        input = $("input:first-child", simpleTable);
+
+    input.val("");
+    input.trigger("keyup");
+
+    row = table.api().row(0);
+    col = table.api().column(-1);
+    cell = table.api().cell(row, col);
+
+    assert.equal(cell.data(), "false");
+
+
+    input.val("12");
+    input.trigger("keyup");
+
+    row = table.api().row(0);
+    col = table.api().column(-1);
+    cell = table.api().cell(row, col);
+
+    assert.equal(cell.data(), "true");
+});
+
+
+
+
+function fakeResponse() {
+    server.respondWith("GET", "/api/tec/items/WEAP/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.WEAP),
+    ]);
+    server.respondWith("GET", "/api/tec/items/ARMO/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.ARMO),
+    ]);
+    server.respondWith("GET", "/api/tec/items/AMMO/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.AMMO),
+    ]);
+    server.respondWith("GET", "/api/tec/items/BOOK/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.BOOK),
+    ]);
+    server.respondWith("GET", "/api/tec/items/INGR/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.INGR),
+    ]);
+    server.respondWith("GET", "/api/tec/items/ALCH/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.ALCH),
+    ]);
+    server.respondWith("GET", "/api/tec/items/SCRL/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.SCRL),
+    ]);
+    server.respondWith("GET", "/api/tec/items/SLGM/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.SLGM),
+    ]);
+    server.respondWith("GET", "/api/tec/items/KEYM/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.KEYM),
+    ]);
+    server.respondWith("GET", "/api/tec/items/MISC/", [
+        200,
+        {"Content-Type": "application/json"},
+        JSON.stringify(parameters.MISC),
+    ]);
+
+
+    let tables = window.TEC.initialize(parameters);
+    server.respond();
+    return tables;
+}
 
 
 function data() {
     return {
         messages: ["Test message!", "Other test message!"],
         url: "/fakeUrl/",
+        site: "items",
         WEAP: [
             {
                 "quantity": "11",
