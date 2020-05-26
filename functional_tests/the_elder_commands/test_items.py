@@ -1,9 +1,9 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from functional_tests.the_elder_commands import test_plugins
+from the_elder_commands.utils import populate_plugins_table
 from django.test.utils import tag
-from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, ManageTestFiles, template_variables, \
+from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, template_variables, \
     ITEMS_COMMANDS_SUCCESS_MESSAGE
-from unittest import skip
+from the_elder_commands.utils import ManageTestFiles
 
 
 class ItemsTest(FunctionalTest, ManageTestFiles):
@@ -14,7 +14,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         if self.check_test_tag("dont_select"):
             pass
         else:
-            test_plugins.AddPluginTest.populate_plugins_table()
+            populate_plugins_table()
             self.select_plugins()
 
         # Foris open The elder commands website.

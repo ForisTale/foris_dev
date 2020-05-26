@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.http import JsonResponse
-from functional_tests.the_elder_commands import test_plugins
 from the_elder_commands.inventory import PLUGIN_TEST_DICT
+from the_elder_commands.utils import populate_plugins_table
 import json
 import copy
 
@@ -11,7 +11,7 @@ class ItemsApiTest(TestCase):
 
     def setUp(self):
         self.maxDiff = None
-        test_plugins.AddPluginTest.populate_plugins_table()
+        populate_plugins_table()
         session = self.client.session
         session.update({"selected": [{
             "name": "test 01",

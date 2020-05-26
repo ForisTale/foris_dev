@@ -3,8 +3,9 @@ from django.test.utils import tag
 from django.http import QueryDict
 from the_elder_commands.views import unselect, extract_dict_from_plugin_file, create_variants_data_post
 from the_elder_commands.models import Plugins, PluginVariants
-from the_elder_commands.inventory import ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
+from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, \
     PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE
+from the_elder_commands.utils import ManageTestFiles
 from unittest.mock import patch
 from io import StringIO, BytesIO
 import copy

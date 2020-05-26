@@ -1,11 +1,10 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from the_elder_commands.models import Plugins, PluginVariants
 from selenium.webdriver.support.ui import Select
-from the_elder_commands.inventory import PLUGIN_TEST_FILE, ManageTestFiles, ADD_PLUGIN_SUCCESS_MESSAGE, \
-    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_DICT, PLUGIN_TEST_ESL_FILE, \
-    INCORRECT_LOAD_ORDER
+from the_elder_commands.utils import populate_plugins_table
+from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, \
+    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
+from the_elder_commands.utils import ManageTestFiles
 from django.test.utils import tag
-import copy
 
 
 class PluginsTest(FunctionalTest):
@@ -72,7 +71,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         if self.check_test_tag("create_incorrect_file"):
             self.create_test_files({"TEC_incorrect_file.ini": b'3432342343'})
         if self.check_test_tag("populate_plugins_table"):
-            self.populate_plugins_table()
+            populate_plugins_table()
         if self.check_test_tag("create_esl_file"):
             self.create_test_files({"TEC_esl_file.tec": PLUGIN_TEST_ESL_FILE})
 
@@ -97,22 +96,6 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         upload_window.send_keys(file_full_path)
 
         self.driver.find_element_by_id("id_add_plugin_submit").click()
-
-    @staticmethod
-    def populate_plugins_table():
-        for index in range(4):
-            plugin = Plugins.objects.create(name="test 0" + str(index+1), usable_name="test_0" + str(index+1))
-            plugin.save()
-            corrected_dict = copy.deepcopy(PLUGIN_TEST_DICT)
-            corrected_dict.pop("isEsl")
-            for num in range(4):
-                form = PluginVariants.objects.create(
-                    instance=plugin,
-                    version="0" + str(num+1),
-                    language="english",
-                    plugin_data=corrected_dict
-                )
-                form.save()
 
     def check_errors_messages(self, list_of_messages):
         errors_messages = self.wait_for(lambda: self.driver.find_elements_by_class_name("errors_messages"))

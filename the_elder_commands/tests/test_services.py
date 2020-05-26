@@ -2,7 +2,7 @@ from django.test import TestCase
 from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.services import SkillsService, PluginsService, ItemsService
 from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT
-from functional_tests.the_elder_commands import test_plugins
+from the_elder_commands.utils import populate_plugins_table
 import copy
 
 
@@ -259,7 +259,7 @@ class PluginsServiceTest(TestCase):
 
 class ItemsServiceTest(TestCase):
     def setUp(self):
-        test_plugins.AddPluginTest.populate_plugins_table()
+        populate_plugins_table()
         self.maxDiff = None
 
     def test_service_pass_selected_plugins(self):

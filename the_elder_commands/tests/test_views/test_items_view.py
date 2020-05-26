@@ -1,16 +1,17 @@
 from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
-from functional_tests.the_elder_commands import test_plugins
+from the_elder_commands.utils import populate_plugins_table
 from the_elder_commands.inventory import ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
-    ITEMS_CONVERT_POST_ERROR, ManageTestFiles
+    ITEMS_CONVERT_POST_ERROR
+from the_elder_commands.utils import ManageTestFiles
 from the_elder_commands.views import convert_items_from_post
 
 
 class ItemsViewTest(TestCase, ManageTestFiles):
     def setUp(self):
         super().setUp()
-        test_plugins.AddPluginTest.populate_plugins_table()
+        populate_plugins_table()
 
         if self.check_test_tag("dont_select_plugin"):
             pass
