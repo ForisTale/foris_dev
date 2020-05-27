@@ -6,6 +6,7 @@ from .services import SkillsService, PluginsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, \
     ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR, \
     ADD_PLUGIN_FILE_ERROR_MESSAGE
+from .utils import MessagesSystem
 import json
 
 
@@ -31,10 +32,11 @@ def skills_view(request):
 
 
 def items_view(request):
+    message_system = MessagesSystem(request)
+
     if not request.session.get("selected", []):
-        request.session.update({"missing_plugin_messages": [NO_PLUGIN_SELECTED_ERROR_MESSAGE]})
+        message_system.append_plugin_message(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
         return redirect("tec:plugins")
-    get_items_messages(request)
 
     if request.method == "POST":
         commands = convert_items_from_post(request)
@@ -45,7 +47,7 @@ def items_view(request):
             message = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
         return JsonResponse({"message": message})
 
-    messages = request.session.get("items_messages", [])
+    messages = message_system.pop_items_messages()
     return render(request, "the_elder_commands/items.html", {"active": "items", "items_messages": messages})
 
 
@@ -58,7 +60,7 @@ def other_view(request):
 
 
 def plugins_view(request):
-    get_plugins_messages(request)
+    messages_system = MessagesSystem(request)
 
     if request.method == "POST":
         if "add_plugin" in request.POST:
@@ -70,13 +72,13 @@ def plugins_view(request):
                 return redirect("tec:plugins")
             else:
                 for error in form.errors:
-                    request.session["plugins_messages"] += [error]
+                    messages_system.append_plugin_message(error)
         elif "unselect" in request.POST:
             unselect(request)
             return redirect("tec:plugins")
 
     service = PluginsService(request)
-    messages = request.session["plugins_messages"]
+    messages = messages_system.pop_plugins_messages()
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
                                                                "plugins_messages": messages})
 
@@ -97,21 +99,8 @@ def create_items_commands(request):
     return commands
 
 
-def get_plugins_messages(request):
-    request.session["plugins_messages"] = []
-    request.session["plugins_messages"] += request.session.get("add_plugins_messages", [])
-    request.session["plugins_messages"] += request.session.get("missing_plugin_messages", [])
-    request.session["add_plugins_messages"] = []
-    request.session["missing_plugin_messages"] = []
-
-
-def get_items_messages(request):
-    request.session["items_messages"] = []
-    request.session["items_messages"] += request.session.get("items_commands_messages", [])
-    request.session["items_commands_messages"] = []
-
-
 def handle_add_plugin_post(request):
+    messages_system = MessagesSystem(request)
     plugin_custom_form = PluginsForm(name=request.POST.get("plugin_name", ""))
     if plugin_custom_form.is_valid():
         plugin_variants_data = create_variants_data_post(request)
@@ -120,18 +109,18 @@ def handle_add_plugin_post(request):
                                                       instance=plugin_custom_form.instance)
             if plugin_variants_form.is_valid():
                 plugin_variants_form.save()
-                request.session["add_plugins_messages"].append(ADD_PLUGIN_SUCCESS_MESSAGE)
+                messages_system.append_plugin_message(ADD_PLUGIN_SUCCESS_MESSAGE)
                 return
             else:
                 for error in plugin_variants_form.errors.values():
-                    request.session["add_plugins_messages"] += [*error]
+                    messages_system.append_plugin_message(error)
                     return
         else:
-            request.session["add_plugins_messages"].append(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+            messages_system.append_plugin_message(ADD_PLUGIN_FILE_ERROR_MESSAGE)
             return
     else:
         for error in plugin_custom_form.errors:
-            request.session["add_plugins_messages"] += [*error]
+            messages_system.append_plugin_message(error)
             return
 
 
@@ -171,9 +160,10 @@ def extract_dict_from_plugin_file(request):
 
 
 def convert_items_from_post(request):
+    messages_system = MessagesSystem(request)
     table_input = request.POST.get("table_input")
     if table_input is None:
-        request.session["items_messages"] += [ITEMS_CONVERT_POST_ERROR]
+        messages_system.append_item_message(ITEMS_CONVERT_POST_ERROR)
         return {}
     parsed_input = json.loads(table_input)
 
