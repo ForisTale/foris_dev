@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.utils import tag
 from django.http import QueryDict
-from the_elder_commands.views import unselect, extract_dict_from_plugin_file, create_variants_data_post
+from the_elder_commands.views import extract_dict_from_plugin_file, create_variants_data_post
 from the_elder_commands.models import Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, \
     PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE
@@ -15,6 +15,11 @@ class PluginsTest(TestCase):
     def test_plugins_use_template(self):
         response = self.client.get("/the_elder_commands/plugins/")
         self.assertTemplateUsed(response, "the_elder_commands/plugins.html")
+
+    def test_redirect_after_unselect_post(self):
+        post = {"unselect": ["test_01"]}
+        response = self.client.post("/the_elder_commands/plugins/", data=post)
+        self.assertRedirects(response, "/the_elder_commands/plugins/")
 
 
 class AddPluginTest(TestCase, ManageTestFiles):
@@ -239,38 +244,3 @@ class SelectedPluginsTest(TestCase):
         expected.update(post)
 
         form_mock.assert_called_once()
-
-
-class UnselectPluginTest(TestCase):
-
-    def test_redirect_after_post(self):
-        post = {"unselect": ["test_01"]}
-        response = self.client.post("/the_elder_commands/plugins/", data=post)
-        self.assertRedirects(response, "/the_elder_commands/plugins/")
-
-    def test_unselect_chosen(self):
-        data = QueryDict("", mutable=True)
-        data["unselect"] = "test_02"
-
-        class FakeRequest:
-            def __init__(self):
-                self.POST = data
-                self.session = {"selected": [{"usable_name": "test_01"}, {"usable_name": "test_02"},
-                                             {"usable_name": "test_03"}]}
-
-        request = FakeRequest()
-        unselect(request)
-        self.assertEqual(request.session.get("selected"), [{"usable_name": "test_01"}, {"usable_name": "test_03"}])
-
-    def test_unselect_all(self):
-        data = QueryDict("", mutable=True)
-        data["unselect"] = "unselect_all"
-
-        class FakeRequest:
-            def __init__(self):
-                self.POST = data
-                self.session = {"selected": [{"usable_name": "test_01"}, {"usable_name": "test_02"}]}
-
-        request = FakeRequest()
-        unselect(request)
-        self.assertEqual(request.session.get("selected"), [])

@@ -3,6 +3,7 @@ from django.forms import ValidationError
 from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
     PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
+from the_elder_commands.utils import SelectedPlugins
 
 
 class SkillsForm(ModelForm):
@@ -194,9 +195,9 @@ class SelectedPluginsForm:
         return self.errors == []
 
     def collect_selected(self):
-        selected = self.data.getlist("selected", [])
+        selected_from_post = self.data.getlist("selected", [])
         collected = []
-        for usable_name in selected:
+        for usable_name in selected_from_post:
             if usable_name == "":
                 continue
             variant = self.split_variant(usable_name)
@@ -208,7 +209,7 @@ class SelectedPluginsForm:
                 "esl": variant[2],
                 "load_order": self.data.get(f"{usable_name}_load_order")
             })
-        self.request.session.update({"selected": collected})
+        SelectedPlugins(self.request).set(collected)
 
     def split_variant(self, usable_name):
         variant = self.request.POST.get(f"{usable_name}_variant")

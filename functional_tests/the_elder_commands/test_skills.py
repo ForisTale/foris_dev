@@ -1,5 +1,5 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from the_elder_commands.inventory import DEFAULT_SKILLS
+from the_elder_commands.inventory import DEFAULT_SKILLS, COMMANDS_SUCCESS_MESSAGE
 
 
 class CharacterTest(FunctionalTest):
@@ -254,7 +254,13 @@ class CharacterTest(FunctionalTest):
             "3"
         ))
 
-        # Foris change to commands page
+        # Foris sees message
+        self.assertEqual(
+            COMMANDS_SUCCESS_MESSAGE + "\n×",
+            self.driver.find_element_by_class_name("skills_messages").text
+        )
+
+        # so he change to commands page
         self.driver.find_element_by_link_text("Commands").click()
 
         # and in commands list he sees list of commands

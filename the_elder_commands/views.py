@@ -4,16 +4,17 @@ from .models import Skills
 from .forms import SkillsForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from .services import SkillsService, PluginsService
 from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, \
-    ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR, \
-    ADD_PLUGIN_FILE_ERROR_MESSAGE
-from .utils import MessagesSystem
+    COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR, \
+    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
+from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins
 import json
 
 
 def skills_view(request):
+    message_system = MessagesSystem(request)
     if not request.session.session_key:
         request.session.save()
-    form = None
+
     if request.method == "POST":
         instance = Skills.objects.get_or_create(session_key=request.session.session_key)[0]
         if "race" in request.POST:
@@ -24,30 +25,36 @@ def skills_view(request):
         form = SkillsForm(data=post, instance=instance)
         if form.is_valid():
             form.save()
-            return redirect(instance)
+            message_system.append_skills(COMMANDS_SUCCESS_MESSAGE)
+        else:
+            message_system.append_skills(form.errors)
+        return redirect("tec:skills")
+
     skills_service = SkillsService(session_key=request.session.session_key)
-    request.session.update({"skills_commands": skills_service.commands_list()})
-    return render(request, "the_elder_commands/skills.html", {"service": skills_service, "form": form,
+    Commands(request).set_skills(skills_service.commands)
+    message = message_system.pop_skills()
+    return render(request, "the_elder_commands/skills.html", {"service": skills_service, "skills_messages": message,
                                                               "active": "skills"})
 
 
 def items_view(request):
     message_system = MessagesSystem(request)
 
-    if not request.session.get("selected", []):
-        message_system.append_plugin_message(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
+    if not SelectedPlugins(request).exist():
+        message_system.append_plugin(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
         return redirect("tec:plugins")
 
     if request.method == "POST":
-        commands = convert_items_from_post(request)
-        request.session.update({"chosen_items": commands})
+        commands = convert_items_post(request)
+        ChosenItems(request).set(commands)
+        Commands(request).set_items(commands)
         if commands:
-            message = ITEMS_COMMANDS_SUCCESS_MESSAGE
+            message = COMMANDS_SUCCESS_MESSAGE
         else:
             message = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
         return JsonResponse({"message": message})
 
-    messages = message_system.pop_items_messages()
+    messages = message_system.pop_items()
     return render(request, "the_elder_commands/items.html", {"active": "items", "items_messages": messages})
 
 
@@ -72,31 +79,23 @@ def plugins_view(request):
                 return redirect("tec:plugins")
             else:
                 for error in form.errors:
-                    messages_system.append_plugin_message(error)
+                    messages_system.append_plugin(error)
         elif "unselect" in request.POST:
-            unselect(request)
+            selected = SelectedPlugins(request)
+            selected.unselect(request.POST)
             return redirect("tec:plugins")
 
     service = PluginsService(request)
-    messages = messages_system.pop_plugins_messages()
+    messages = messages_system.pop_plugins()
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
                                                                "plugins_messages": messages})
 
 
 def commands_view(request):
-    commands = []
-    commands += request.session.get("skills_commands", [])
-    commands += create_items_commands(request)
+    commands = Commands(request).get_commands()
 
-    return render(request, "the_elder_commands/commands.html", {"active": "commands", "commands": commands})
-
-
-def create_items_commands(request):
-    items = request.session.get("chosen_items", {})
-    commands = []
-    for form_id, amount in items.items():
-        commands.append(f"player.additem {form_id} {amount}")
-    return commands
+    return render(request, "the_elder_commands/commands.html", {"active": "commands",
+                                                                "commands": commands})
 
 
 def handle_add_plugin_post(request):
@@ -109,34 +108,18 @@ def handle_add_plugin_post(request):
                                                       instance=plugin_custom_form.instance)
             if plugin_variants_form.is_valid():
                 plugin_variants_form.save()
-                messages_system.append_plugin_message(ADD_PLUGIN_SUCCESS_MESSAGE)
+                messages_system.append_plugin(ADD_PLUGIN_SUCCESS_MESSAGE)
                 return
             else:
-                for error in plugin_variants_form.errors.values():
-                    messages_system.append_plugin_message(error)
-                    return
+                messages_system.append_plugin(ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE)
+                return
         else:
-            messages_system.append_plugin_message(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+            messages_system.append_plugin(ADD_PLUGIN_FILE_ERROR_MESSAGE)
             return
     else:
         for error in plugin_custom_form.errors:
-            messages_system.append_plugin_message(error)
+            messages_system.append_plugin(error)
             return
-
-
-def unselect(request):
-    to_unselect = request.POST.getlist("unselect", [])
-    if to_unselect == ["unselect_all"]:
-        request.session.update({"selected": []})
-        return
-
-    all_selected = request.session.get("selected", [])
-    for item in to_unselect:
-        for selected in all_selected:
-            if selected.get("usable_name") == item:
-                all_selected.remove(selected)
-                break
-    request.session.update({"selected": all_selected})
 
 
 def create_variants_data_post(request):
@@ -159,11 +142,11 @@ def extract_dict_from_plugin_file(request):
         pass
 
 
-def convert_items_from_post(request):
+def convert_items_post(request):
     messages_system = MessagesSystem(request)
     table_input = request.POST.get("table_input")
     if table_input is None:
-        messages_system.append_item_message(ITEMS_CONVERT_POST_ERROR)
+        messages_system.append_item(ITEMS_CONVERT_POST_ERROR)
         return {}
     parsed_input = json.loads(table_input)
 

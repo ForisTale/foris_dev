@@ -2,7 +2,7 @@ from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from the_elder_commands.utils import populate_plugins_table
 from django.test.utils import tag
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, template_variables, \
-    ITEMS_COMMANDS_SUCCESS_MESSAGE
+    COMMANDS_SUCCESS_MESSAGE
 from the_elder_commands.utils import ManageTestFiles
 
 
@@ -34,7 +34,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         self.driver.find_element_by_id("id_select_plugin_submit").click()
 
     def submit_items_table(self):
-        table = self.driver.find_element_by_name("submit_table")
+        table = self.driver.find_element_by_class_name("submit_table")
         self.driver.execute_script("arguments[0].click()", table)
 
     def test_default_looks(self):
@@ -97,13 +97,13 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
             self.wait_for(lambda: table.find_element_by_tag_name("input").send_keys("1"))
 
         # After that he submit all of them
-        self.submit_items_table()
+        self.wait_for(lambda: self.submit_items_table())
 
         # on screen he sees message that all codes will be shown on commands page
         wrappers = self.wait_for(lambda: self.driver.find_elements_by_class_name("alert-primary"))
         for wrapper in wrappers:
             if wrapper.is_displayed():
-                self.assertEqual(wrapper.text, ITEMS_COMMANDS_SUCCESS_MESSAGE + "\n×")
+                self.assertEqual(wrapper.text, COMMANDS_SUCCESS_MESSAGE + "\n×")
 
         # he go to that page and there is list of commands for items.
         self.driver.find_element_by_link_text("Commands").click()
@@ -117,12 +117,12 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
     def test_chosen_items_are_chosen_after_change_page(self):
         # Foris chose some items
         table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
-        table.find_element_by_tag_name("input").send_keys("5")
+        self.wait_for(lambda: table.find_element_by_tag_name("input").send_keys("5"))
         self.driver.find_element_by_link_text("Armors").click()
 
         table = self.wait_for(lambda: self.driver.find_element_by_id("id_armors_tbody"))
         table.find_element_by_tag_name("input").send_keys("2")
-        self.submit_items_table()
+        self.wait_for(lambda: self.submit_items_table())
 
         # then he change page and come back to items page
         self.driver.find_element_by_link_text("Skills").click()
@@ -141,8 +141,15 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
             table.find_element_by_tag_name("input").get_attribute("value"),
             "2"
         )
-        self.driver.find_element_by_link_text("Selected").click()
-        self.wait_for(lambda: self.assertEqual(
-            self.driver.find_element_by_id("id_selected_tbody").text,
-            ""
-        ))
+
+    def test_can_toggle_hide_not_selected_items(self):
+        # Foris select few items in items page
+
+        # he decide that he want check if he chose correct items
+        # so he click hide button
+
+        # now he sees only selected items, 
+        # all are correct so he press show button
+
+        # and now he sees all items
+        self.fail("Finish test!")

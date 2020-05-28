@@ -173,7 +173,7 @@ class PluginFormValidationTest(TestCase):
             {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
         )
 
-    def test_unique_version_language_returns_correct_error(self):
+    def test_unique_validation(self):
         plugin = Plugins.objects.create(name="test", usable_name="test")
         plugin.save()
 
@@ -183,7 +183,6 @@ class PluginFormValidationTest(TestCase):
 
         other_form = PluginVariantsForm(instance=plugin, data=self.data["variant"])
         self.assertFalse(other_form.is_valid())
-        self.assertEqual(other_form.errors["__all__"], [ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE])
 
         plugin = Plugins.objects.create(name="test 02", usable_name="test")
         another_form = PluginVariantsForm(instance=plugin, data=self.data["variant"])

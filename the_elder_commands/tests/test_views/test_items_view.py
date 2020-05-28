@@ -2,10 +2,10 @@ from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
 from the_elder_commands.utils import populate_plugins_table
-from the_elder_commands.inventory import ITEMS_COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
+from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
     ITEMS_CONVERT_POST_ERROR
 from the_elder_commands.utils import ManageTestFiles
-from the_elder_commands.views import convert_items_from_post
+from the_elder_commands.views import convert_items_post
 
 
 class ItemsViewTest(TestCase, ManageTestFiles):
@@ -57,7 +57,7 @@ class ItemsViewTest(TestCase, ManageTestFiles):
     def test_successful_post_give_message_to_view(self):
         post = {"table_input": ['[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"}]']}
         response = self.client.post("/the_elder_commands/items/", data=post)
-        self.assertIn(ITEMS_COMMANDS_SUCCESS_MESSAGE, response.json().get("message"))
+        self.assertIn(COMMANDS_SUCCESS_MESSAGE, response.json().get("message"))
 
     def test_give_empty_post_message_after_empty_POST(self):
         post = {"table_input": ['[{"name":"0101BFEF","value":""},{"name":"010282E9","value":""}, '
@@ -73,7 +73,7 @@ class ConvertItemsFromPostTest(TestCase):
             POST = {"table_input": '[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"},'
                     '{"name":"010282E6","value":""}]'}
 
-        result = convert_items_from_post(FakeRequest())
+        result = convert_items_post(FakeRequest())
         self.assertEqual(result, {"0101BFEF": "1", "010282E9": "12"})
 
     def test_incorrect_post_give_error_message(self):
@@ -83,7 +83,7 @@ class ConvertItemsFromPostTest(TestCase):
             session = {"items_messages": []}
 
         request = FakeRequest()
-        output = convert_items_from_post(request)
+        output = convert_items_post(request)
         self.assertEqual(request.session.get("items_messages"), [ITEMS_CONVERT_POST_ERROR])
         self.assertEqual(output, {})
 

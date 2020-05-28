@@ -1,5 +1,6 @@
 from .models import Skills, PluginVariants, Plugins
 from .inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
+from .utils import ChosenItems, SelectedPlugins
 import copy
 import math
 
@@ -17,6 +18,7 @@ class SkillsService:
         self.fill_skills = character.fill_skills
         self.desired_level = self.predict_desired_level(character_model=character)
         self.default_level = self.predict_level("default")
+        self.commands = self.commands_list()
 
     @staticmethod
     def default_race_skills_update(race):
@@ -183,8 +185,8 @@ class PluginsService:
 
 class ItemsService:
     def __init__(self, request, category):
-        self.chosen = request.session.get("chosen_items", {})
-        self.selected = request.session.get("selected", [])
+        self.chosen = ChosenItems(request).get()
+        self.selected = SelectedPlugins(request).get()
         self.items = self.get_items(category)
 
     def get_items(self, category):

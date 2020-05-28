@@ -17,10 +17,9 @@ ADD_PLUGIN_SUCCESS_MESSAGE = "Plugin was successfully added to database."
 
 ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
 
-ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin variants with this Version, Language, Instance and Is esl already " \
-                                        "exists."
+ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin with this Name, Version and Language already exists."
 
-ITEMS_COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the commands page."
+COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the Commands page."
 
 ITEMS_COMMANDS_POST_EMPTY_MESSAGE = "No items selected!"
 

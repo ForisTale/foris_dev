@@ -282,9 +282,6 @@ class ItemsServiceTest(TestCase):
 
         self.assertDictEqual({1: service.items}, {1: test_dict})
 
-    def test_get_items_run_only_when_change_in_selected(self):
-        self.fail("Finish test!")
-
     def test_service_pass_chosen_items_into_template(self):
 
         class FakeRequest:
