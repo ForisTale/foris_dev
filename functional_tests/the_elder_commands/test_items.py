@@ -144,12 +144,19 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
 
     def test_can_toggle_hide_not_selected_items(self):
         # Foris select few items in items page
+        table_body = self.driver.find_element_by_tag_name("tbody")
+        self.wait_for(lambda: table_body.find_element_by_tag_name("input").send_keys("11"))
 
         # he decide that he want check if he chose correct items
         # so he click hide button
+        self.driver.find_element_by_class_name("hide_not_selected").click()
 
-        # now he sees only selected items, 
+        # now he sees only selected items,
+        inputs = table_body.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 1)
         # all are correct so he press show button
+        self.wait_for(lambda: self.driver.find_element_by_class_name("show_all").click())
 
         # and now he sees all items
-        self.fail("Finish test!")
+        inputs = table_body.find_elements_by_tag_name("input")
+        self.assertEqual(len(inputs), 4)

@@ -61,18 +61,18 @@ window.TEC.adjustWrapper = function() {
 
 
 window.TEC.createSubmitButton = function() {
-    $('.table_wrapper').append('<div class="col-1"><button type="button" ' +
+    $('.table_wrapper').append('<div class="col-md-1 col-12"><button type="button" ' +
         'class="btn btn-dark text-info submit_table">Generate<br>Commands</button></div>');
 };
 
 window.TEC.createShowButton = function() {
-    $(".table_wrapper > div:first-child").after('<div class="col-1"><button type="button" ' +
+    $(".table_wrapper > div:first-child").after('<div class="col-md-1 col-12"><button type="button" ' +
         'class="btn btn-dark text-info show_all btn-block">Show<br>All</button></div>');
 };
 
 window.TEC.createHideButton = function() {
-    $(".table_wrapper > div:first-child").after('<div class="col-1"><button type="button" ' +
-        'class="btn btn-dark text-info hide_not_selected">Hide&nbspWithout<br>Quantity</button></div>');
+    $(".table_wrapper > div:first-child").after('<div class="col-md-1 col-12"><button type="button" ' +
+        'class="btn btn-dark text-info hide_not_selected">Hide&nbspNot<br>Selected</button></div>');
 };
 
 window.TEC.removeHideButton = function() {
@@ -105,12 +105,14 @@ window.TEC.showButton = function(tables) {
 
 window.TEC.searchSelected = function(tables) {
     for (let table of tables) {
+        table.api().search("");
         table.api().column(-1).search("true").draw();
     }
 };
 
 window.TEC.clearSearch = function(tables) {
     for (let table of tables) {
+        table.api().search("");
         table.api().column(-1).search("").draw();
     }
 };
