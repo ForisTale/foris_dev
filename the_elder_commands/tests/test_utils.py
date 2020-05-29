@@ -170,7 +170,7 @@ class SelectedPluginsTest(TestCase):
     def test_unselect_one_can_handle_missing_key(self):
         selected = SelectedPlugins(self.request)
         selected._unselect_one("test")
-        self.assertEqual(self.request.session.get("selected"), None)
+        self.assertEqual(self.request.session.get("selected"), [])
 
     def test_unselect_all(self):
         self.request.session.update({"selected": [{"usable_name": "test"}, {"usable_name": "test_02"}]})

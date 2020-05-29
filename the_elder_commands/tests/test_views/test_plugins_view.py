@@ -12,14 +12,16 @@ import copy
 
 
 class PluginsTest(TestCase):
+    base_url = "/the_elder_commands/plugins/"
+
     def test_plugins_use_template(self):
-        response = self.client.get("/the_elder_commands/plugins/")
+        response = self.client.get(self.base_url)
         self.assertTemplateUsed(response, "the_elder_commands/plugins.html")
 
     def test_redirect_after_unselect_post(self):
         post = {"unselect": ["test_01"]}
-        response = self.client.post("/the_elder_commands/plugins/", data=post)
-        self.assertRedirects(response, "/the_elder_commands/plugins/")
+        response = self.client.post(self.base_url, data=post)
+        self.assertRedirects(response, self.base_url)
 
 
 class AddPluginTest(TestCase, ManageTestFiles):
@@ -30,6 +32,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
     def setUp(self):
         super().setUp()
         self.maxDiff = None
+        self.base_url = "/the_elder_commands/plugins/"
 
         if self.check_test_tag("create_test_file"):
             self.create_test_files({"TEC_test_file.tec": PLUGIN_TEST_FILE})
@@ -49,17 +52,17 @@ class AddPluginTest(TestCase, ManageTestFiles):
                 "plugin_file": file,
                 "add_plugin": ""
             }
-            return self.client.post("/the_elder_commands/plugins/", data=data)
+            return self.client.post(self.base_url, data=data)
 
     @tag("create_test_file")
     def test_redirect_after_POST(self):
         response = self.send_default_post_and_return_response()
-        self.assertRedirects(response, "/the_elder_commands/plugins/")
+        self.assertRedirects(response, self.base_url)
 
     @tag("create_test_file")
     def test_view_pass_plugins(self):
         self.send_default_post_and_return_response()
-        response = self.client.get("/the_elder_commands/plugins/")
+        response = self.client.get(self.base_url)
         self.assertEqual(
             "test 015an",
             response.context["service"].all_plugins[0].name
@@ -67,13 +70,13 @@ class AddPluginTest(TestCase, ManageTestFiles):
 
     @tag("create_test_file")
     def test_view_pass_messages(self):
-        response = self.client.get("/the_elder_commands/plugins/")
+        response = self.client.get(self.base_url)
         self.assertEqual(
             response.context.get("plugins_messages"),
             []
         )
         self.send_default_post_and_return_response()
-        response = self.client.get("/the_elder_commands/plugins/")
+        response = self.client.get(self.base_url)
         self.assertEqual(
             response.context["plugins_messages"],
             [ADD_PLUGIN_SUCCESS_MESSAGE]
@@ -82,7 +85,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
     @tag("create_incorrect_file")
     def test_view_show_error_message(self):
         self.send_default_post_and_return_response()
-        response = self.client.get("/the_elder_commands/plugins/")
+        response = self.client.get(self.base_url)
         self.assertEqual(
             response.context["plugins_messages"],
             [ADD_PLUGIN_FILE_ERROR_MESSAGE]
@@ -91,8 +94,8 @@ class AddPluginTest(TestCase, ManageTestFiles):
     @tag("create_test_file")
     def test_success_message_dont_show_after_reload(self):
         self.send_default_post_and_return_response()
-        self.client.get("/the_elder_commands/plugins/")
-        response = self.client.get("/the_elder_commands/plugins/")
+        self.client.get(self.base_url)
+        response = self.client.get(self.base_url)
         self.assertEqual(
             response.context["plugins_messages"],
             []
@@ -228,18 +231,19 @@ class CreateVariantsDataPost(TestCase):
 
 
 class SelectedPluginsTest(TestCase):
+    base_url = "/the_elder_commands/plugins/"
 
     def test_redirect_after_post(self):
         Plugins.objects.create(name="test 01", usable_name="test_01")
 
         post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
-        response = self.client.post("/the_elder_commands/plugins/", data=post)
-        self.assertRedirects(response, "/the_elder_commands/plugins/")
+        response = self.client.post(self.base_url, data=post)
+        self.assertRedirects(response, self.base_url)
 
     @patch("the_elder_commands.views.SelectedPluginsForm")
     def test_select_post_is_managed_by_correct_form(self, form_mock):
         post = {"selected": "", "test_01_selected": "", "test_01_variant": "0.1&english&", "test_01_load_order": "01"}
-        self.client.post("/the_elder_commands/plugins/", data=post)
+        self.client.post(self.base_url, data=post)
         expected = QueryDict("", mutable=True)
         expected.update(post)
 

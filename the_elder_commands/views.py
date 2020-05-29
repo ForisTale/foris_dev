@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import QueryDict, JsonResponse
+from django.http import QueryDict, JsonResponse, FileResponse
 from .models import Skills
 from .forms import SkillsForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from .services import SkillsService, PluginsService
@@ -8,13 +8,13 @@ from .inventory import SKILLS_CONSOLE_NAME, ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGI
     ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
 from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins
 import json
+from io import BytesIO
 
 
 def skills_view(request):
     message_system = MessagesSystem(request)
     if not request.session.session_key:
         request.session.save()
-
     if request.method == "POST":
         instance = Skills.objects.get_or_create(session_key=request.session.session_key)[0]
         if "race" in request.POST:
@@ -96,6 +96,14 @@ def commands_view(request):
 
     return render(request, "the_elder_commands/commands.html", {"active": "commands",
                                                                 "commands": commands})
+
+
+def commands_download(request):
+    commands = Commands(request).get_commands()
+    content = "\n".join(commands)
+    encoded = content.encode("utf-8")
+    file = BytesIO(encoded)
+    return FileResponse(file, as_attachment=True, filename="TEC_Commands.txt")
 
 
 def handle_add_plugin_post(request):

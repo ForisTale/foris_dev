@@ -45,13 +45,18 @@ SKILL_POST = {
 
 
 class SkillsViewTest(TestCase):
+    base_url = "/the_elder_commands/skills/"
 
     def test_tec_use_template(self):
+        response = self.client.get(self.base_url)
+        self.assertTemplateUsed(response, "the_elder_commands/skills.html")
+
+    def test_default_url_connect_to_correct_template(self):
         response = self.client.get("/the_elder_commands/")
         self.assertTemplateUsed(response, "the_elder_commands/skills.html")
 
     def test_character_view_use_service(self):
-        response = self.client.get("/the_elder_commands/")
+        response = self.client.get(self.base_url)
         self.assertIsInstance(
             response.context["service"],
             SkillsService
@@ -59,13 +64,13 @@ class SkillsViewTest(TestCase):
 
     def test_redirect_after_POST(self):
         response = self.client.post(
-            "/the_elder_commands/",
+            self.base_url,
             data={}
         )
-        self.assertRedirects(response, "/the_elder_commands/")
+        self.assertRedirects(response, self.base_url)
 
     def test_pass_race_in_url_passed_it_to_form(self):
-        self.client.post("/the_elder_commands/", data={"race": "Ork"})
+        self.client.post(self.base_url, data={"race": "Ork"})
 
         self.assertEqual(Skills.objects.count(), 1)
         model = Skills.objects.first()
@@ -80,7 +85,7 @@ class SkillsViewTest(TestCase):
         data["heavyarmor_new"] = ["40"]
 
         self.client.post(
-            "/the_elder_commands/",
+            self.base_url,
             data=data
         )
         model = Skills.objects.first()
@@ -98,13 +103,13 @@ class SkillsViewTest(TestCase):
         )
 
     def test_after_send_POST_character_give_correct_level(self):
-        self.client.post("/the_elder_commands/", data={"race": "Ork"})
+        self.client.post(self.base_url, data={"race": "Ork"})
         data = SKILL_POST.copy()
         data["twohanded_new"] = ["21"]
         data["speechcraft_new"] = ["21"]
         data["lightarmor_new"] = ["21"]
         self.client.post(
-            "/the_elder_commands/",
+            self.base_url,
             data=data
         )
 

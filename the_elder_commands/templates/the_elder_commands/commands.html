@@ -1,8 +1,18 @@
 {% extends "the_elder_commands/base.html" %}
 
 {% block body %}
+<div class="row row-separator"></div>
 <div class="row">
-<div class="col-md-2">
+
+<div class="col-md-4 col-12">
+    <label><a class="btn-dark text-info btn-lg download" href="{% url 'tec:commands_download' %}"
+    >Download Commands</a></label>
+</div>
+</div>
+<div class="row row-separator"></div>
+
+<div class="row row-separator">
+<div class="col-md-2 col-12">
     <table class="table table-dark text-info" id="id_commands_list">
         <thead>
         <tr>
@@ -18,7 +28,6 @@
         </tbody>
     </table>
 </div>
-
 
 </div>
 

@@ -18,6 +18,8 @@ class ItemsViewTest(TestCase, ManageTestFiles):
         else:
             self.selected_placeholder()
 
+        self.base_url = "/the_elder_commands/items/"
+
     def selected_placeholder(self):
         session = self.client.session
         session.update({"selected": [{
@@ -31,17 +33,17 @@ class ItemsViewTest(TestCase, ManageTestFiles):
 
     def test_items_use_template(self):
 
-        response = self.client.get("/the_elder_commands/items/")
+        response = self.client.get(self.base_url)
         self.assertTemplateUsed(response, "the_elder_commands/items.html")
 
     @tag("dont_select_plugin")
     def test_redirect_when_plugin_is_not_selected(self):
-        response = self.client.get("/the_elder_commands/items/")
+        response = self.client.get(self.base_url)
         self.assertRedirects(response, "/the_elder_commands/plugins/")
 
     def test_return_json_response_after_post(self):
         post = {"table_input": ['[{"name":"010282E9","value":"12"}]']}
-        response = self.client.post("/the_elder_commands/items/", data=post)
+        response = self.client.post(self.base_url, data=post)
         self.assertIsInstance(response, JsonResponse)
 
     def test_view_convert_post_to_console_codes(self):
@@ -49,20 +51,20 @@ class ItemsViewTest(TestCase, ManageTestFiles):
                  '[{"name":"010282E9","value":""}]': {}}
         for table_input, expected in cases.items():
             post = {"table_input": [table_input]}
-            self.client.post("/the_elder_commands/items/", data=post)
+            self.client.post(self.base_url, data=post)
             session = self.client.session
             codes = session.get("chosen_items")
             self.assertEqual(codes, expected)
 
     def test_successful_post_give_message_to_view(self):
         post = {"table_input": ['[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"}]']}
-        response = self.client.post("/the_elder_commands/items/", data=post)
+        response = self.client.post(self.base_url, data=post)
         self.assertIn(COMMANDS_SUCCESS_MESSAGE, response.json().get("message"))
 
     def test_give_empty_post_message_after_empty_POST(self):
         post = {"table_input": ['[{"name":"0101BFEF","value":""},{"name":"010282E9","value":""}, '
                                 '{"name":"010282E6","value":""}]']}
-        response = self.client.post("/the_elder_commands/items/", data=post)
+        response = self.client.post(self.base_url, data=post)
         self.assertIn(ITEMS_COMMANDS_POST_EMPTY_MESSAGE, response.json().get("message"))
 
 
