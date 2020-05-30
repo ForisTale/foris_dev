@@ -119,7 +119,11 @@ def handle_add_plugin_post(request):
                 messages_system.append_plugin(ADD_PLUGIN_SUCCESS_MESSAGE)
                 return
             else:
-                messages_system.append_plugin(ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE)
+                for header, error in plugin_variants_form.errors.items():
+                    if header == "__all__":
+                        messages_system.append_plugin(ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE)
+                        return
+                    messages_system.append_plugin([*error])
                 return
         else:
             messages_system.append_plugin(ADD_PLUGIN_FILE_ERROR_MESSAGE)

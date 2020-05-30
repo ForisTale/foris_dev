@@ -159,3 +159,17 @@ class SelectedPlugins:
             self._unselect_all()
         else:
             self._unselect_one(usable_name)
+
+
+def escape_js(string):
+    escape = {'&': '\\u0026', '<': '\\u003c', '>': '\\u003e', '\u2028': '\\u2028', '\u2029': '\\u2029'}
+    for unsafe, safe in escape.items():
+        string = string.replace(unsafe, safe)
+    return string
+
+
+def escape_html(string):
+    escape = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '\'': '&#39;', '\"': '&quot;'}
+    for unsafe, safe in escape.items():
+        string = string.replace(unsafe, safe)
+    return string

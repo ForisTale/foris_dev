@@ -1,7 +1,7 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from selenium.webdriver.support.ui import Select
 from the_elder_commands.utils import populate_plugins_table
-from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, \
+from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, PLUGIN_TEST_ESCAPE_FILE, \
     ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils import ManageTestFiles
 from django.test.utils import tag
@@ -68,12 +68,14 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
 
         if self.check_test_tag("create_test_file"):
             self.create_test_files({"TEC_plugin_test_file.tec": PLUGIN_TEST_FILE})
-        if self.check_test_tag("create_incorrect_file"):
+        elif self.check_test_tag("create_incorrect_file"):
             self.create_test_files({"TEC_incorrect_file.ini": b'3432342343'})
-        if self.check_test_tag("populate_plugins_table"):
+        elif self.check_test_tag("populate_plugins_table"):
             populate_plugins_table()
-        if self.check_test_tag("create_esl_file"):
+        elif self.check_test_tag("create_esl_file"):
             self.create_test_files({"TEC_esl_file.tec": PLUGIN_TEST_ESL_FILE})
+        elif self.check_test_tag("create_escape_file"):
+            self.create_test_files({"TEC_escape_file.tec": PLUGIN_TEST_ESCAPE_FILE})
 
         # Foris open plugins section of TEC,
         self.driver.get(self.live_server_url + "/plugins/")
@@ -244,3 +246,22 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
             self.driver.find_element_by_class_name("selected_plugins").text,
             "esl ver: 0.1 Polish esl\nUnselect"
         ))
+
+    @tag("create_escape_file")
+    def test_data_is_escaped_properly(self):
+        # Foris upload file
+        self.submit_add_file("test", "0.1", "English", self.test_file_full_path)
+        # enable it
+        self.wait_for(lambda: self.driver.find_element_by_class_name("test").click())
+        self.driver.find_element_by_name("test_load_order").send_keys("01")
+        self.driver.find_element_by_id("id_select_plugin_submit").click()
+
+        # then he change to items page
+        self.wait_for(lambda: self.driver.find_element_by_link_text("Items").click())
+
+        # and sees that its look ok
+        table_body = self.driver.find_element_by_id("id_weapons_table")
+        self.wait_for(lambda: self.assertEqual(table_body.find_elements_by_tag_name("td")[1].text,
+                                               "<strong>Stalowy</strong> wielki miecz skwaru"))
+        self.wait_for(lambda: self.assertEqual(table_body.find_elements_by_tag_name("td")[7].text,
+                                               "&DA14DremoraGreatswordFire03"))

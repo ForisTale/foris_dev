@@ -265,6 +265,53 @@ RACES_EXTRA_SKILLS = {
     },
 }
 
+PLUGIN_TEST_EMPTY_DICT = {
+    "isEsl": False,
+    "WEAP": [],
+    "ARMO": [],
+    "BOOK": [],
+    "INGR": [],
+    "ALCH": [],
+    "MISC": [],
+    "AMMO": [],
+    "SCRL": [],
+    "SLGM": [],
+    "KEYM": [],
+    "SPEL": [],
+    "WOOP": [],
+}
+
+PLUGIN_TEST_EMPTY_DATA = '''{
+    "isEsl": false
+}'''
+
+PLUGIN_TEST_ESCAPE_FILE = '''{    
+    "isEsl": false,
+    "WEAP": [
+        {
+            "fullName": "<strong>Stalowy</strong> wielki miecz skwaru",
+            "editorId": "&DA14DremoraGreatswordFire03",
+            "formId": "017288",
+            "Weight": 17,
+            "Value": 90,
+            "Damage": 17,
+            "Type": "Two Handed",
+            "Description": "Zadaje celowi <mag> pkt. obrażeń od ognia. Płonące cele odnoszą dodatkowe obrażenia.|"
+        }
+    ],
+    "ARMO": [],
+    "BOOK": [],
+    "INGR": [],
+    "ALCH": [],
+    "MISC": [],
+    "AMMO": [],
+    "SCRL": [],
+    "SLGM": [],
+    "KEYM": [],
+    "SPEL": [],
+    "WOOP": []
+}'''
+
 PLUGIN_TEST_DICT = {
     "isEsl": False,
     "WEAP": [
@@ -478,6 +525,220 @@ PLUGIN_TEST_DICT = {
         }
     ]
 }
+
+PLUGIN_TEST_DICT_ALTERED_BY_FORM = {
+    "WEAP": [
+        {
+            "fullName": "Stalowy wielki miecz skwaru",
+            "editorId": "DA14DremoraGreatswordFire03",
+            "formId": "017288",
+            "Weight": "17",
+            "Value": "90",
+            "Damage": "17",
+            "Type": "Two Handed",
+            "Description": "Zadaje celowi &lt;mag&gt; pkt. obrażeń od ognia. Płonące cele odnoszą dodatkowe obrażenia.|"
+        },
+        {
+            "fullName": "Daedryczny wielki miecz inferna",
+            "editorId": "EnchDaedricGreatswordDremoraFire06",
+            "formId": "017009",
+            "Weight": "23",
+            "Value": "2500",
+            "Damage": "24",
+            "Type": "Two Handed",
+            "Description": ""
+        }
+    ],
+    "ARMO": [
+        {
+            "fullName": "Buty",
+            "editorId": "DremoraBoots",
+            "formId": "016FFF",
+            "Weight": "1",
+            "Value": "4",
+            "Armor rating": "0",
+            "Armor type": "Clothing",
+            "Description": ""
+        },
+        {
+            "fullName": "Elfia tarcza wybitnego blokowania",
+            "editorId": "EnchArmorElvenShieldBlock04",
+            "formId": "10FC28",
+            "Weight": "4",
+            "Value": "115",
+            "Armor rating": "21",
+            "Armor type": "Light Armor",
+            "Description": "Tarcza blokuje o &lt;mag&gt;% obrażeń więcej.|"
+        }
+    ],
+    "BOOK": [
+        {
+            "fullName": "Księga czarów: Przywołanie Władcy Dremor",
+            "editorId": "SpellTomeConjureDremoraLord",
+            "formId": "10FD60",
+            "Weight": "1",
+            "Value": "730"
+        },
+        {
+            "fullName": "Księga czarów: Piorun",
+            "editorId": "SpellTomeThunderbolt",
+            "formId": "10F7F5",
+            "Weight": "1",
+            "Value": "750"
+        }
+    ],
+    "INGR": [
+        {
+            "fullName": "Okoń srebrnoboczny",
+            "editorId": "CritterPondFish01Ingredient",
+            "formId": "106E1C",
+            "Weight": "0.25",
+            "Value": "15",
+            "Effects": "Przywrócenie kondycji|Osłabienie regeneracji kondycji|Wyniszczenie zdrowia|Odporność na mróz"
+        },
+        {
+            "fullName": "Abecejski długopłetwiak",
+            "editorId": "CritterPondFish02Ingredient",
+            "formId": "106E1B",
+            "Weight": "0.5",
+            "Value": "15",
+            "Effects": "Podatność na mróz|Premia do skradania|Wrażliwość na trucizny|Premia do przywracania"
+        }
+    ],
+    "ALCH": [
+        {
+            "fullName": "Miód z owocem jałowca",
+            "editorId": "MQ101JuniperMead",
+            "formId": "107A8A",
+            "Weight": "0",
+            "Value": "0",
+            "Effects": "Przywrócenie kondycji|Osłabienie regeneracji kondycji"
+        },
+        {
+            "fullName": "Miód",
+            "editorId": "FoodHoney",
+            "formId": "10394D",
+            "Weight": "0",
+            "Value": "0",
+            "Effects": "Przywrócenie zdrowia"
+        }
+    ],
+    "MISC": [
+        {
+            "fullName": "Wypaczony klejnot duszy",
+            "editorId": "MGRArniel04SoulGem",
+            "formId": "10E44B",
+            "Weight": "0.5",
+            "Value": "0"
+        },
+        {
+            "fullName": "Posąg Dibelli",
+            "editorId": "TG01HaelgaStatuePost",
+            "formId": "10CC6A",
+            "Weight": "2",
+            "Value": "100"
+        }
+    ],
+    "AMMO": [
+        {
+            "fullName": "Dwemerski bełt",
+            "editorId": "DwarvenSphereBolt02",
+            "formId": "10EC8C",
+            "Weight": "0",
+            "Value": "0",
+            "Damage": "15"
+        },
+        {
+            "fullName": "Żelazna strzała",
+            "editorId": "FollowerIronArrow",
+            "formId": "10E2DE",
+            "Weight": "0",
+            "Value": "1",
+            "Damage": "8"
+        }
+    ],
+    "SCRL": [
+        {
+            "fullName": "Spostrzeżenia Shalidora: Magia",
+            "editorId": "MGR21ScrollMagicka",
+            "formId": "1076EC",
+            "Weight": "0.5",
+            "Value": "50",
+            "Effects": "Zwiększa magię o &lt;mag&gt; pkt.|Regeneracja magii przyśpieszona o &lt;mag&gt;% przez &lt;dur&gt; s.|"
+        },
+        {
+            "fullName": "Spostrzeżenia Shalidora: Przywołanie",
+            "editorId": "MGR21ScrollConjuration",
+            "formId": "1076EB",
+            "Weight": "0.5",
+            "Value": "50",
+            "Effects": "Zwiększa czas trwania i zmniejsza koszt zaklęć przywołania przez &lt;dur&gt; s.|"
+        }
+    ],
+    "SLGM": [
+        {
+            "fullName": "Klejnot duszy Wylandriah",
+            "editorId": "FFRiften14SoulGem",
+            "formId": "043E26",
+            "Weight": "0",
+            "Value": "0"
+        },
+        {
+            "fullName": "Uzdatniony klejnot duszy",
+            "editorId": "WhiterunSoulGem",
+            "formId": "094E40",
+            "Weight": "0.2",
+            "Value": "25"
+        }
+    ],
+    "KEYM": [
+        {
+            "fullName": "Klucz do skonfiskowanych towarów",
+            "editorId": "RiftenConfiscatedGoodsChestKey",
+            "formId": "10E7E6",
+            "Weight": "0",
+            "Value": "0"
+        },
+        {
+            "fullName": "Klucz do pokoju Malurila",
+            "editorId": "MzinchaleftKey01",
+            "formId": "10BEFF",
+            "Weight": "0",
+            "Value": "0"
+        }
+    ],
+    "SPEL": [
+        {
+            "fullName": "Spalenie",
+            "editorId": "IncinerateLeftHand",
+            "formId": "10FD5F",
+            "Effects": "Wybuch ognia zadaje &lt;mag&gt; pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
+            "Spell Mastery": "Ekspert - zniszczenie"
+        },
+        {
+            "fullName": "Płaszcz Płomieni",
+            "editorId": "DragonPriestMaskUltraFlameCloak",
+            "formId": "10FC17",
+            "Effects": "Przez &lt;dur&gt; s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
+            "Spell Mastery": "Czeladnik - zniszczenie"
+        }
+    ],
+    "WOOP": [
+        {
+            "fullName": "Nus",
+            "editorId": "WordNus",
+            "formId": "0602A5",
+            "Translation": "Posąg"
+        },
+        {
+            "fullName": "Slen",
+            "editorId": "WordSlen",
+            "formId": "0602A4",
+            "Translation": "Ciało"
+        }
+    ]
+}
+
 
 PLUGIN_TEST_FILE = '''{
     "isEsl": false,

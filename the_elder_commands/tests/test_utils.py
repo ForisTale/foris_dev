@@ -1,5 +1,5 @@
 from django.test import TestCase
-from the_elder_commands.utils import ManageTestFiles, MessagesSystem, Commands, SelectedPlugins
+from the_elder_commands.utils import ManageTestFiles, MessagesSystem, Commands, SelectedPlugins, escape_js, escape_html
 from unittest.mock import patch
 from django.http import QueryDict
 
@@ -200,3 +200,21 @@ class SelectedPluginsTest(TestCase):
         selected.unselect(post)
         un_all.assert_called_once()
         one.assert_not_called()
+
+
+class EscapeJS(TestCase):
+
+    def test_escape_js(self):
+        string = "&<>test\u2028\u2029"
+        expected = "\\u0026\\u003c\\u003etest\\u2028\\u2029"
+        actual = escape_js(string)
+        self.assertEqual(expected, actual)
+
+
+class EscapeHTML(TestCase):
+
+    def test_escape_HTML(self):
+        string = "&<>test'\""
+        expected = "&amp;&lt;&gt;test&#39;&quot;"
+        actual = escape_html(string)
+        self.assertEqual(expected, actual)

@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.http import QueryDict
+from django.forms import ValidationError
 from the_elder_commands.forms import SkillsForm, PluginsForm, PluginVariantsForm, SelectedPluginsForm
 from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.services import SkillsService
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_DICT, \
-    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, \
-    INCORRECT_LOAD_ORDER
+    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, PLUGIN_TEST_EMPTY_DICT
 import copy
 
 
@@ -168,10 +168,38 @@ class PluginFormValidationTest(TestCase):
         form = PluginsForm(name=self.data["plugin"]["name"])
         variant_form = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
         self.assertFalse(variant_form.is_valid())
-        self.assertEqual(
-            variant_form.errors,
-            {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
-        )
+        self.assertEqual(variant_form.errors, {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]})
+
+    def test_plugin_data_is_stripped_from_html_char(self):
+        self.data["variant"]["plugin_data"] = PLUGIN_TEST_EMPTY_DICT
+        self.data["variant"]["plugin_data"]["WEAP"].append({"name": "&<>test'\""})
+
+        form = PluginsForm(name=self.data["plugin"]["name"])
+        variant_form = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
+        variant_form.save()
+        variant = PluginVariants.objects.first()
+        weap_list = variant.plugin_data.get("WEAP")
+        item = weap_list[0]
+        tested_string = item.get("name")
+        self.assertEqual("&amp;&lt;&gt;test&#39;&quot;", tested_string)
+
+    def test_escape_items(self):
+        items = [
+            {"name": "&test",
+             "other": ">some"},
+        ]
+        expected = [
+            {"name": "&amp;test",
+             "other": "&gt;some"},
+        ]
+        actual = PluginVariantsForm.escape_items(items)
+        self.assertEqual(expected, actual)
+
+    def test_escape_items_can_handle_wrong_data(self):
+        cases = [None, [None], [{None}]]
+        for case in cases:
+            with self.assertRaises(ValidationError, msg=f"Fail on {case}"):
+                PluginVariantsForm.escape_items(case)
 
     def test_unique_validation(self):
         plugin = Plugins.objects.create(name="test", usable_name="test")

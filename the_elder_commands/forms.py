@@ -3,7 +3,7 @@ from django.forms import ValidationError
 from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
     PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
-from the_elder_commands.utils import SelectedPlugins
+from the_elder_commands.utils import SelectedPlugins, escape_html
 
 
 class SkillsForm(ModelForm):
@@ -151,12 +151,30 @@ class PluginVariantsForm(ModelForm):
         plugin_keys = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH", "MISC",
                        "AMMO", "SCRL", "SLGM", "KEYM", "SPEL", "WOOP"]
         form_data = self.cleaned_data["plugin_data"]
-        data_keys = form_data.keys()
+        new_form_data = {}
 
-        if set(plugin_keys).symmetric_difference(data_keys):
+        for key in plugin_keys:
+            data_value = form_data.get(key)
+            if data_value is None:
+                raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+
+            new_items = self.escape_items(data_value)
+            new_form_data.update({key: new_items})
+
+        return new_form_data
+
+    @staticmethod
+    def escape_items(items):
+        new_items = []
+        try:
+            for item in items:
+                new_dict = {}
+                for key, value in item.items():
+                    new_dict.update({key: escape_html(str(value))})
+                new_items.append(new_dict)
+        except (TypeError, AttributeError):
             raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
-
-        return form_data
+        return new_items
 
 
 class SelectedPluginsForm:

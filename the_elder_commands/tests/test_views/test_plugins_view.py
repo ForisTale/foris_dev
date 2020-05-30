@@ -3,8 +3,9 @@ from django.test.utils import tag
 from django.http import QueryDict
 from the_elder_commands.views import extract_dict_from_plugin_file, create_variants_data_post
 from the_elder_commands.models import Plugins, PluginVariants
-from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, \
-    PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE
+from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, \
+    PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_EMPTY_DATA, \
+    PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils import ManageTestFiles
 from unittest.mock import patch
 from io import StringIO, BytesIO
@@ -38,6 +39,8 @@ class AddPluginTest(TestCase, ManageTestFiles):
             self.create_test_files({"TEC_test_file.tec": PLUGIN_TEST_FILE})
         elif self.check_test_tag("create_incorrect_file"):
             self.create_test_files({"TEC_test_file.ini": {"test": 1}})
+        elif self.check_test_tag("create_empty_data"):
+            self.create_test_files({"TEC_empty_data.tec": PLUGIN_TEST_EMPTY_DATA})
 
     def tearDown(self):
         self.delete_test_files()
@@ -92,6 +95,25 @@ class AddPluginTest(TestCase, ManageTestFiles):
         )
 
     @tag("create_test_file")
+    def test_add_plugin_give_plugin_exist_error(self):
+        self.send_default_post_and_return_response()
+        self.send_default_post_and_return_response()
+        response = self.client.get(self.base_url)
+        self.assertEqual(
+            response.context["plugins_messages"][1],
+            ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
+        )
+
+    @tag("create_empty_data")
+    def test_add_plugin_give_file_error_message(self):
+        self.send_default_post_and_return_response()
+        response = self.client.get(self.base_url)
+        self.assertEqual(
+            response.context["plugins_messages"],
+            [ADD_PLUGIN_FILE_ERROR_MESSAGE]
+        )
+
+    @tag("create_test_file")
     def test_success_message_dont_show_after_reload(self):
         self.send_default_post_and_return_response()
         self.client.get(self.base_url)
@@ -117,8 +139,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
                 plugin_model.__getattribute__(field),
                 desired_result
             )
-        correct_dict = copy.deepcopy(PLUGIN_TEST_DICT)
-        correct_dict.pop("isEsl")
+        correct_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM)
         variants_cases = {
             "version": "0.1",
             "language": "Polish",
@@ -214,7 +235,7 @@ class CreateVariantsDataPost(TestCase):
             post = create_variants_data_post(request)
             self.assertDictEqual(post.get("plugin_data"), expected)
 
-    def test_missing_is_esl_key_make_function_return_none(self):
+    def test_missing_is_esl_key_make_function_return_none_and_handle_key_error(self):
         with StringIO('{\"test\": []}') as file:
             class FakeRequest:
                 FILES = {"plugin_file": file}
