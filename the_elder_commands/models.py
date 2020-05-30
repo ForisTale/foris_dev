@@ -1,12 +1,11 @@
 from django.db import models
 from django.urls import reverse
-from django.contrib.postgres.fields import JSONField
 
 
 class Skills(models.Model):
     race = models.TextField(default="Nord")
     session_key = models.TextField(default="", unique=True)
-    skills = JSONField(default=dict)
+    skills = models.JSONField(default=dict)
     desired_level = models.IntegerField(default=1, null=True)
     priority_multiplier = models.FloatField(default=1.5)
     fill_skills = models.BooleanField(default=False)
@@ -33,4 +32,4 @@ class PluginVariants(models.Model):
     version = models.TextField(default="")
     language = models.TextField(default="")
     is_esl = models.BooleanField(default=False)
-    plugin_data = JSONField(default=dict)
+    plugin_data = models.JSONField(default=dict)
