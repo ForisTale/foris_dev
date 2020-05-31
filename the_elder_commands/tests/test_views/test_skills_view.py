@@ -3,45 +3,7 @@ from django.test import TestCase
 from the_elder_commands.models import Skills
 from the_elder_commands.services import SkillsService
 from the_elder_commands.views import extract_skills, set_skills_values, unpack_post
-
-SKILL_POST = {
-    'alteration_base': "15",
-    'conjuration_base': "15",
-    'destruction_base': "15",
-    'enchanting_base': "15",
-    'illusion_base': "15",
-    'restoration_base': "15",
-    'marksman_base': "15",
-    'block_base': "15",
-    'heavyarmor_base': "15",
-    'onehanded_base': "15",
-    'smithing_base': "15",
-    'twohanded_base': "15",
-    'alchemy_base': "15",
-    'lightarmor_base': "15",
-    'lockpicking_base': "15",
-    'pickpocket_base': "15",
-    'sneak_base': "15",
-    'speechcraft_base': "15",
-    'alteration_new': "",
-    'conjuration_new': "",
-    'destruction_new': "",
-    'enchanting_new': "",
-    'illusion_new': "",
-    'restoration_new': "",
-    'marksman_new': "",
-    'block_new': "",
-    'heavyarmor_new': "",
-    'onehanded_new': "",
-    'smithing_new': "",
-    'twohanded_new': "",
-    'alchemy_new': "",
-    'lightarmor_new': "",
-    'lockpicking_new': "",
-    'pickpocket_new': "",
-    'sneak_new': "",
-    'speechcraft_new': "",
-}
+from the_elder_commands.inventory import SKILL_POST, SKILLS_ERROR_VALUES_MUST_BE_INTEGERS
 
 
 class SkillsViewTest(TestCase):
@@ -57,16 +19,10 @@ class SkillsViewTest(TestCase):
 
     def test_character_view_use_service(self):
         response = self.client.get(self.base_url)
-        self.assertIsInstance(
-            response.context["service"],
-            SkillsService
-        )
+        self.assertIsInstance(response.context["service"], SkillsService)
 
     def test_redirect_after_POST(self):
-        response = self.client.post(
-            self.base_url,
-            data={}
-        )
+        response = self.client.post(self.base_url, data={})
         self.assertRedirects(response, self.base_url)
 
     def test_pass_race_in_url_passed_it_to_form(self):
@@ -74,33 +30,18 @@ class SkillsViewTest(TestCase):
 
         self.assertEqual(Skills.objects.count(), 1)
         model = Skills.objects.first()
-        self.assertEqual(
-            model.race,
-            "Ork"
-        )
+        self.assertEqual(model.race, "Ork")
 
     def test_view_build_dict_and_pass_it_to_form(self):
         data = SKILL_POST.copy()
         data["alteration_base"] = ["35"]
         data["heavyarmor_new"] = ["40"]
 
-        self.client.post(
-            self.base_url,
-            data=data
-        )
+        self.client.post(self.base_url, data=data)
         model = Skills.objects.first()
-        self.assertEqual(
-            model.skills["Magic"]["Alteration"]["default_value"],
-            35
-        )
-        self.assertEqual(
-            model.skills["Combat"]["Heavy Armor"]["desired_value"],
-            40
-        )
-        self.assertEqual(
-            model.skills["Magic"]["Alteration"]["desired_value"],
-            ""
-        )
+        self.assertEqual(model.skills["Magic"]["Alteration"]["default_value"], 35)
+        self.assertEqual(model.skills["Combat"]["Heavy Armor"]["desired_value"], 40)
+        self.assertEqual(model.skills["Magic"]["Alteration"]["desired_value"], "")
 
     def test_after_send_POST_character_give_correct_level(self):
         self.client.post(self.base_url, data={"race": "Ork"})
@@ -108,17 +49,23 @@ class SkillsViewTest(TestCase):
         data["twohanded_new"] = ["21"]
         data["speechcraft_new"] = ["21"]
         data["lightarmor_new"] = ["21"]
-        self.client.post(
-            self.base_url,
-            data=data
-        )
+        self.client.post(self.base_url, data=data)
 
         key = Skills.objects.first().session_key
         character = SkillsService(session_key=key)
-        self.assertEqual(
-            character.desired_level,
-            3
-        )
+        self.assertEqual(character.desired_level, 3)
+
+    def test_skill_view_pass_correct_error(self):
+        data = SKILL_POST.copy()
+        data.update({"alteration_base": ""})
+        self.client.post(self.base_url, data=data)
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.context["skills_messages"], [SKILLS_ERROR_VALUES_MUST_BE_INTEGERS])
+
+    def test_change_race_dont_give_message(self):
+        self.client.post(self.base_url, data={"race": "Ork"})
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.context["skills_messages"], [])
 
 
 class ExtractSkillsTest(TestCase):

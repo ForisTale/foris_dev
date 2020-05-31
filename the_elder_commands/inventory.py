@@ -34,12 +34,59 @@ PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"
 
 NO_PLUGIN_SELECTED_ERROR_MESSAGE = "Please select plugin before use Items or Spells."
 
+SKILLS_ERROR_VALUES_MUST_BE_INTEGERS = "All skills values must be integers!"
+
+SKILLS_ERROR_VALUES_RANGE = "The skill need to be a integer between 15 and 100."
+
+SKILLS_ERROR_NEW_VALUE_BIGGER = "New value of skills must be bigger than a value!"
+
+SKILLS_ERROR_DESIRED_RANGE = "The desired level need to be a integer between 1 and 81."
+
 SKILLS_CONSOLE_NAME = [
     'alteration', 'conjuration', 'destruction', 'enchanting',
     'illusion', 'restoration', 'marksman', 'block', 'heavyarmor',
     'onehanded', 'smithing', 'twohanded', 'alchemy', 'lightarmor',
     'lockpicking', 'pickpocket', 'sneak', 'speechcraft'
 ]
+
+SKILL_POST = {
+    'alteration_base': "15",
+    'conjuration_base': "15",
+    'destruction_base': "15",
+    'enchanting_base': "15",
+    'illusion_base': "15",
+    'restoration_base': "15",
+    'marksman_base': "15",
+    'block_base': "15",
+    'heavyarmor_base': "15",
+    'onehanded_base': "15",
+    'smithing_base': "15",
+    'twohanded_base': "15",
+    'alchemy_base': "15",
+    'lightarmor_base': "15",
+    'lockpicking_base': "15",
+    'pickpocket_base': "15",
+    'sneak_base': "15",
+    'speechcraft_base': "15",
+    'alteration_new': "",
+    'conjuration_new': "",
+    'destruction_new': "",
+    'enchanting_new': "",
+    'illusion_new': "",
+    'restoration_new': "",
+    'marksman_new': "",
+    'block_new': "",
+    'heavyarmor_new': "",
+    'onehanded_new': "",
+    'smithing_new': "",
+    'twohanded_new': "",
+    'alchemy_new': "",
+    'lightarmor_new': "",
+    'lockpicking_new': "",
+    'pickpocket_new': "",
+    'sneak_new': "",
+    'speechcraft_new': "",
+}
 
 DEFAULT_SKILLS = {
     "Magic": {

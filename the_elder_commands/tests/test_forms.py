@@ -5,7 +5,9 @@ from the_elder_commands.forms import SkillsForm, PluginsForm, PluginVariantsForm
 from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.services import SkillsService
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_DICT, \
-    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, PLUGIN_TEST_EMPTY_DICT
+    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, PLUGIN_TEST_EMPTY_DICT, \
+    SKILLS_ERROR_DESIRED_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_VALUES_RANGE, \
+    SKILLS_ERROR_VALUES_MUST_BE_INTEGERS
 import copy
 
 
@@ -39,7 +41,7 @@ class SkillsFormValidationTest(TestCase):
         for case in cases:
             form = SkillsForm(data={"desired_level": str(case)}, instance=self.instance)
             self.check_fail_and_message(form, {"desired_level":
-                                               ["The desired level need to be a integer between 1 and 81."]})
+                                               [SKILLS_ERROR_DESIRED_RANGE]})
         form = SkillsForm(data={"desired_level": 5}, instance=self.instance)
         self.assertTrue(form.is_valid())
 
@@ -60,7 +62,7 @@ class SkillsFormValidationTest(TestCase):
                 skills["Magic"]["Alteration"][kind + "_value"] = case
                 form = SkillsForm(data={"skills": skills}, instance=self.instance)
                 self.check_fail_and_message(form, {'skills':
-                                                   ['The skill need to be a integer between 15 and 100.']})
+                                                   [SKILLS_ERROR_VALUES_RANGE]})
             skills["Magic"]["Alteration"][kind + "_value"] = "15"
             form = SkillsForm(data={"skills": skills}, instance=self.instance)
             self.assertTrue(form.is_valid())
@@ -71,18 +73,25 @@ class SkillsFormValidationTest(TestCase):
         skills["Magic"]["Alteration"]["desired_value"] = "test"
         form = SkillsForm(data={"skills": skills}, instance=self.instance)
         self.check_fail_and_message(form, {"skills":
-                                           ['All skills values must be integers!']})
+                                           [SKILLS_ERROR_VALUES_MUST_BE_INTEGERS]})
 
     def test_desired_must_be_bigger_than_default(self):
         skills = SkillsService.default_race_skills_update("Nord")
         skills["Magic"]["Alteration"]["default_value"] = 55
         skills["Magic"]["Alteration"]["desired_value"] = 35
         form = SkillsForm(data={"skills": skills}, instance=self.instance)
-        self.check_fail_and_message(form, {'skills': ['New value of skills must be bigger than a value!']})
+        self.check_fail_and_message(form, {'skills': [SKILLS_ERROR_NEW_VALUE_BIGGER]})
 
         skills["Magic"]["Alteration"]["desired_value"] = 56
         form = SkillsForm(data={"skills": skills}, instance=self.instance)
         self.assertTrue(form.is_valid())
+
+    def test_base_value_cannot_be_empty(self):
+        skills = SkillsService.default_race_skills_update("Nord")
+        skills["Magic"]["Alteration"]["default_value"] = ""
+        form = SkillsForm(data={"skills": skills}, instance=self.instance)
+        self.assertFalse(form.is_valid())
+        self.check_fail_and_message(form, {"skills": [SKILLS_ERROR_VALUES_MUST_BE_INTEGERS]})
 
 
 class PluginsFormTest(TestCase):

@@ -25,9 +25,11 @@ def skills_view(request):
         form = SkillsForm(data=post, instance=instance)
         if form.is_valid():
             form.save()
-            message_system.append_skills(COMMANDS_SUCCESS_MESSAGE)
+            if "race" not in request.POST:
+                message_system.append_skills(COMMANDS_SUCCESS_MESSAGE)
         else:
-            message_system.append_skills(form.errors)
+            for error in form.errors.values():
+                message_system.append_skills([*error])
         return redirect("tec:skills")
 
     skills_service = SkillsService(session_key=request.session.session_key)

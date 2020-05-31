@@ -2,7 +2,8 @@ from django.forms.models import ModelForm
 from django.forms import ValidationError
 from the_elder_commands.models import Skills, Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
-    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY
+    SKILLS_ERROR_VALUES_MUST_BE_INTEGERS, PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
+    SKILLS_ERROR_VALUES_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_DESIRED_RANGE
 from the_elder_commands.utils import SelectedPlugins, escape_html
 
 
@@ -29,7 +30,7 @@ class SkillsForm(ModelForm):
             return 1
         else:
             if form_data < 1 or form_data > 81:
-                raise ValidationError("The desired level need to be a integer between 1 and 81.")
+                raise ValidationError(SKILLS_ERROR_DESIRED_RANGE)
         return form_data
 
     def clean_skills(self):
@@ -47,7 +48,7 @@ class SkillsForm(ModelForm):
         if skill["desired_value"] == "":
             return
         if skill["default_value"] > skill["desired_value"]:
-            raise ValidationError("New value of skills must be bigger than a value!")
+            raise ValidationError(SKILLS_ERROR_NEW_VALUE_BIGGER)
 
     @staticmethod
     def check_skills_range(skill):
@@ -56,17 +57,24 @@ class SkillsForm(ModelForm):
             if skill_value == "":
                 return
             if skill_value < 15 or skill_value > 100:
-                raise ValidationError("The skill need to be a integer between 15 and 100.")
+                raise ValidationError(SKILLS_ERROR_VALUES_RANGE)
 
     @staticmethod
     def ensure_all_skills_are_integers(skill):
-        for kind in ["default", "desired"]:
-            if skill[kind + "_value"] == "":
-                return
+        if skill["default_value"] == "":
+            raise ValidationError(SKILLS_ERROR_VALUES_MUST_BE_INTEGERS)
+        else:
             try:
-                skill[kind + "_value"] = int(skill[kind + "_value"])
+                skill["default_value"] = int(skill["default_value"])
             except ValueError:
-                raise ValidationError("All skills values must be integers!")
+                raise ValidationError(SKILLS_ERROR_VALUES_MUST_BE_INTEGERS)
+        if skill["desired_value"] == "":
+            return
+        else:
+            try:
+                skill["desired_value"] = int(skill["desired_value"])
+            except ValueError:
+                raise ValidationError(SKILLS_ERROR_VALUES_MUST_BE_INTEGERS)
 
 
 class PluginsForm:
