@@ -1,19 +1,4 @@
 from django.db import models
-from django.urls import reverse
-
-
-class Skills(models.Model):
-    race = models.TextField(default="Nord")
-    session_key = models.TextField(default="", unique=True)
-    skills = models.JSONField(default=dict)
-    desired_level = models.IntegerField(default=1, null=True)
-    priority_multiplier = models.FloatField(default=1.5)
-    fill_skills = models.BooleanField(default=False)
-    timestamp = models.TimeField(auto_now=True)
-
-    @staticmethod
-    def get_absolute_url():
-        return reverse("tec:skills")
 
 
 class Plugins(models.Model):

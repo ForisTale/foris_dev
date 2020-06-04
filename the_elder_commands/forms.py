@@ -1,80 +1,13 @@
 from django.forms.models import ModelForm
 from django.forms import ValidationError
-from the_elder_commands.models import Skills, Plugins, PluginVariants
+from the_elder_commands.models import Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
-    SKILLS_ERROR_VALUES_MUST_BE_INTEGERS, PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
-    SKILLS_ERROR_VALUES_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_DESIRED_RANGE
-from the_elder_commands.utils import SelectedPlugins, escape_html
-
-
-class SkillsForm(ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["race"].required = False
-        self.fields["skills"].required = False
-        self.fields["desired_level"].required = False
-        self.fields["priority_multiplier"].required = False
-        self.fields["fill_skills"].required = False
-
-    class Meta:
-        model = Skills
-        fields = (
-            "race", "skills", "desired_level",
-            "priority_multiplier", "fill_skills",
-        )
-
-    def clean_desired_level(self):
-        form_data = self.cleaned_data["desired_level"]
-        if form_data is None:
-            return 1
-        else:
-            if form_data < 1 or form_data > 81:
-                raise ValidationError(SKILLS_ERROR_DESIRED_RANGE)
-        return form_data
-
-    def clean_skills(self):
-        form_data = self.cleaned_data["skills"]
-        if form_data is not None:
-            for skills in form_data.values():
-                for skill in skills.values():
-                    self.ensure_all_skills_are_integers(skill)
-                    self.check_skills_range(skill)
-                    self.check_desired_is_bigger(skill)
-        return form_data
-
-    @staticmethod
-    def check_desired_is_bigger(skill):
-        if skill["desired_value"] == "":
-            return
-        if skill["default_value"] > skill["desired_value"]:
-            raise ValidationError(SKILLS_ERROR_NEW_VALUE_BIGGER)
-
-    @staticmethod
-    def check_skills_range(skill):
-        for kind in ["default", "desired"]:
-            skill_value = skill[kind + "_value"]
-            if skill_value == "":
-                return
-            if skill_value < 15 or skill_value > 100:
-                raise ValidationError(SKILLS_ERROR_VALUES_RANGE)
-
-    @staticmethod
-    def ensure_all_skills_are_integers(skill):
-        if skill["default_value"] == "":
-            raise ValidationError(SKILLS_ERROR_VALUES_MUST_BE_INTEGERS)
-        else:
-            try:
-                skill["default_value"] = int(skill["default_value"])
-            except ValueError:
-                raise ValidationError(SKILLS_ERROR_VALUES_MUST_BE_INTEGERS)
-        if skill["desired_value"] == "":
-            return
-        else:
-            try:
-                skill["desired_value"] = int(skill["desired_value"])
-            except ValueError:
-                raise ValidationError(SKILLS_ERROR_VALUES_MUST_BE_INTEGERS)
+    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
+    SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_DESIRED_LEVEL_RANGE, \
+    SKILLS_ERROR_DESIRED_LEVEL, SKILLS_ERROR_MULTIPLIER, DEFAULT_SKILLS, SKILLS_ERROR_DESIRED_SKILL, \
+    SKILLS_ERROR_BASE_SKILL
+from the_elder_commands.utils import SelectedPlugins, escape_html, Skills as NewSkills
+import copy
 
 
 class PluginsForm:
@@ -245,3 +178,100 @@ class SelectedPluginsForm:
     def get_name(usable_name):
         plugin = Plugins.objects.get(usable_name=usable_name)
         return plugin.name
+
+
+class SkillsValidationError(Exception):
+    pass
+
+
+class ValidateSkills:
+    def __init__(self, request):
+        self.request = request
+        self.errors = []
+        self.desired_level = self._desired_level_validation()
+        self.multiplier = self._priority_multiplier_validation()
+        self.fill_skills = self._get_fill_skills()
+        self.skills = self.prepare_skills()
+
+    def is_valid(self):
+        return self.errors == []
+
+    def _desired_level_validation(self):
+        desired_level = self.request.POST.get("desired_level")
+        try:
+            level = int(desired_level)
+            if 81 >= level >= 1:
+                return level
+            else:
+                self.errors.append(SKILLS_ERROR_DESIRED_LEVEL_RANGE)
+        except ValueError:
+            self.errors.append(SKILLS_ERROR_DESIRED_LEVEL)
+
+    def _priority_multiplier_validation(self):
+        multiplier = self.request.POST.get("priority_multiplier")
+        try:
+            return float(multiplier)
+        except ValueError:
+            self.errors.append(SKILLS_ERROR_MULTIPLIER)
+
+    def prepare_skills(self):
+        base_skills = copy.deepcopy(DEFAULT_SKILLS)
+        for skills in base_skills.values():
+            for skill, properties in skills.items():
+                skill_name = properties.get("name")
+                default_skill = self._get_default_skill(skill, skill_name)
+                desired_skill = self._get_desired_skill(skill, skill_name)
+                multiplier = self._get_multiplier(skill)
+                if not self.is_new_skill_bigger(default_skill, desired_skill):
+                    self.errors.append(SKILLS_ERROR_NEW_VALUE_BIGGER.format(skill=skill_name))
+                properties.update({
+                  "default_value": default_skill,
+                  "desired_value": desired_skill,
+                  "multiplier": multiplier
+                })
+        return base_skills
+
+    @staticmethod
+    def is_new_skill_bigger(default_skill, desired_skill):
+        try:
+            return default_skill <= desired_skill
+        except TypeError:
+            return True
+
+    def _get_default_skill(self, skill, skill_name):
+        try:
+            value = int(self.request.POST.get(f"{skill}_base"))
+            if 15 <= value <= 100:
+                return value
+        except ValueError:
+            pass
+        self.errors.append(SKILLS_ERROR_BASE_SKILL.format(skill=skill_name))
+
+    def _get_desired_skill(self, skill, skill_name):
+        value = self.request.POST.get(f"{skill}_new")
+        if value == "":
+            return value
+        try:
+            value = int(value)
+            if 15 <= value <= 100:
+                return value
+        except ValueError:
+            pass
+        self.errors.append(SKILLS_ERROR_DESIRED_SKILL.format(skill=skill_name))
+
+    def _get_multiplier(self, skill):
+        multiplier = self.request.POST.get(f"{skill}_multiplier")
+        return multiplier == "on"
+
+    def _get_fill_skills(self):
+        return self.request.POST.get("fill_skills")
+
+    def save(self):
+        if self.is_valid():
+            skills = NewSkills(self.request)
+            skills.save_skills(self.skills)
+            skills.save_desired_level(self.desired_level)
+            skills.save_multiplier(self.multiplier)
+            skills.save_fill_skills(self.fill_skills)
+        else:
+            raise SkillsValidationError(self.errors)

@@ -1,151 +1,9 @@
 from django.test import TestCase
-from the_elder_commands.models import Skills, Plugins, PluginVariants
-from the_elder_commands.services import SkillsService, PluginsService, ItemsService
-from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT
-from the_elder_commands.utils import populate_plugins_table
+from the_elder_commands.models import Plugins, PluginVariants
+from the_elder_commands.services import PluginsService, ItemsService, SkillsService
+from the_elder_commands.inventory import PLUGIN_TEST_DICT, DEFAULT_SKILLS
+from the_elder_commands.utils import populate_plugins_table, default_race_skills_update, set_up_default_nord
 import copy
-
-
-class SkillsServiceTest(TestCase):
-
-    @staticmethod
-    def set_up_default_nord():
-        skills = copy.deepcopy(DEFAULT_SKILLS)
-        skills["Combat"]["Two-handed"]["default_value"] += 10
-        skills["Stealth"]["Speech"]["default_value"] += 5
-        skills["Stealth"]["Light Armor"]["default_value"] += 5
-        for skill in ["Block", "One-handed", "Smithing"]:
-            skills["Combat"][skill]["default_value"] += 5
-        return skills
-
-    @staticmethod
-    def set_up_desire_skills():
-        skills = SkillsService.default_race_skills_update("Altmer")
-        skills["Combat"]["Two-handed"]["desired_value"] = 20
-        skills["Stealth"]["Speech"]["desired_value"] = 20
-        skills["Stealth"]["Light Armor"]["desired_value"] = 20
-        Skills.objects.create(race="Altmer", session_key="key", skills=skills)
-        character = SkillsService("key")
-        return character
-
-    def test_race_skills_update_depend_on_race(self):
-        default_skills = SkillsService.default_race_skills_update("Nord")
-        skills = self.set_up_default_nord()
-        self.assertEqual(default_skills, skills)
-
-    def test_predict_level(self):
-        skills = self.set_up_default_nord()
-        skills["Combat"]["Archery"]["default_value"] = 20
-        skills["Stealth"]["Sneak"]["default_value"] = 20
-        skills["Stealth"]["Alchemy"]["default_value"] = 20
-        Skills.objects.create(session_key="key", skills=skills)
-        self.assertEqual(
-            SkillsService(session_key="key").default_level,
-            3
-        )
-
-    def test_commands_list(self):
-        character = self.set_up_desire_skills()
-        commands_list = [
-            "player.advskill twohanded 425",
-            "player.advskill speechcraft 7013",
-            "player.advskill lightarmor 632",
-        ]
-        self.assertEqual(character.commands_list(), commands_list)
-
-    def test_predict_desired_level_count_from_default(self):
-        skills = copy.deepcopy(DEFAULT_SKILLS)
-        skills["Magic"]["Alteration"]["default_value"] = 32
-        skills["Magic"]["Alteration"]["desired_value"] = 40
-        skills["Magic"]["Enchanting"]["default_value"] = 40
-        Skills.objects.create(session_key="key", skills=skills)
-        character = SkillsService(session_key="key")
-        self.assertEqual(character.default_level, 7)
-        self.assertEqual(character.desired_level, 8)
-
-    def test_if_passes_non_exist_session_key_create_default(self):
-        SkillsService(session_key="key")
-        character = Skills.objects.first()
-        self.assertEqual(character.session_key, "key")
-
-    def test_desired_skills_update_return_correct_object(self):
-        character = self.set_up_desire_skills()
-        self.assertEqual(
-            character.skills["Stealth"]["Speech"]["desired_value"],
-            20
-        )
-
-    def test_empty_character_desired_skills_return_desired_skills_empty_value(self):
-        character = SkillsService(session_key="key")
-        self.assertEqual(
-            character.skills["Magic"]["Alteration"]["desired_value"],
-            ""
-        )
-
-    def test_desired_level_is_calculated_against_default_skills(self):
-        skills = self.set_up_default_nord()
-        skills["Combat"]["One-handed"]["default_value"] = 25
-        skills["Combat"]["One-handed"]["desired_value"] = 35
-        Skills.objects.create(session_key="key", skills=skills)
-        character = SkillsService(session_key="key")
-        self.assertEqual(character.default_level, 2)
-        self.assertEqual(character.desired_level, 4)
-
-    def test_calculate_desired_level(self):
-        character = self.set_up_desire_skills()
-        self.assertEqual(character.desired_level, 3)
-        model = Skills.objects.get(session_key="key")
-        model.desired_level = 6
-        model.fill_skills = True
-        model.save()
-        changed_character = SkillsService(session_key="key")
-        self.assertEqual(changed_character.desired_level, 6)
-
-    def test_if_desired_level_is_bigger_than_calculated_then_change_skills(self):
-        self.set_up_desire_skills()
-        model = Skills.objects.get(session_key="key")
-        model.desired_level = 6
-        model.fill_skills = True
-        model.save()
-        character = SkillsService(session_key="key")
-        cases = [
-            character.skills["Combat"]["Archery"]["desired_value"],
-            character.skills["Combat"]["Block"]["desired_value"],
-            character.skills["Stealth"]["Alchemy"]["desired_value"],
-        ]
-        for case in cases:
-            self.assertNotEqual(case, "")
-            self.assertNotEqual(case, 15)
-
-    def test_desired_level_fill_skills_only_to_100(self):
-        self.set_up_desire_skills()
-        model = Skills.objects.get(session_key="key")
-        model.desired_level = 81
-        model.fill_skills = True
-        skills = model.skills
-        skills["Magic"]["Alteration"]["desired_value"] = 99
-        model.save()
-
-        character = SkillsService(session_key="key")
-        for skill_type in character.skills:
-            for name in character.skills[skill_type]:
-                self.assertEqual(
-                    character.skills[skill_type][name]["desired_value"],
-                    100
-                )
-
-    def test_desired_level_did_not_have_infinity_loop(self):
-        skills = copy.deepcopy(DEFAULT_SKILLS)
-        categories = ["Magic", "Combat", "Stealth"]
-        skills_categories = [['Alteration', 'Conjuration', 'Destruction', 'Enchanting', 'Illusion', 'Restoration'],
-                             ['Archery', 'Block', 'Heavy Armor', 'One-handed', 'Smithing', 'Two-handed'],
-                             ['Alchemy', 'Light Armor', 'Lockpicking', 'Pickpocket', 'Sneak', 'Speech']]
-        for index in range(3):
-            for skill in skills_categories[index]:
-                skills[categories[index]][skill]["default_value"] = 99
-        Skills.objects.update_or_create(session_key="key", skills=skills, desired_level=81, fill_skills=True)
-        SkillsService(session_key="key")
-        self.assertTrue(True, "It's not looping!")
 
 
 class PluginsServiceTest(TestCase):
@@ -297,3 +155,107 @@ class ItemsServiceTest(TestCase):
 
         service = ItemsService(FakeRequest, "WEAP")
         self.assertEqual(service.chosen, {})
+
+
+class SkillsServiceTest(TestCase):
+
+    class FakeRequest:
+        def __init__(self):
+            self.session = {"skills": set_up_default_nord(), "desired_level": 1, "multiplier": 1.5, "race": "nord",
+                            "fill_skills": "true"}
+
+    def setUp(self):
+        self.maxDiff = None
+
+    @staticmethod
+    def set_up_desire_skills_for_altmer():
+        skills = default_race_skills_update("altmer")
+        skills["Combat"]["twohanded"]["desired_value"] = 20
+        skills["Stealth"]["speechcraft"]["desired_value"] = 20
+        skills["Stealth"]["lightarmor"]["desired_value"] = 20
+        return skills
+
+    def test_service_can_get_race(self):
+        request = self.FakeRequest()
+        service = SkillsService(request)
+        self.assertEqual(service.race, "nord")
+
+    def test_service_can_get_data_from_session(self):
+        request = self.FakeRequest()
+        service = SkillsService(request)
+        self.assertEqual(service.skills, set_up_default_nord())
+        self.assertEqual(service.multiplier, 1.5)
+        self.assertEqual(service.race, "nord")
+        self.assertEqual(service.fill_skills, "true")
+        self.assertEqual(service.desired_level, 1)
+        self.assertEqual(service.default_level, 1)
+
+    # noinspection PyTypeChecker
+    def test_predict_level_by_default_level(self):
+        request = self.FakeRequest()
+        skills = request.session.get("skills")
+        skills["Combat"]["marksman"]["default_value"] = 20
+        skills["Stealth"]["sneak"]["default_value"] = 20
+        skills["Stealth"]["alchemy"]["default_value"] = 20
+        service = SkillsService(request)
+        self.assertEqual(service.predict_level("default"), 3)
+
+    def test_predict_level_by_desired_level(self):
+        skills = self.set_up_desire_skills_for_altmer()
+        request = self.FakeRequest()
+        request.session.update({"skills": skills, "race": "altmer"})
+        service = SkillsService(request)
+        self.assertEqual(service.predict_level("desired"), 3)
+
+    def test_desired_level_return_default_level_when_smaller_than_default(self):
+        skills = self.set_up_desire_skills_for_altmer()
+        request = self.FakeRequest()
+        request.session.update({"skills": skills, "race": "altmer", "desired_level": 2})
+        service = SkillsService(request)
+        self.assertEqual(service.desired_level, 2)
+        request.session.pop("fill_skills")
+        service = SkillsService(request)
+        self.assertEqual(service.desired_level, 3)
+
+    def test_set_skills_to_desired_level(self):
+        request = self.FakeRequest()
+        request.session.update({"desired_level": 10})
+        service = SkillsService(request)
+        actual = service.skills
+        self.assertEqual(actual["Combat"]["marksman"]["desired_value"], 21)
+        self.assertEqual(actual["Combat"]["block"]["desired_value"], 26)
+        self.assertEqual(actual["Combat"]["twohanded"]["desired_value"], 31)
+
+    def test_desired_level_fill_skills_only_to_100(self):
+        skills = self.set_up_desire_skills_for_altmer()
+        skills["Magic"]["alteration"]["desired_value"] = 99
+        request = self.FakeRequest()
+        request.session.update({"skills": skills, "race": "altmer", "desired_level": 81})
+        service = SkillsService(request)
+        for skill_type in service.skills:
+            for name in service.skills[skill_type]:
+                self.assertEqual(
+                    service.skills[skill_type][name]["desired_value"],
+                    100
+                )
+
+    def test_desired_level_did_not_have_infinity_loop(self):
+        skills = copy.deepcopy(DEFAULT_SKILLS)
+        for skill_type in skills:
+            for name in skills[skill_type]:
+                skills[skill_type][name]["default_value"] = 99
+        request = self.FakeRequest()
+        request.session.update({"skills": skills, "race": "altmer", "desired_level": 81})
+        SkillsService(request)
+        self.assertTrue(True, "It's not looping!")
+
+    def test_create_commands_list(self):
+        skills = self.set_up_desire_skills_for_altmer()
+        request = self.FakeRequest()
+        request.session.update({"skills": skills, "race": "altmer", "desired_level": 3})
+        service = SkillsService(request)
+
+        commands_list = ["player.advskill twohanded 425", "player.advskill lightarmor 632",
+                         "player.advskill speechcraft 7013"]
+        self.assertEqual(service.commands_list(), commands_list)
+        self.assertEqual(service.commands, commands_list)

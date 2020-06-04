@@ -1,12 +1,7 @@
 def template_variables(request):
     return {
-        "playable_races": [
-            ["Altmer", "altmer_race"], ["Argonian", "argonian_race"],
-            ["Bosmer", "bosmer_race"], ["Breton", "breton_race"],
-            ["Dunmer", "dunmer_race"], ["Imperial", "imperial_race"],
-            ["Khajiit", "khajiit_race"], ["Nord", "nord_race"],
-            ["Ork", "ork_race"], ["Redguard", "redguard_race"],
-        ],
+        "playable_races": ["altmer", "argonian", "bosmer", "breton", "dunmer", "imperial", "khajiit", "nord",
+                           "ork", "redguard"],
         "main_categories": ["skills", "items", "spells", "other", "plugins", "commands"],
         "items_categories": ["Weapons", "Armors", "Ammo", "Books", "Ingredients", "Alchemy", "Scrolls", "SoulGems",
                              "Keys", "Miscellaneous"],
@@ -34,13 +29,18 @@ PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"
 
 NO_PLUGIN_SELECTED_ERROR_MESSAGE = "Please select plugin before use Items or Spells."
 
-SKILLS_ERROR_VALUES_MUST_BE_INTEGERS = "All skills values must be integers!"
+SKILLS_ERROR_NEW_VALUE_BIGGER = "New value of {skill} must be bigger than a value!"
 
-SKILLS_ERROR_VALUES_RANGE = "The skill need to be a integer between 15 and 100."
+SKILLS_ERROR_DESIRED_LEVEL_RANGE = "Desired level need to be a integer between 1 and 81."
 
-SKILLS_ERROR_NEW_VALUE_BIGGER = "New value of skills must be bigger than a value!"
+SKILLS_ERROR_DESIRED_LEVEL = "Desired level need to be integer!"
 
-SKILLS_ERROR_DESIRED_RANGE = "The desired level need to be a integer between 1 and 81."
+SKILLS_ERROR_MULTIPLIER = "Priority multiplier need to be number!"
+
+SKILLS_ERROR_BASE_SKILL = "Skill {skill} need to be a integer between 15 and 100!"
+
+SKILLS_ERROR_DESIRED_SKILL = "Desired skill {skill} need to be a integer between 15 " \
+                                                              "and 100 or empty!"
 
 SKILLS_CONSOLE_NAME = [
     'alteration', 'conjuration', 'destruction', 'enchanting',
@@ -49,7 +49,7 @@ SKILLS_CONSOLE_NAME = [
     'lockpicking', 'pickpocket', 'sneak', 'speechcraft'
 ]
 
-SKILL_POST = {
+DEFAULT_SKILL_POST = {
     'alteration_base': "15",
     'conjuration_base': "15",
     'destruction_base': "15",
@@ -90,7 +90,8 @@ SKILL_POST = {
 
 DEFAULT_SKILLS = {
     "Magic": {
-        "Alteration": {
+        "alteration": {
+            "name": "Alteration",
             "console_name": "alteration",
             "default_value": 15,
             "desired_value": "",
@@ -99,7 +100,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 3,
         },
-        "Conjuration":  {
+        "conjuration":  {
+            "name": "Conjuration",
             "console_name": "conjuration",
             "default_value": 15,
             "desired_value": "",
@@ -108,7 +110,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 2.1,
         },
-        "Destruction":  {
+        "destruction":  {
+            "name": "Destruction",
             "console_name": "destruction",
             "default_value": 15,
             "desired_value": "",
@@ -117,7 +120,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 1.35,
         },
-        "Enchanting":  {
+        "enchanting":  {
+            "name": "Enchanting",
             "console_name": "enchanting",
             "default_value": 15,
             "desired_value": "",
@@ -126,7 +130,8 @@ DEFAULT_SKILLS = {
             "sio": 170,
             "sum": 900,
         },
-        "Illusion":  {
+        "illusion":  {
+            "name": "Illusion",
             "console_name": "illusion",
             "default_value": 15,
             "desired_value": "",
@@ -135,7 +140,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 4.6,
         },
-        "Restoration":  {
+        "restoration":  {
+            "name": "Restoration",
             "console_name": "restoration",
             "default_value": 15,
             "desired_value": "",
@@ -146,7 +152,8 @@ DEFAULT_SKILLS = {
         },
     },
     "Combat": {
-        "Archery":  {
+        "marksman":  {
+            "name": "Archery",
             "console_name": "marksman",
             "default_value": 15,
             "desired_value": "",
@@ -155,7 +162,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 9.3,
         },
-        "Block":  {
+        "block":  {
+            "name": "Block",
             "console_name": "block",
             "default_value": 15,
             "desired_value": "",
@@ -164,7 +172,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 8.1,
         },
-        "Heavy Armor":  {
+        "heavyarmor":  {
+            "name": "Heavy Armor",
             "console_name": "heavyarmor",
             "default_value": 15,
             "desired_value": "",
@@ -173,7 +182,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 3.8,
         },
-        "One-handed":  {
+        "onehanded":  {
+            "name": "One-handed",
             "console_name": "onehanded",
             "default_value": 15,
             "desired_value": "",
@@ -182,7 +192,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 6.3,
         },
-        "Smithing":  {
+        "smithing":  {
+            "name": "Smithing",
             "console_name": "smithing",
             "default_value": 15,
             "desired_value": "",
@@ -191,7 +202,8 @@ DEFAULT_SKILLS = {
             "sio": 300,
             "sum": 1,
         },
-        "Two-handed":  {
+        "twohanded":  {
+            "name": "Two-handed",
             "console_name": "twohanded",
             "default_value": 15,
             "desired_value": "",
@@ -202,7 +214,8 @@ DEFAULT_SKILLS = {
         },
     },
     "Stealth": {
-        "Alchemy":  {
+        "alchemy":  {
+            "name": "Alchemy",
             "console_name": "alchemy",
             "default_value": 15,
             "desired_value": "",
@@ -211,7 +224,8 @@ DEFAULT_SKILLS = {
             "sio": 65,
             "sum": 0.75,
         },
-        "Light Armor":  {
+        "lightarmor":  {
+            "name": "Light Armor",
             "console_name": "lightarmor",
             "default_value": 15,
             "desired_value": "",
@@ -220,7 +234,8 @@ DEFAULT_SKILLS = {
             "sio": 0,
             "sum": 4,
         },
-        "Lockpicking":  {
+        "lockpicking":  {
+            "name": "Lockpicking",
             "console_name": "lockpicking",
             "default_value": 15,
             "desired_value": "",
@@ -229,7 +244,8 @@ DEFAULT_SKILLS = {
             "sio": 300,
             "sum": 45,
         },
-        "Pickpocket":  {
+        "pickpocket":  {
+            "name": "Pickpocket",
             "console_name": "pickpocket",
             "default_value": 15,
             "desired_value": "",
@@ -238,7 +254,8 @@ DEFAULT_SKILLS = {
             "sio": 250,
             "sum": 8.1,
         },
-        "Sneak":  {
+        "sneak":  {
+            "name": "Sneak",
             "console_name": "sneak",
             "default_value": 15,
             "desired_value": "",
@@ -247,7 +264,8 @@ DEFAULT_SKILLS = {
             "sio": 120,
             "sum": 11.25,
         },
-        "Speech":  {
+        "speechcraft":  {
+            "name": "Speech",
             "console_name": "speechcraft",
             "default_value": 15,
             "desired_value": "",
@@ -260,55 +278,55 @@ DEFAULT_SKILLS = {
 }
 
 RACES_EXTRA_SKILLS = {
-    "Altmer": {
-        10: {"Magic": "Illusion"},
-        5: {"Magic": ["Alteration", "Conjuration", "Destruction",
-                      "Enchanting", "Restoration"]},
+    "altmer": {
+        10: {"Magic": "illusion"},
+        5: {"Magic": ["alteration", "conjuration", "destruction",
+                      "enchanting", "restoration"]},
     },
-    "Argonian": {
-        10: {"Stealth": "Lockpicking"},
-        5: {"Magic": ["Alteration", "Restoration"],
-            "Stealth": ["Light Armor", "Pickpocket", "Sneak"]},
+    "argonian": {
+        10: {"Stealth": "lockpicking"},
+        5: {"Magic": ["alteration", "restoration"],
+            "Stealth": ["lightarmor", "pickpocket", "sneak"]},
     },
-    "Bosmer": {
-        10: {"Combat": "Archery"},
-        5: {"Stealth": ["Alchemy", "Light Armor", "Lockpicking",
-                        "Pickpocket", "Sneak"]},
+    "bosmer": {
+        10: {"Combat": "marksman"},
+        5: {"Stealth": ["alchemy", "lightarmor", "lockpicking",
+                        "pickpocket", "sneak"]},
     },
-    "Breton": {
-        10: {"Magic": "Conjuration"},
-        5: {"Magic": ["Alteration", "Illusion", "Restoration"],
-            "Stealth": ["Alchemy", "Speech"]},
+    "breton": {
+        10: {"Magic": "conjuration"},
+        5: {"Magic": ["alteration", "illusion", "restoration"],
+            "Stealth": ["alchemy", "speechcraft"]},
     },
-    "Dunmer": {
-        10: {"Magic": "Destruction"},
-        5: {"Magic": ["Alteration", "Illusion"],
-            "Stealth": ["Alchemy", "Light Armor", "Sneak"]},
+    "dunmer": {
+        10: {"Magic": "destruction"},
+        5: {"Magic": ["alteration", "illusion"],
+            "Stealth": ["alchemy", "light Armor", "sneak"]},
     },
-    "Imperial": {
-        10: {"Magic": "Restoration"},
-        5: {"Magic": ["Destruction", "Enchanting"],
-            "Combat": ["Block", "Heavy Armor", "One-handed"]},
+    "imperial": {
+        10: {"Magic": "restoration"},
+        5: {"Magic": ["destruction", "enchanting"],
+            "Combat": ["block", "heavyarmor", "onehanded"]},
     },
-    "Khajiit": {
-        10: {"Stealth": "Sneak"},
-        5: {"Stealth": ["Alchemy", "Lockpicking", "Pickpocket"],
-            "Combat": ["Archery", "One-handed"]},
+    "khajiit": {
+        10: {"Stealth": "sneak"},
+        5: {"Stealth": ["alchemy", "lockpicking", "pickpocket"],
+            "Combat": ["marksman", "onehanded"]},
     },
-    "Nord": {
-        10: {"Combat": "Two-handed"},
-        5: {"Stealth": ["Speech", "Light Armor"],
-            "Combat": ["Block", "One-handed", "Smithing"]},
+    "nord": {
+        10: {"Combat": "twohanded"},
+        5: {"Stealth": ["speechcraft", "lightarmor"],
+            "Combat": ["block", "onehanded", "smithing"]},
     },
-    "Ork": {
-        10: {"Combat": "Heavy Armor"},
-        5: {"Combat": ["Block", "One-handed", "Smithing", "Two-handed"],
-            "Magic": ["Enchanting"]},
+    "ork": {
+        10: {"Combat": "heavyarmor"},
+        5: {"Combat": ["block", "onehanded", "smithing", "twohanded"],
+            "Magic": ["enchanting"]},
     },
-    "Redguard": {
-        10: {"Combat": "One-handed"},
-        5: {"Combat": ["Archery", "Block", "Smithing"],
-            "Magic": ["Alteration", "Destruction"]},
+    "redguard": {
+        10: {"Combat": "onehanded"},
+        5: {"Combat": ["marksman", "block", "smithing"],
+            "Magic": ["alteration", "destruction"]},
     },
 }
 
@@ -785,7 +803,6 @@ PLUGIN_TEST_DICT_ALTERED_BY_FORM = {
         }
     ]
 }
-
 
 PLUGIN_TEST_FILE = '''{
     "isEsl": false,

@@ -1,5 +1,5 @@
 from .models import Plugins, PluginVariants
-from .inventory import PLUGIN_TEST_DICT
+from .inventory import PLUGIN_TEST_DICT, RACES_EXTRA_SKILLS, DEFAULT_SKILLS
 import copy
 import os
 
@@ -173,3 +173,64 @@ def escape_html(string):
     for unsafe, safe in escape.items():
         string = string.replace(unsafe, safe)
     return string
+
+
+def set_up_default_nord():
+    skills = copy.deepcopy(DEFAULT_SKILLS)
+    skills["Combat"]["twohanded"]["default_value"] += 10
+    skills["Stealth"]["speechcraft"]["default_value"] += 5
+    skills["Stealth"]["lightarmor"]["default_value"] += 5
+    for skill in ["block", "onehanded", "smithing"]:
+        skills["Combat"][skill]["default_value"] += 5
+    return skills
+
+
+def default_race_skills_update(race):
+    skills_tree = copy.deepcopy(DEFAULT_SKILLS)
+    for category, skills in RACES_EXTRA_SKILLS[race][10].items():
+        skills_tree[category][skills]["default_value"] += 10
+    for category, skills in RACES_EXTRA_SKILLS[race][5].items():
+        for skill in skills:
+            skills_tree[category][skill]["default_value"] += 5
+    return skills_tree
+
+
+class Skills:
+    def __init__(self, request):
+        self.request = request
+        self._race_key = "race"
+        self._default_race = "nord"
+        self._skills_key = "skills"
+        self._desired_level_key = "desired_level"
+        self._multiplier_key = "multiplier"
+        self._fill_skills_key = "fill_skills"
+
+    def save_skills(self, skills):
+        self.request.session.update({self._skills_key: skills})
+
+    def save_desired_level(self, desired_level):
+        self.request.session.update({self._desired_level_key: desired_level})
+
+    def save_multiplier(self, multiplier):
+        self.request.session.update({self._multiplier_key: multiplier})
+
+    def save_race(self, race):
+        self.request.session.update({self._race_key: race})
+
+    def save_fill_skills(self, value):
+        self.request.session.update({self._fill_skills_key: value})
+
+    def get_race(self):
+        return self.request.session.get(self._race_key, self._default_race)
+
+    def get_skills(self):
+        return self.request.session.get(self._skills_key, default_race_skills_update(self._default_race))
+
+    def get_desired_level(self):
+        return self.request.session.get(self._desired_level_key, 1)
+
+    def get_multiplier(self):
+        return self.request.session.get(self._multiplier_key, 1.5)
+
+    def get_fill_skills(self):
+        return self.request.session.get(self._fill_skills_key)

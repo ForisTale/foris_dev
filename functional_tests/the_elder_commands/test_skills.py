@@ -1,8 +1,9 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from the_elder_commands.inventory import DEFAULT_SKILLS, COMMANDS_SUCCESS_MESSAGE
+from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, DEFAULT_SKILLS, SKILLS_ERROR_BASE_SKILL, \
+    SKILLS_ERROR_NEW_VALUE_BIGGER
 
 
-class CharacterTest(FunctionalTest):
+class SkillsTest(FunctionalTest):
     def setUp(self):
         super().setUp()
         # Foris open The elder commands website.
@@ -55,11 +56,11 @@ class CharacterTest(FunctionalTest):
 
                 # that every one of them has some values.
                 skill_value = 15
-                if skill == "Two-handed":
+                if skill == "twohanded":
                     skill_value += 10
-                elif skill in ["Block", "Light Armor",
-                               "One-handed", "Smithing",
-                               "Speech"]:
+                elif skill in ["block", "lightarmor",
+                               "onehanded", "smithing",
+                               "speechcraft"]:
                     skill_value += 5
                 base_value = self.driver.find_element_by_name(f"{items['console_name']}_base")
                 self.assertEqual(
@@ -102,7 +103,7 @@ class CharacterTest(FunctionalTest):
 
         # Error appear.
         self.wait_for(lambda: self.assertIn(
-            "All skills values must be integers!",
+            SKILLS_ERROR_BASE_SKILL.format(skill="Block"),
             self.driver.find_element_by_tag_name("body").text
         ))
 
@@ -112,7 +113,7 @@ class CharacterTest(FunctionalTest):
 
         # Again error appear
         self.wait_for(lambda: self.assertIn(
-            "The skill need to be a integer between 15 and 100.",
+            SKILLS_ERROR_BASE_SKILL.format(skill="Block"),
             self.driver.find_element_by_tag_name("body").text
         ))
 
@@ -124,7 +125,7 @@ class CharacterTest(FunctionalTest):
 
         # and error appear
         self.wait_for(lambda: self.assertIn(
-            "New value of skills must be bigger than a value!",
+            SKILLS_ERROR_NEW_VALUE_BIGGER.format(skill="Block"),
             self.driver.find_element_by_tag_name("body").text
         ))
 
@@ -217,7 +218,7 @@ class CharacterTest(FunctionalTest):
     def test_calculate_desired_level_and_skills(self):
         # Foris change race to orc
         self.driver.find_element_by_id("id_chose_race").click()
-        self.driver.find_element_by_class_name("ork_race").click()
+        self.driver.find_element_by_class_name("ork").click()
 
         self.equal_find_element_by_id("id_race_name", "Chosen race:\nOrk")
 
@@ -225,11 +226,11 @@ class CharacterTest(FunctionalTest):
         for category in DEFAULT_SKILLS.keys():
             for skill, items in DEFAULT_SKILLS[category].items():
                 skill_value = 15
-                if skill == "Heavy Armor":
+                if skill == "heavyarmor":
                     skill_value += 10
-                elif skill in ["Block", "Enchanting",
-                               "One-handed", "Smithing",
-                               "Two-handed"]:
+                elif skill in ["block", "enchanting",
+                               "onehanded", "smithing",
+                               "twohanded"]:
                     skill_value += 5
                 base_value = self.driver.find_element_by_name(f"{items['console_name']}_base")
                 self.wait_for(lambda: self.assertEqual(
@@ -266,10 +267,10 @@ class CharacterTest(FunctionalTest):
         # and in commands list he sees list of commands
         commands_table = self.driver.find_element_by_id("id_commands_list")
         list_of_commands = commands_table.find_elements_by_tag_name("td")
-        list_of_commands = [row.text for row in list_of_commands]
-        commands = [
+        list_of_commands = {row.text for row in list_of_commands}
+        commands = {
             "player.advskill alteration 842",
-            "player.advskill speechcraft 7013",
             "player.advskill lightarmor 632",
-        ]
+            "player.advskill speechcraft 7013",
+        }
         self.assertEqual(commands, list_of_commands)

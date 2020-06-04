@@ -1,5 +1,6 @@
 from django.test import TestCase
-from the_elder_commands.utils import ManageTestFiles, MessagesSystem, Commands, SelectedPlugins, escape_js, escape_html
+from the_elder_commands.utils import ManageTestFiles, MessagesSystem, Commands, SelectedPlugins, escape_js, \
+    escape_html, Skills, set_up_default_nord, default_race_skills_update
 from unittest.mock import patch
 from django.http import QueryDict
 
@@ -202,7 +203,7 @@ class SelectedPluginsTest(TestCase):
         one.assert_not_called()
 
 
-class EscapeJS(TestCase):
+class EscapeJSTest(TestCase):
 
     def test_escape_js(self):
         string = "&<>test\u2028\u2029"
@@ -211,10 +212,98 @@ class EscapeJS(TestCase):
         self.assertEqual(expected, actual)
 
 
-class EscapeHTML(TestCase):
+class EscapeHTMLTest(TestCase):
 
     def test_escape_HTML(self):
         string = "&<>test'\""
         expected = "&amp;&lt;&gt;test&#39;&quot;"
         actual = escape_html(string)
         self.assertEqual(expected, actual)
+
+
+class NewSkillsTest(TestCase):
+
+    class FakeRequest:
+        def __init__(self):
+            self.session = {}
+
+    def test_skills_save_properties_to_session(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        skills.save_skills({"some"})
+        skills.save_desired_level(1)
+        skills.save_multiplier(1.5)
+        skills.save_fill_skills("true")
+
+        self.assertDictEqual(request.session, {"skills": {"some"}, "desired_level": 1, "multiplier": 1.5,
+                                               "fill_skills": "true"})
+
+    def test_skills_can_save_race(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        skills.save_race("ork")
+        self.assertEqual(request.session.get("race"), "ork")
+
+    def test_can_get_race(self):
+        request = self.FakeRequest()
+        request.session.update({"race": "ork"})
+        skills = Skills(request)
+        self.assertEqual(skills.get_race(), "ork")
+
+    def test_can_get_default_race(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        self.assertEqual(skills.get_race(), "nord")
+
+    def test_can_get_skills(self):
+        request = self.FakeRequest()
+        request.session.update({"skills": {"Some!"}})
+        skills = Skills(request)
+        self.assertEqual(skills.get_skills(), {"Some!"})
+
+    def test_have_default_skills(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        expected = set_up_default_nord()
+        self.assertDictEqual(skills.get_skills(), expected)
+
+    def test_can_get_desired_level(self):
+        request = self.FakeRequest()
+        request.session.update({"desired_level": 1})
+        skills = Skills(request)
+        self.assertEqual(skills.get_desired_level(), 1)
+
+    def test_have_default_desired_level(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        self.assertEqual(skills.get_desired_level(), 1)
+
+    def test_can_get_multiplier(self):
+        request = self.FakeRequest()
+        request.session.update({"multiplier": 2.5})
+        skills = Skills(request)
+        self.assertEqual(skills.get_multiplier(), 2.5)
+
+    def test_have_default_multiplier(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        self.assertEqual(skills.get_multiplier(), 1.5)
+
+    def test_can_get_fill_skills(self):
+        request = self.FakeRequest()
+        request.session.update({"fill_skills": "true"})
+        skills = Skills(request)
+        self.assertEqual(skills.get_fill_skills(), "true")
+
+    def test_have_default_fill_skills(self):
+        request = self.FakeRequest()
+        skills = Skills(request)
+        self.assertEqual(skills.get_fill_skills(), None)
+
+
+class DefaultRaceSkillsUpdateTest(TestCase):
+
+    def test_service_have_default_skills_method(self):
+        expected = set_up_default_nord()
+        actual = default_race_skills_update("nord")
+        self.assertDictEqual(actual, expected)
