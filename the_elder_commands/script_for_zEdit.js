@@ -1,7 +1,7 @@
 //SLGM - soul gems
 const itemsSignatures = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH",
                          "MISC", "AMMO", "SCRL", "SLGM", "KEYM"],
-    magicSignatures = ["SPEL", "WOOP"];
+    magicSignatures = ["SPEL", "WOOP", "PERK"];
 let pluginName,
     isEsl,
     skyrimAndDlc = ["Skyrim", "Dawnguard", "Dragonborn", "HearthFires"];
@@ -125,6 +125,8 @@ function getSpecifyData(record){
             return getSpellData(record);
         case "WOOP":
             return getWordOfPowerData(record);
+        case "PERK":
+            return {"Description": getPerkDescription(record)};
         default:
             zedit.log("Something went wrong! " + xelib.Signature(record));
             return {};
@@ -161,12 +163,44 @@ function getArmorData(record){
 
 function getSpellData(record){
     const effects = getEffects(record);
-    return {"Effects": getEffectsDescriptions(effects), "Spell Mastery": getSpellMastery(record)};
+    return {"Effects": getEffectsDescriptions(effects), ...getSpellMasteryAndCategory(record)};
 }
 
-function getSpellMastery(record){
-    let mastery = xelib.GetValue(record, "SPIT - Data\\Half-cost Perk");
-    return mastery.slice(mastery.indexOf("\"") + 1, mastery.lastIndexOf("\""));
+function getSpellMasteryAndCategory(record){
+    let mastery = xelib.GetValue(record, "SPIT - Data\\Half-cost Perk"),
+        category = mastery.slice(0, 4);
+    switch(category) {
+        case "Alte":
+            return {"Category": "Alteration", "Mastery": getMastery(10, mastery)};
+        case "Conj":
+            return {"Category": "Conjuration", "Mastery": getMastery(11, mastery)};
+        case "Dest":
+            return {"Category": "Destruction", "Mastery": getMastery(11, mastery)};
+        case "Illu":
+            return {"Category": "Illusion", "Mastery": getMastery(8, mastery)};
+        case "Rest":
+            return {"Category": "Restoration", "Mastery": getMastery(11, mastery)};
+        default:
+            return {"Category": "", "Mastery": ""};
+    }
+}
+
+function getMastery(start, fullString) {
+    let mastery = fullString.slice(start, start+3)
+    switch (mastery) {
+        case "Nov":
+            return "Novice";
+        case "App":
+            return "Apprentice";
+        case "Ade":
+            return "Adept";
+        case "Exp":
+            return "Expert";
+        case "Mas":
+            return "Master";
+        default:
+            return "";
+    }
 }
 
 function getItemDescription(record) {
@@ -234,6 +268,10 @@ function getEffectsNames(effects){
 
 function getWordOfPowerData(record){
     return {"Translation": xelib.GetValue(record, "TNAM - Translation")};
+}
+
+function getPerkDescription(record) {
+    return xelib.GetValue(record, "DESC");
 }
 
 

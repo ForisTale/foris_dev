@@ -39,8 +39,7 @@ SKILLS_ERROR_MULTIPLIER = "Priority multiplier need to be number!"
 
 SKILLS_ERROR_BASE_SKILL = "Skill {skill} need to be a integer between 15 and 100!"
 
-SKILLS_ERROR_DESIRED_SKILL = "Desired skill {skill} need to be a integer between 15 " \
-                                                              "and 100 or empty!"
+SKILLS_ERROR_DESIRED_SKILL = "Desired skill {skill} need to be a integer between 15 and 100 or empty!"
 
 SKILLS_CONSOLE_NAME = [
     'alteration', 'conjuration', 'destruction', 'enchanting',
@@ -344,6 +343,7 @@ PLUGIN_TEST_EMPTY_DICT = {
     "KEYM": [],
     "SPEL": [],
     "WOOP": [],
+    "PERK": [],
 }
 
 PLUGIN_TEST_EMPTY_DATA = '''{
@@ -374,7 +374,8 @@ PLUGIN_TEST_ESCAPE_FILE = '''{
     "SLGM": [],
     "KEYM": [],
     "SPEL": [],
-    "WOOP": []
+    "WOOP": [],
+    "PERK": []
 }'''
 
 PLUGIN_TEST_DICT = {
@@ -565,14 +566,16 @@ PLUGIN_TEST_DICT = {
             "editorId": "IncinerateLeftHand",
             "formId": "10FD5F",
             "Effects": "Wybuch ognia zadaje <mag> pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
-            "Spell Mastery": "Ekspert - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Adept"
         },
         {
             "fullName": "Płaszcz Płomieni",
             "editorId": "DragonPriestMaskUltraFlameCloak",
             "formId": "10FC17",
             "Effects": "Przez <dur> s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
-            "Spell Mastery": "Czeladnik - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Expert"
         }
     ],
     "WOOP": [
@@ -587,6 +590,20 @@ PLUGIN_TEST_DICT = {
             "editorId": "WordSlen",
             "formId": "0602A4",
             "Translation": "Ciało"
+        }
+    ],
+    "PERK": [
+        {
+          "fullName": "Dopasowane blachy",
+          "editorId": "DBWellFitted",
+          "formId": "01711C",
+          "Description": "Premia +25 do pancerza, jeśli nosisz całą zbroję mroku."
+        },
+        {
+          "fullName": "Przeszywające pioruny",
+          "editorId": "AugmentedShock60",
+          "formId": "10FCFA",
+          "Description": "Czary porażeniowe zadają obrażenia większe o 50%."
         }
     ]
 }
@@ -772,20 +789,23 @@ PLUGIN_TEST_DICT_ALTERED_BY_FORM = {
             "Value": "0"
         }
     ],
+
     "SPEL": [
         {
             "fullName": "Spalenie",
             "editorId": "IncinerateLeftHand",
             "formId": "10FD5F",
             "Effects": "Wybuch ognia zadaje &lt;mag&gt; pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
-            "Spell Mastery": "Ekspert - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Adept"
         },
         {
             "fullName": "Płaszcz Płomieni",
             "editorId": "DragonPriestMaskUltraFlameCloak",
             "formId": "10FC17",
             "Effects": "Przez &lt;dur&gt; s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
-            "Spell Mastery": "Czeladnik - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Expert"
         }
     ],
     "WOOP": [
@@ -800,6 +820,20 @@ PLUGIN_TEST_DICT_ALTERED_BY_FORM = {
             "editorId": "WordSlen",
             "formId": "0602A4",
             "Translation": "Ciało"
+        }
+    ],
+    "PERK": [
+        {
+          "fullName": "Dopasowane blachy",
+          "editorId": "DBWellFitted",
+          "formId": "01711C",
+          "Description": "Premia +25 do pancerza, jeśli nosisz całą zbroję mroku."
+        },
+        {
+          "fullName": "Przeszywające pioruny",
+          "editorId": "AugmentedShock60",
+          "formId": "10FCFA",
+          "Description": "Czary porażeniowe zadają obrażenia większe o 50%."
         }
     ]
 }
@@ -992,14 +1026,16 @@ PLUGIN_TEST_FILE = '''{
             "editorId": "IncinerateLeftHand",
             "formId": "10FD5F",
             "Effects": "Wybuch ognia zadaje <mag> pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
-            "Spell Mastery": "Ekspert - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Adept"
         },
         {
             "fullName": "Płaszcz Płomieni",
             "editorId": "DragonPriestMaskUltraFlameCloak",
             "formId": "10FC17",
             "Effects": "Przez <dur> s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
-            "Spell Mastery": "Czeladnik - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Expert"
         }
     ],
     "WOOP": [
@@ -1014,6 +1050,20 @@ PLUGIN_TEST_FILE = '''{
             "editorId": "WordSlen",
             "formId": "0602A4",
             "Translation": "Ciało"
+        }
+    ],
+    "PERK": [
+        {
+          "fullName": "Dopasowane blachy",
+          "editorId": "DBWellFitted",
+          "formId": "01711C",
+          "Description": "Premia +25 do pancerza, jeśli nosisz całą zbroję mroku."
+        },
+        {
+          "fullName": "Przeszywające pioruny",
+          "editorId": "AugmentedShock60",
+          "formId": "10FCFA",
+          "Description": "Czary porażeniowe zadają obrażenia większe o 50%."
         }
     ]
 }'''
@@ -1204,30 +1254,46 @@ PLUGIN_TEST_ESL_FILE = '''{
         {
             "fullName": "Spalenie",
             "editorId": "IncinerateLeftHand",
-            "formId": "D5F",
+            "formId": "10FD5F",
             "Effects": "Wybuch ognia zadaje <mag> pkt. obrażeń. Płonące cele ponoszą dodatkowe obrażenia.|||",
-            "Spell Mastery": "Ekspert - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Adept"
         },
         {
             "fullName": "Płaszcz Płomieni",
             "editorId": "DragonPriestMaskUltraFlameCloak",
-            "formId": "C17",
+            "formId": "10FC17",
             "Effects": "Przez <dur> s zadaje celom w zasięgu broni do walki wręcz pkt. obrażeń od ognia na sekundę.",
-            "Spell Mastery": "Czeladnik - zniszczenie"
+            "Category": "Destruction",
+            "Mastery": "Expert"
         }
     ],
     "WOOP": [
         {
             "fullName": "Nus",
             "editorId": "WordNus",
-            "formId": "2A5",
+            "formId": "0602A5",
             "Translation": "Posąg"
         },
         {
             "fullName": "Slen",
             "editorId": "WordSlen",
-            "formId": "2A4",
+            "formId": "0602A4",
             "Translation": "Ciało"
+        }
+    ],
+    "PERK": [
+        {
+          "fullName": "Dopasowane blachy",
+          "editorId": "DBWellFitted",
+          "formId": "01711C",
+          "Description": "Premia +25 do pancerza, jeśli nosisz całą zbroję mroku."
+        },
+        {
+          "fullName": "Przeszywające pioruny",
+          "editorId": "AugmentedShock60",
+          "formId": "10FCFA",
+          "Description": "Czary porażeniowe zadają obrażenia większe o 50%."
         }
     ]
 }'''

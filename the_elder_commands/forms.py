@@ -89,7 +89,7 @@ class PluginVariantsForm(ModelForm):
         return new_version
 
     def clean_plugin_data(self):
-        plugin_keys = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH", "MISC",
+        plugin_keys = ["WEAP", "ARMO", "BOOK", "INGR", "ALCH", "MISC", "PERK",
                        "AMMO", "SCRL", "SLGM", "KEYM", "SPEL", "WOOP"]
         form_data = self.cleaned_data["plugin_data"]
         new_form_data = {}
@@ -202,8 +202,7 @@ class ValidateSkills:
             level = int(desired_level)
             if 81 >= level >= 1:
                 return level
-            else:
-                self.errors.append(SKILLS_ERROR_DESIRED_LEVEL_RANGE)
+            self.errors.append(SKILLS_ERROR_DESIRED_LEVEL_RANGE)
         except ValueError:
             self.errors.append(SKILLS_ERROR_DESIRED_LEVEL)
 

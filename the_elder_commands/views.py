@@ -20,16 +20,14 @@ def skills_view(request):
             skills.save_race(race)
             skills.save_skills(reset_skills)
             skills.save_fill_skills(None)
-            return redirect("tec:skills")
         else:
             form = ValidateSkills(request)
             if form.is_valid():
                 form.save()
                 message_system.append_skills(COMMANDS_SUCCESS_MESSAGE)
-                return redirect("tec:skills")
             else:
                 message_system.append_skills(form.errors)
-                return redirect("tec:skills")
+        return redirect("tec:skills")
 
     message = message_system.pop_skills()
     service = SkillsService(request)
@@ -76,11 +74,8 @@ def plugins_view(request):
             return redirect("tec:plugins")
         elif "selected" in request.POST:
             form = SelectedPluginsForm(request=request)
-            if form.is_valid():
-                return redirect("tec:plugins")
-            else:
-                for error in form.errors:
-                    messages_system.append_plugin(error)
+            messages_system.append_plugin(form.errors)
+            return redirect("tec:plugins")
         elif "unselect" in request.POST:
             selected = SelectedPlugins(request)
             selected.unselect(request.POST)

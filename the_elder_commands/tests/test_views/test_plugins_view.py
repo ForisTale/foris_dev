@@ -5,7 +5,7 @@ from the_elder_commands.views import extract_dict_from_plugin_file, create_varia
 from the_elder_commands.models import Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, \
     PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_EMPTY_DATA, \
-    PLUGIN_TEST_DICT_ALTERED_BY_FORM
+    PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils import ManageTestFiles
 from unittest.mock import patch
 from io import StringIO, BytesIO
@@ -254,18 +254,29 @@ class CreateVariantsDataPost(TestCase):
 class SelectedPluginsTest(TestCase):
     base_url = "/the_elder_commands/plugins/"
 
-    def test_redirect_after_post(self):
+    def test_redirect_after_correct_post(self):
         Plugins.objects.create(name="test 01", usable_name="test_01")
-
         post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
         response = self.client.post(self.base_url, data=post)
         self.assertRedirects(response, self.base_url)
 
-    @patch("the_elder_commands.views.SelectedPluginsForm")
-    def test_select_post_is_managed_by_correct_form(self, form_mock):
-        post = {"selected": "", "test_01_selected": "", "test_01_variant": "0.1&english&", "test_01_load_order": "01"}
-        self.client.post(self.base_url, data=post)
-        expected = QueryDict("", mutable=True)
-        expected.update(post)
+    def test_redirect_after_wrong_post(self):
+        post = {"selected": "test_01", "test_01_variant": "0.1&english&", "test_01_load_order": "avva"}
+        Plugins.objects.create(name="test 01", usable_name="test_01")
+        response = self.client.post(self.base_url, data=post)
+        self.assertRedirects(response, self.base_url)
 
-        form_mock.assert_called_once()
+    def test_pass_error_message_after_wrong_post(self):
+        post = {"selected": "test_01", "test_01_variant": "0.1&english&", "test_01_load_order": "avva"}
+        Plugins.objects.create(name="test 01", usable_name="test_01")
+        self.client.post(self.base_url, data=post)
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.context["plugins_messages"], [INCORRECT_LOAD_ORDER])
+
+    def test_data_are_passed_correctly(self):
+        Plugins.objects.create(name="test 01", usable_name="test_01")
+        post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
+        self.client.post(self.base_url, data=post)
+        session = self.client.session
+        self.assertEqual(session.get("selected"), [{'esl': '', 'language': 'polish', 'load_order': '01',
+                                                    'name': 'test 01', 'usable_name': 'test_01', 'version': '0.1'}])
