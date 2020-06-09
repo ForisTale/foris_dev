@@ -1,57 +1,51 @@
 from django.forms.models import ModelForm
 from django.forms import ValidationError
+from django.http import QueryDict
 from the_elder_commands.models import Plugins, PluginVariants
-from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, INCORRECT_LOAD_ORDER, \
-    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
+from the_elder_commands.inventory import ADD_PLUGIN_ERROR_FILE, INCORRECT_LOAD_ORDER, \
+    PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
     SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_DESIRED_LEVEL_RANGE, \
     SKILLS_ERROR_DESIRED_LEVEL, SKILLS_ERROR_MULTIPLIER, DEFAULT_SKILLS, SKILLS_ERROR_DESIRED_SKILL, \
-    SKILLS_ERROR_BASE_SKILL
+    SKILLS_ERROR_BASE_SKILL, ADD_PLUGIN_ERROR_PLUGIN_EXIST
 from the_elder_commands.utils import SelectedPlugins, escape_html, Skills as NewSkills
 import copy
+import json
 
 
-class PluginsForm:
-    def __init__(self, name):
-        self.name = name
+class AddPluginsForm:
+    def __init__(self, request):
+        self.request = request
+        self.name = request.POST.get("plugin_name", "")
         self.errors = []
 
         self.clean_name()
         if self.is_valid():
-            self.name = self.get_name(name)
+            self.name = self.cut_special_letters_from_name()
             self.usable_name = self.get_usable_name()
             self.instance, created = Plugins.objects.get_or_create(name=self.name,
                                                                    usable_name=self.usable_name)
+            self.handle_variants_form()
 
     def clean_name(self):
         if self.name == "":
-            self.errors.append(PLUGINS_ERROR_STRING_IS_EMTPY)
-        else:
-            if self.name_become_empty():
-                self.errors.append(PLUGINS_ERROR_NAME_BECOME_EMPTY)
+            self.errors.append(PLUGINS_ERROR_NAME_IS_EMTPY)
+        elif self.name_become_empty():
+            self.errors.append(PLUGINS_ERROR_NAME_BECOME_EMPTY)
 
     def is_valid(self):
         return self.errors == []
 
     def name_become_empty(self):
-        name = self.get_name(self.name)
+        name = self.cut_special_letters_from_name()
         name = name.strip()
         if name == "":
             return True
-        else:
-            return False
 
-    def get_name(self, raw_name):
-        converted = self.cut_special_letters(raw_name)
-        return converted
-
-    @staticmethod
-    def cut_special_letters(raw_string):
+    def cut_special_letters_from_name(self):
         converted = ""
-        for letter in raw_string:
+        for letter in self.name:
             if letter.isalnum() or letter == " ":
                 converted += letter
-            else:
-                converted += ""
         return converted
 
     def get_usable_name(self):
@@ -63,18 +57,56 @@ class PluginsForm:
                 converted += letter.lower()
         return converted
 
+    def handle_variants_form(self):
+        if self.is_valid():
+            correct_post = self.create_variants_post()
+            if correct_post:
+                form = PluginVariantsForm(data=correct_post)
+                if form.is_valid():
+                    form.save()
+                else:
+                    for header, error in form.errors.items():
+                        if header == "__all__":
+                            self.errors.append(ADD_PLUGIN_ERROR_PLUGIN_EXIST)
+                        else:
+                            self.errors.append([*error])
+            else:
+                self.errors.append(ADD_PLUGIN_ERROR_FILE)
+
+    def create_variants_post(self):
+        file_content = self.extract_dict_from_plugin_file()
+        is_esl = self.pop_is_esl(file_content)
+        if is_esl is not None:
+            post = QueryDict("", mutable=True)
+            post.update({"version": self.request.POST.get("plugin_version"), "is_esl": is_esl,
+                         "language": self.request.POST.get("plugin_language"),
+                         "plugin_data": file_content, "instance": self.instance})
+            return post
+
+    def extract_dict_from_plugin_file(self):
+        file = self.request.FILES.get("plugin_file")
+        try:
+            return json.load(file)
+        except (json.decoder.JSONDecodeError, AttributeError, UnicodeDecodeError):
+            pass
+
+    @staticmethod
+    def pop_is_esl(file_content):
+        try:
+            is_esl = file_content.pop("isEsl")
+        except (KeyError, AttributeError):
+            return
+        return is_esl
+
 
 class PluginVariantsForm(ModelForm):
-    def __init__(self, instance, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.data["instance"] = instance
 
     class Meta:
         model = PluginVariants
         fields = ("version", "language", "plugin_data", "instance", "is_esl")
 
         error_messages = {
-            "plugin_data": {"required": ADD_PLUGIN_FILE_ERROR_MESSAGE},
+            "plugin_data": {"required": ADD_PLUGIN_ERROR_FILE},
         }
 
     def clean_version(self):
@@ -97,7 +129,7 @@ class PluginVariantsForm(ModelForm):
         for key in plugin_keys:
             data_value = form_data.get(key)
             if data_value is None:
-                raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+                raise ValidationError(ADD_PLUGIN_ERROR_FILE)
 
             new_items = self.escape_items(data_value)
             new_form_data.update({key: new_items})
@@ -114,7 +146,7 @@ class PluginVariantsForm(ModelForm):
                     new_dict.update({key: escape_html(str(value))})
                 new_items.append(new_dict)
         except (TypeError, AttributeError):
-            raise ValidationError(ADD_PLUGIN_FILE_ERROR_MESSAGE)
+            raise ValidationError(ADD_PLUGIN_ERROR_FILE)
         return new_items
 
 

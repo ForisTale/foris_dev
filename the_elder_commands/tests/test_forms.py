@@ -1,73 +1,174 @@
 from django.test import TestCase
 from django.http import QueryDict
 from django.forms import ValidationError
-from the_elder_commands.forms import PluginsForm, PluginVariantsForm, SelectedPluginsForm, ValidateSkills, \
+from the_elder_commands.forms import AddPluginsForm, PluginVariantsForm, SelectedPluginsForm, ValidateSkills, \
     SkillsValidationError
 from the_elder_commands.models import Plugins, PluginVariants
-from the_elder_commands.inventory import ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_DICT, DEFAULT_SKILL_POST, \
-    PLUGINS_ERROR_STRING_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, PLUGIN_TEST_EMPTY_DICT, \
-    SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, \
+from the_elder_commands.inventory import ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_DICT, DEFAULT_SKILL_POST, \
+    PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, PLUGIN_TEST_EMPTY_DICT, \
+    SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, PLUGIN_TEST_FILE, \
     SKILLS_ERROR_DESIRED_LEVEL, DEFAULT_SKILLS, \
     SKILLS_ERROR_MULTIPLIER, SKILLS_ERROR_BASE_SKILL, SKILLS_ERROR_DESIRED_SKILL
+from io import StringIO, BytesIO
+from unittest.mock import patch
 import copy
 
 
-class PluginsFormTest(TestCase):
+class AddPluginsFormTest(TestCase):
+
+    class FakeRequest:
+        def __init__(self):
+            self.POST = QueryDict("", mutable=True)
+            self.POST.update({"plugin_version": "01", "plugin_language": "english"})
+
+    class FakeSelf:
+        pass
 
     def test_form_pass_data_to_model(self):
-        form = PluginsForm(name="test 01")
-        self.assertTrue(form.is_valid())
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 01"})
+            form = AddPluginsForm(request)
+            self.assertTrue(form.is_valid())
 
-        self.assertEqual(Plugins.objects.count(), 1)
-        self.assertEqual(
-            Plugins.objects.get(name="test 01"),
-            Plugins.objects.all()[0]
-        )
+            self.assertEqual(Plugins.objects.count(), 1)
+            self.assertEqual("test 01", Plugins.objects.first().name)
+            self.assertEqual(PluginVariants.objects.count(), 1)
+            self.assertEqual(PluginVariants.objects.first().instance.name, "test 01")
 
     def test_form_clean_name_and_create_usable_name_from_name(self):
-        form = PluginsForm(name="Test 5'a <>[]{}()!@#$%^&*sony\"\' raw **")
-        self.assertTrue(form.is_valid())
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            request = self.FakeRequest()
+            request.POST.update({"plugin_name": "Test 5'a <>[]{}()!@#$%^&*sony\"\' raw **"})
+            request.FILES = {"plugin_file": file}
+            form = AddPluginsForm(request)
+            self.assertTrue(form.is_valid())
 
-        plugins = Plugins.objects.first()
-        self.assertEqual(plugins.name, "Test 5a sony raw ")
-        self.assertEqual(plugins.usable_name, "test_5a_sony_raw_")
+            plugins = Plugins.objects.first()
+            self.assertEqual(plugins.name, "Test 5a sony raw ")
+            self.assertEqual(plugins.usable_name, "test_5a_sony_raw_")
 
     def test_plugin_name_cannot_be_empty_string(self):
-        form = PluginsForm(name="")
-        self.assertEqual(len(Plugins.objects.all()), 0)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[0], PLUGINS_ERROR_STRING_IS_EMTPY)
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": ""})
+            form = AddPluginsForm(request)
+            self.assertEqual(len(Plugins.objects.all()), 0)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form.errors, [PLUGINS_ERROR_NAME_IS_EMTPY])
 
     def test_after_clean_name_and_usable_name_cannot_be_empty(self):
-        form = PluginsForm(name="## #$")
-        self.assertEqual(len(Plugins.objects.all()), 0)
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "## #$"})
+            form = AddPluginsForm(request)
+            self.assertEqual(len(Plugins.objects.all()), 0)
 
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors[0], PLUGINS_ERROR_NAME_BECOME_EMPTY)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form.errors, [PLUGINS_ERROR_NAME_BECOME_EMPTY])
+
+    def test_can_process_file_into_dict(self):
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            fake_self = self.FakeSelf()
+            fake_self.request = request
+
+            actual = AddPluginsForm.extract_dict_from_plugin_file(fake_self)
+
+            self.maxDiff = None
+            self.assertDictEqual(actual, PLUGIN_TEST_DICT)
+
+    def test_catch_json_decode_error(self):
+        with StringIO(" ") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            fake_self = self.FakeSelf()
+            fake_self.request = request
+            result = AddPluginsForm.extract_dict_from_plugin_file(fake_self)  # Should not raises!
+        self.assertEqual(result, None)
+
+    def test_catch_json_attribute_error(self):
+        request = self.FakeRequest()
+        request.FILES = {"plugin_file": {"plugin_file": 1}}
+        fake_self = self.FakeSelf()
+        fake_self.request = request
+
+        result = AddPluginsForm.extract_dict_from_plugin_file(fake_self)  # Should not raises!
+        self.assertEqual(result, None)
+
+    def test_catch_unicode_error(self):
+        with BytesIO(b"\x81") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            fake_self = self.FakeSelf()
+            fake_self.request = request
+            result = AddPluginsForm.extract_dict_from_plugin_file(fake_self)  # Should not raises!
+        self.assertEqual(result, None)
+
+    @patch("the_elder_commands.forms.AddPluginsForm.extract_dict_from_plugin_file")
+    @patch("the_elder_commands.forms.AddPluginsForm.pop_is_esl")
+    def test_extract_dict_pass_all_data_correctly(self, esl_mock, extract_mock):
+        esl_mock.return_value = False
+        extract_mock.return_value = {"data"}
+        with StringIO(PLUGIN_TEST_FILE) as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            fake_self = self.FakeSelf()
+            fake_self.request = request
+            fake_self.instance = ""
+            fake_self.extract_dict_from_plugin_file = AddPluginsForm.extract_dict_from_plugin_file
+            fake_self.pop_is_esl = AddPluginsForm.pop_is_esl
+
+            post = AddPluginsForm.create_variants_post(fake_self)
+            self.assertEqual(post.get("version"), "01")
+            self.assertEqual(post.get("language"), "english")
+            self.assertEqual(post.get("is_esl"), False)
+            self.assertEqual(post.get("instance"), "")
+            self.assertEqual(post.get("plugin_data"), {"data"})
+
+    def test_pop_is_esl_from_dict(self):
+        dictionary = {"test": 1, "isEsl": True}
+        expected = {"test": 1}
+
+        result = AddPluginsForm.pop_is_esl(dictionary)
+        self.assertDictEqual(dictionary, expected)
+        self.assertEqual(result, True)
+
+    def test_pop_is_esl_can_handle_key_error_then_return_none(self):
+        dictionary = {"test": 1}
+        result = AddPluginsForm.pop_is_esl(dictionary)
+        self.assertEqual(result, None)
+
+    def test_pop_is_esl_can_handle_none_as_argument_then_return_none(self):
+        dictionary = None
+        result = AddPluginsForm.pop_is_esl(dictionary)
+        self.assertEqual(result, None)
 
 
 class PluginFormValidationTest(TestCase):
 
     def setUp(self):
-        empty_dict = QueryDict("", mutable=True)
-        self.data = empty_dict.copy()
-        self.data.update({"plugin": {
-            "name": "test 01",
-        }})
+        plugin = Plugins.objects.create(name="test 01")
+
+        self.data = QueryDict("", mutable=True)
         corrected_dict = copy.deepcopy(PLUGIN_TEST_DICT)
         corrected_dict.pop("isEsl")
-        self.data.update({"variant": {
+        self.data.update({
             "version": "0.1",
             "language": "Polish",
             "is_esl": False,
             "plugin_data": corrected_dict,
-        }})
+            "instance": plugin,
+        })
 
-    def count_plugins_or_variants(self, amount, plugins=True):
-        form = PluginsForm(name=self.data["plugin"]["name"])
-        self.assertTrue(form.is_valid())
-
-        variant = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
+    def count_plugins_or_variants(self, amount, name, plugins=True):
+        instance, created = Plugins.objects.get_or_create(name=name)
+        self.data.update({"instance": instance})
+        variant = PluginVariantsForm(data=self.data)
         if not variant.is_valid():
             print(variant.errors)
         variant.save()
@@ -75,34 +176,28 @@ class PluginFormValidationTest(TestCase):
             self.assertEqual(len(Plugins.objects.all()), amount)
         else:
             self.assertEqual(len(Plugins.objects.all()), 1)
-            self.assertEqual(len(PluginVariants.objects.filter(instance=form.instance)), amount)
+            self.assertEqual(len(PluginVariants.objects.filter(instance=instance)), amount)
 
     def test_plugin_data_do_not_take_empty_dict(self):
-        self.data["variant"]["plugin_data"] = {}
-        form = PluginsForm(name=self.data["plugin"]["name"])
-        self.assertTrue(form.is_valid())
+        self.data.update({"plugin_data": {}})
 
-        variant_form = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
+        variant_form = PluginVariantsForm(data=self.data)
         self.assertFalse(variant_form.is_valid())
         self.assertEqual(
             variant_form.errors,
-            {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]}
+            {"plugin_data": [ADD_PLUGIN_ERROR_FILE]}
         )
 
     def test_plugin_data_have_correct_structure(self):
-        self.data["variant"]["plugin_data"] = {"test": 1}
-
-        form = PluginsForm(name=self.data["plugin"]["name"])
-        variant_form = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
+        self.data.update({"plugin_data": {"test": 1}})
+        variant_form = PluginVariantsForm(data=self.data)
         self.assertFalse(variant_form.is_valid())
-        self.assertEqual(variant_form.errors, {"plugin_data": [ADD_PLUGIN_FILE_ERROR_MESSAGE]})
+        self.assertEqual(variant_form.errors, {"plugin_data": [ADD_PLUGIN_ERROR_FILE]})
 
     def test_plugin_data_is_stripped_from_html_char(self):
-        self.data["variant"]["plugin_data"] = PLUGIN_TEST_EMPTY_DICT
-        self.data["variant"]["plugin_data"]["WEAP"].append({"name": "&<>test'\""})
-
-        form = PluginsForm(name=self.data["plugin"]["name"])
-        variant_form = PluginVariantsForm(data=self.data["variant"], instance=form.instance)
+        self.data.update({"plugin_data": PLUGIN_TEST_EMPTY_DICT})
+        self.data["plugin_data"]["WEAP"].append({"name": "&<>test'\""})
+        variant_form = PluginVariantsForm(data=self.data)
         variant_form.save()
         variant = PluginVariants.objects.first()
         weap_list = variant.plugin_data.get("WEAP")
@@ -129,48 +224,42 @@ class PluginFormValidationTest(TestCase):
                 PluginVariantsForm.escape_items(case)
 
     def test_unique_validation(self):
-        plugin = Plugins.objects.create(name="test", usable_name="test")
-        plugin.save()
-
-        form = PluginVariantsForm(instance=plugin, data=self.data["variant"])
+        form = PluginVariantsForm(data=self.data)
         self.assertTrue(form.is_valid())
         form.save()
-
-        other_form = PluginVariantsForm(instance=plugin, data=self.data["variant"])
+        other_form = PluginVariantsForm(data=self.data)
         self.assertFalse(other_form.is_valid())
 
         plugin = Plugins.objects.create(name="test 02", usable_name="test")
-        another_form = PluginVariantsForm(instance=plugin, data=self.data["variant"])
+        self.data.update({"instance": plugin})
+        another_form = PluginVariantsForm(data=self.data)
         self.assertTrue(another_form.is_valid())
 
     def test_form_create_new_plugin_only_if_there_is_new_name(self):
 
-        self.count_plugins_or_variants(1, plugins=True)
+        self.count_plugins_or_variants(1, "test 01", plugins=True)
 
-        self.data["plugin"].update({"name": "test 02"})
+        self.count_plugins_or_variants(2, "test 02", plugins=True)
 
-        self.count_plugins_or_variants(2, plugins=True)
+        self.data.update({"version": "0.2"})
 
-        self.data["variant"].update({"version": "0.2"})
-
-        self.count_plugins_or_variants(2, plugins=True)
+        self.count_plugins_or_variants(2, "test 02", plugins=True)
 
     def test_form_create_plugins_variants_for_each_version(self):
 
-        self.count_plugins_or_variants(1, plugins=False)
+        self.count_plugins_or_variants(1, "test 01", plugins=False)
 
-        self.data["variant"].update({"version": "0.2"})
+        self.data.update({"version": "0.2"})
 
-        self.count_plugins_or_variants(2, plugins=False)
+        self.count_plugins_or_variants(2, "test 01", plugins=False)
 
-        self.data["variant"].update({"language": "English"})
+        self.data.update({"language": "English"})
 
-        self.count_plugins_or_variants(3, plugins=False)
+        self.count_plugins_or_variants(3, "test 01", plugins=False)
 
     def test_plugin_version_is_stripped_from_most_special_signs(self):
-        self.data["variant"].update({"version": "a!@#$%^&*()_-=+;:\"\',<>./?`~\\|"})
-        plugin = Plugins.objects.create(name="test", usable_name="test")
-        form = PluginVariantsForm(instance=plugin, data=self.data["variant"])
+        self.data.update({"version": "a!@#$%^&*()_-=+;:\"\',<>./?`~\\|"})
+        form = PluginVariantsForm(data=self.data)
         self.assertTrue(form.is_valid())
         form.save()
         plugin_variant = PluginVariants.objects.first()

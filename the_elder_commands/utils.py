@@ -153,7 +153,8 @@ class SelectedPlugins:
     def _unselect_all(self):
         self.request.session.update({self._key: []})
 
-    def unselect(self, post):
+    def unselect(self):
+        post = self.request.POST
         usable_name = post.get(self._unselect_key)
         if usable_name == "unselect_all":
             self._unselect_all()

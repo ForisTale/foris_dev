@@ -1,14 +1,10 @@
 from django.test import TestCase
 from django.test.utils import tag
-from django.http import QueryDict
-from the_elder_commands.views import extract_dict_from_plugin_file, create_variants_data_post
 from the_elder_commands.models import Plugins, PluginVariants
-from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, \
-    PLUGIN_TEST_FILE, PLUGIN_TEST_DICT, ADD_PLUGIN_FILE_ERROR_MESSAGE, PLUGIN_TEST_EMPTY_DATA, \
+from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
+    PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, \
     PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils import ManageTestFiles
-from unittest.mock import patch
-from io import StringIO, BytesIO
 import copy
 
 
@@ -91,7 +87,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         response = self.client.get(self.base_url)
         self.assertEqual(
             response.context["plugins_messages"],
-            [ADD_PLUGIN_FILE_ERROR_MESSAGE]
+            [ADD_PLUGIN_ERROR_FILE]
         )
 
     @tag("create_test_file")
@@ -101,7 +97,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         response = self.client.get(self.base_url)
         self.assertEqual(
             response.context["plugins_messages"][1],
-            ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE
+            ADD_PLUGIN_ERROR_PLUGIN_EXIST
         )
 
     @tag("create_empty_data")
@@ -110,7 +106,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         response = self.client.get(self.base_url)
         self.assertEqual(
             response.context["plugins_messages"],
-            [ADD_PLUGIN_FILE_ERROR_MESSAGE]
+            [ADD_PLUGIN_ERROR_FILE]
         )
 
     @tag("create_test_file")
@@ -150,105 +146,6 @@ class AddPluginTest(TestCase, ManageTestFiles):
                 variants_model.__getattribute__(field),
                 desired_result
             )
-
-    @tag("create_test_file")
-    @patch("the_elder_commands.views.PluginVariantsForm")
-    def test_file_is_changed_to_dict_before_pass_POST_to_form(self, form_mock):
-        self.send_default_post_and_return_response()
-
-        expected = QueryDict("", mutable=True)
-        plugin = Plugins.objects.first()
-        correct_dict = copy.deepcopy(PLUGIN_TEST_DICT)
-        correct_dict.pop("isEsl")
-        expected.update({
-            'version': '0.1', 'language': 'Polish', 'plugin_data': correct_dict, "is_esl": False
-        })
-        form_mock.assert_called_once()
-        form_mock.assert_called_with(data=expected, instance=plugin)
-
-
-class ExtractDictFromPluginFilePost(TestCase):
-
-    def test_can_process_file_into_dict(self):
-        with StringIO(PLUGIN_TEST_FILE) as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-
-            actual = extract_dict_from_plugin_file(FakeRequest)
-
-            self.maxDiff = None
-            self.assertDictEqual(actual, PLUGIN_TEST_DICT)
-
-    def test_catch_json_decode_error(self):
-        with StringIO(" ") as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-
-            request = FakeRequest()
-            extract_dict_from_plugin_file(request)  # Should not raises!
-        self.assertTrue(True)
-
-    def test_catch_json_attribute_error(self):
-        class FakeRequest:
-            FILES = {"plugin_file": 1}
-
-        request = FakeRequest()
-        extract_dict_from_plugin_file(request)  # Should not raises!
-        self.assertTrue(True)
-
-    def test_catch_unicode_error(self):
-        with BytesIO(b"\x81") as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-
-            request = FakeRequest()
-            extract_dict_from_plugin_file(request)  # Should not raises!
-        self.assertTrue(True)
-
-
-class CreateVariantsDataPost(TestCase):
-
-    def test_pass_all_data_correctly(self):
-        with StringIO(PLUGIN_TEST_FILE) as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-                POST = {"plugin_version": 1, "plugin_language": 2}
-            expected_dict = copy.deepcopy(PLUGIN_TEST_DICT)
-            expected_dict.pop("isEsl")
-
-            request = FakeRequest()
-            post = create_variants_data_post(request)
-            self.assertEqual(post.get("version"), 1)
-            self.assertEqual(post.get("language"), 2)
-            self.assertEqual(post.get("is_esl"), False)
-            self.assertDictEqual(post.get("plugin_data"), expected_dict)
-
-    def test_pop_is_esl_from_extracted_dict(self):
-        with StringIO(PLUGIN_TEST_FILE) as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-                POST = {}
-            expected = copy.deepcopy(PLUGIN_TEST_DICT)
-            expected.pop("isEsl")
-
-            request = FakeRequest()
-            post = create_variants_data_post(request)
-            self.assertDictEqual(post.get("plugin_data"), expected)
-
-    def test_missing_is_esl_key_make_function_return_none_and_handle_key_error(self):
-        with StringIO('{\"test\": []}') as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-                POST = {}
-            self.assertEqual(create_variants_data_post(FakeRequest()), None)
-
-    def test_catch_attribute_error_from_incorrect_file(self):
-        with StringIO(" ") as file:
-            class FakeRequest:
-                FILES = {"plugin_file": file}
-                POST = {}
-            post = create_variants_data_post(FakeRequest())  # Should not raises
-            self.assertEqual(post, None)
 
 
 class SelectedPluginsTest(TestCase):

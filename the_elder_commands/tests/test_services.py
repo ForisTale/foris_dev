@@ -32,6 +32,11 @@ class PluginsServiceTest(TestCase):
 
         return PluginsService(request=Request())
 
+    def test_service_dont_pass_plugin_without_data(self):
+        Plugins.objects.create(name="Fake!", usable_name="Fake")
+        plugin_service = self.set_up_fake_request_and_return_plugin_service()
+        self.assertEqual(len(plugin_service.all_plugins), 2)
+
     def test_get_all_plugins_return_all_plugins_from_database(self):
 
         plugin_service = self.set_up_fake_request_and_return_plugin_service()

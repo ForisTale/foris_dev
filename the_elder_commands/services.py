@@ -113,13 +113,15 @@ class PluginsService:
     def get_all_plugins(self):
         plugins = []
         for plugin in Plugins.objects.all():
-            plugins.append(self.Plugin(
-                name=plugin.name,
-                usable_name=plugin.usable_name,
-                selected=self.is_plugin_selected(plugin.name),
-                load_order=self.get_load_order(plugin.name),
-                variants=self.get_variants(plugin.name)
-            ))
+            variants = self.get_variants(plugin.name)
+            if variants:
+                plugins.append(self.Plugin(
+                    name=plugin.name,
+                    usable_name=plugin.usable_name,
+                    selected=self.is_plugin_selected(plugin.name),
+                    load_order=self.get_load_order(plugin.name),
+                    variants=variants
+                ))
         return plugins
 
     def is_plugin_selected(self, plugin_name):

@@ -136,6 +136,7 @@ class SelectedPluginsTest(TestCase):
 
     def setUp(self):
         class FakeRequest:
+            POST = QueryDict("", mutable=True)
             session = {}
 
         self.request = FakeRequest()
@@ -185,8 +186,9 @@ class SelectedPluginsTest(TestCase):
         post = QueryDict("", mutable=True)
         post.update({"unselect": "test"})
         self.request.session.update({"selected": [{"usable_name": "test"}, {"usable_name": "test_02"}]})
+        self.request.POST.update(post)
         selected = SelectedPlugins(self.request)
-        selected.unselect(post)
+        selected.unselect()
         one.assert_called_once()
         un_all.assert_not_called()
         one.assert_called_with("test")
@@ -197,8 +199,9 @@ class SelectedPluginsTest(TestCase):
         post = QueryDict("", mutable=True)
         post.update({"unselect": "unselect_all"})
         self.request.session.update({"selected": [{"usable_name": "test"}, {"usable_name": "test_02"}]})
+        self.request.POST.update(post)
         selected = SelectedPlugins(self.request)
-        selected.unselect(post)
+        selected.unselect()
         un_all.assert_called_once()
         one.assert_not_called()
 

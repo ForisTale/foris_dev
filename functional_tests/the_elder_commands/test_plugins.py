@@ -2,7 +2,7 @@ from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from selenium.webdriver.support.ui import Select
 from the_elder_commands.utils import populate_plugins_table
 from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, PLUGIN_TEST_ESCAPE_FILE, \
-    ADD_PLUGIN_FILE_ERROR_MESSAGE, ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
+    ADD_PLUGIN_ERROR_FILE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils import ManageTestFiles
 from django.test.utils import tag
 
@@ -132,7 +132,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         self.submit_add_file("test mod", "0.1", "English", self.test_file_full_path)
 
         # but he get message that file was incorrect
-        self.check_errors_messages([ADD_PLUGIN_FILE_ERROR_MESSAGE])
+        self.check_errors_messages([ADD_PLUGIN_ERROR_FILE])
 
     @tag("create_test_file")
     def test_files_with_same_data_return_error(self):
@@ -141,7 +141,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
 
         # and he sees error.
-        self.check_errors_messages([ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE])
+        self.check_errors_messages([ADD_PLUGIN_ERROR_PLUGIN_EXIST])
 
     @tag("create_test_file")
     def test_plugins_with_same_name_show_options_to_chose_variants(self):

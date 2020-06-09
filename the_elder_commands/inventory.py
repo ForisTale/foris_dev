@@ -10,9 +10,9 @@ def template_variables(request):
 
 ADD_PLUGIN_SUCCESS_MESSAGE = "Plugin was successfully added to database."
 
-ADD_PLUGIN_FILE_ERROR_MESSAGE = "File was incorrect!"
+ADD_PLUGIN_ERROR_FILE = "File was incorrect!"
 
-ADD_PLUGIN_PLUGIN_EXIST_ERROR_MESSAGE = "Plugin with this Name, Version and Language already exists."
+ADD_PLUGIN_ERROR_PLUGIN_EXIST = "Plugin with this Name, Version and Language already exists."
 
 COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the Commands page."
 
@@ -23,7 +23,7 @@ ITEMS_CONVERT_POST_ERROR = "Javascript error! Something went wrong! If the error
 INCORRECT_LOAD_ORDER = "Load order need to be hex number between 00 and FF for esp files and from FE001 to "\
                        "FEFFF for esl files!"
 
-PLUGINS_ERROR_STRING_IS_EMTPY = "Name cannot be empty!"
+PLUGINS_ERROR_NAME_IS_EMTPY = "Name cannot be empty!"
 
 PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"
 
