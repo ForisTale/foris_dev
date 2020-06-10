@@ -2,7 +2,8 @@ from django.test import TestCase
 from the_elder_commands.models import Plugins, PluginVariants
 from the_elder_commands.services import PluginsService, ItemsService, SkillsService
 from the_elder_commands.inventory import PLUGIN_TEST_DICT, DEFAULT_SKILLS
-from the_elder_commands.utils import populate_plugins_table, default_race_skills_update, set_up_default_nord
+from the_elder_commands.utils import default_skills_race_update
+from the_elder_commands.utils_for_tests import populate_plugins_table, set_up_default_nord
 import copy
 
 
@@ -174,7 +175,7 @@ class SkillsServiceTest(TestCase):
 
     @staticmethod
     def set_up_desire_skills_for_altmer():
-        skills = default_race_skills_update("altmer")
+        skills = default_skills_race_update("altmer")
         skills["Combat"]["twohanded"]["desired_value"] = 20
         skills["Stealth"]["speechcraft"]["desired_value"] = 20
         skills["Stealth"]["lightarmor"]["desired_value"] = 20

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.http import JsonResponse
 from the_elder_commands.inventory import PLUGIN_TEST_DICT
-from the_elder_commands.utils import populate_plugins_table
+from the_elder_commands.utils_for_tests import populate_plugins_table
 import json
 import copy
 

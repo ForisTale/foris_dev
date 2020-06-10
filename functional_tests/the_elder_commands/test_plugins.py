@@ -1,9 +1,8 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from selenium.webdriver.support.ui import Select
-from the_elder_commands.utils import populate_plugins_table
 from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, PLUGIN_TEST_ESCAPE_FILE, \
     ADD_PLUGIN_ERROR_FILE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
-from the_elder_commands.utils import ManageTestFiles
+from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, populate_plugins_table
 from django.test.utils import tag
 
 
@@ -66,15 +65,15 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     def setUp(self):
         super().setUp()
 
-        if self.check_test_tag("create_test_file"):
+        if check_test_tag(self, "create_test_file"):
             self.create_test_files({"TEC_plugin_test_file.tec": PLUGIN_TEST_FILE})
-        elif self.check_test_tag("create_incorrect_file"):
+        elif check_test_tag(self, "create_incorrect_file"):
             self.create_test_files({"TEC_incorrect_file.ini": b'3432342343'})
-        elif self.check_test_tag("populate_plugins_table"):
+        elif check_test_tag(self, "populate_plugins_table"):
             populate_plugins_table()
-        elif self.check_test_tag("create_esl_file"):
+        elif check_test_tag(self, "create_esl_file"):
             self.create_test_files({"TEC_esl_file.tec": PLUGIN_TEST_ESL_FILE})
-        elif self.check_test_tag("create_escape_file"):
+        elif check_test_tag(self, "create_escape_file"):
             self.create_test_files({"TEC_escape_file.tec": PLUGIN_TEST_ESCAPE_FILE})
 
         # Foris open plugins section of TEC,

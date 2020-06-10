@@ -4,7 +4,7 @@ from the_elder_commands.models import Plugins, PluginVariants
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
     PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, \
     PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
-from the_elder_commands.utils import ManageTestFiles
+from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag
 import copy
 
 
@@ -31,11 +31,11 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.maxDiff = None
         self.base_url = "/the_elder_commands/plugins/"
 
-        if self.check_test_tag("create_test_file"):
+        if check_test_tag(self, "create_test_file"):
             self.create_test_files({"TEC_test_file.tec": PLUGIN_TEST_FILE})
-        elif self.check_test_tag("create_incorrect_file"):
+        elif check_test_tag(self, "create_incorrect_file"):
             self.create_test_files({"TEC_test_file.ini": {"test": 1}})
-        elif self.check_test_tag("create_empty_data"):
+        elif check_test_tag(self, "create_empty_data"):
             self.create_test_files({"TEC_empty_data.tec": PLUGIN_TEST_EMPTY_DATA})
 
     def tearDown(self):

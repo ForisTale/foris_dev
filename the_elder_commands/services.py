@@ -1,5 +1,5 @@
 from .models import PluginVariants, Plugins
-from .utils import ChosenItems, SelectedPlugins, Skills as NewSkills, default_race_skills_update
+from .utils import ChosenItems, SelectedPlugins, Skills as NewSkills, default_skills_race_update
 import math
 
 
@@ -15,7 +15,7 @@ class SkillsService:
         self.commands = self.commands_list()
 
     def predict_level(self, kind):
-        default = default_race_skills_update(self.race)
+        default = default_skills_race_update(self.race)
         total_exp = 0
         for category, skills in self.skills.items():
             for name, skill in skills.items():

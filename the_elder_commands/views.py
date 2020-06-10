@@ -4,7 +4,7 @@ from .forms import AddPluginsForm, SelectedPluginsForm, ValidateSkills
 from .services import PluginsService, SkillsService
 from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
     ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR
-from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_race_skills_update
+from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update
 import json
 from io import BytesIO
 
@@ -26,7 +26,7 @@ def skills_view(request):
 
 def manage_race_post(request):
     race = request.POST.get("race")
-    reset_skills = default_race_skills_update(race)
+    reset_skills = default_skills_race_update(race)
     skills = Skills(request)
     skills.save_race(race)
     skills.save_skills(reset_skills)
@@ -49,9 +49,9 @@ def items_view(request):
 
     if request.method == "POST":
         commands = convert_items_post(request)
+        ChosenItems(request).set(commands)
+        Commands(request).set_items(commands)
         if commands:
-            ChosenItems(request).set(commands)
-            Commands(request).set_items(commands)
             message = COMMANDS_SUCCESS_MESSAGE
         else:
             message = ITEMS_COMMANDS_POST_EMPTY_MESSAGE

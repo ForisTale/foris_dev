@@ -1,35 +1,22 @@
 from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
-from the_elder_commands.utils import populate_plugins_table
 from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
-    ITEMS_CONVERT_POST_ERROR
-from the_elder_commands.utils import ManageTestFiles
+    ITEMS_CONVERT_POST_ERROR, NO_PLUGIN_SELECTED_ERROR_MESSAGE
+from the_elder_commands.utils_for_tests import check_test_tag, select_plugin, populate_plugins_table
 from the_elder_commands.views import convert_items_post, convert_input
 
 
-class ItemsViewTest(TestCase, ManageTestFiles):
+class ItemsViewTest(TestCase):
     def setUp(self):
-        super().setUp()
         populate_plugins_table()
 
-        if self.check_test_tag("dont_select_plugin"):
+        if check_test_tag(self, "dont_select_plugin"):
             pass
         else:
-            self.selected_placeholder()
+            select_plugin(self)
 
         self.base_url = "/the_elder_commands/items/"
-
-    def selected_placeholder(self):
-        session = self.client.session
-        session.update({"selected": [{
-                "name": "test 01",
-                "usable_name": "test_01",
-                "version": "03",
-                "language": "english",
-                "load_order": "A5"
-            }]})
-        session.save()
 
     def test_items_use_template(self):
 
@@ -40,6 +27,12 @@ class ItemsViewTest(TestCase, ManageTestFiles):
     def test_redirect_when_plugin_is_not_selected(self):
         response = self.client.get(self.base_url)
         self.assertRedirects(response, "/the_elder_commands/plugins/")
+
+    @tag("dont_select_plugin")
+    def test_not_selected_give_error_message(self):
+        self.client.get(self.base_url)
+        session = self.client.session
+        self.assertEqual(session.get("plugins_messages"), [NO_PLUGIN_SELECTED_ERROR_MESSAGE])
 
     def test_return_json_response_after_post(self):
         post = {"table_input": ['[{"name":"010282E9","value":"12"}]']}

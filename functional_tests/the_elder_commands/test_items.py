@@ -1,9 +1,8 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from the_elder_commands.utils import populate_plugins_table
 from django.test.utils import tag
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, template_variables, \
     COMMANDS_SUCCESS_MESSAGE
-from the_elder_commands.utils import ManageTestFiles
+from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, populate_plugins_table
 
 
 class ItemsTest(FunctionalTest, ManageTestFiles):
@@ -11,7 +10,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         super().setUp()
         self.maxDiff = None
 
-        if self.check_test_tag("dont_select"):
+        if check_test_tag(self, "dont_select"):
             pass
         else:
             populate_plugins_table()

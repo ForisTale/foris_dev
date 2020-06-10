@@ -1,6 +1,7 @@
 from django.test import TestCase
-from the_elder_commands.utils import ManageTestFiles, MessagesSystem, Commands, SelectedPlugins, escape_js, \
-    escape_html, Skills, set_up_default_nord, default_race_skills_update
+from the_elder_commands.utils import MessagesSystem, Commands, SelectedPlugins, escape_js, \
+    escape_html, Skills, default_skills_race_update
+from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord
 from unittest.mock import patch
 from django.http import QueryDict
 
@@ -308,5 +309,5 @@ class DefaultRaceSkillsUpdateTest(TestCase):
 
     def test_service_have_default_skills_method(self):
         expected = set_up_default_nord()
-        actual = default_race_skills_update("nord")
+        actual = default_skills_race_update("nord")
         self.assertDictEqual(actual, expected)

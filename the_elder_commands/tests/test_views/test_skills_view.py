@@ -1,7 +1,7 @@
 from django.test import TestCase
 from the_elder_commands.services import SkillsService
 from the_elder_commands.inventory import DEFAULT_SKILL_POST, COMMANDS_SUCCESS_MESSAGE, SKILLS_ERROR_DESIRED_LEVEL
-from the_elder_commands.utils import default_race_skills_update
+from the_elder_commands.utils import default_skills_race_update
 
 
 class SkillsViewTest(TestCase):
@@ -37,7 +37,7 @@ class SkillsViewTest(TestCase):
         self.client.post(self.base_url, data={"race": "ork"})
         response = self.client.get(self.base_url)
         actual = response.context["service"]
-        expected = default_race_skills_update("ork")
+        expected = default_skills_race_update("ork")
         self.assertDictEqual(actual.skills, expected)
         self.assertEqual(actual.fill_skills, None)
 
