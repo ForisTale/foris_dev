@@ -5,7 +5,7 @@ from the_elder_commands.utils import populate_plugins_table
 from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
     ITEMS_CONVERT_POST_ERROR
 from the_elder_commands.utils import ManageTestFiles
-from the_elder_commands.views import convert_items_post
+from the_elder_commands.views import convert_items_post, convert_input
 
 
 class ItemsViewTest(TestCase, ManageTestFiles):
@@ -89,3 +89,10 @@ class ConvertItemsFromPostTest(TestCase):
         self.assertEqual(request.session.get("items_messages"), [ITEMS_CONVERT_POST_ERROR])
         self.assertEqual(output, {})
 
+
+class ConvertInputTest(TestCase):
+    def test_convert_input(self):
+        case = [{"value": "1", "name": "A1"}, {"value": "", "name": "A2"}, {"value": "3", "name": "A3"}]
+        result = convert_input(case)
+        expected = {"A1": "1", "A3": "3"}
+        self.assertEqual(expected, result)

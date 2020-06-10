@@ -132,7 +132,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
             }
         for field, desired_result in plugin_cases.items():
             self.assertEqual(
-                plugin_model.__getattribute__(field),
+                getattr(plugin_model, field),
                 desired_result
             )
         correct_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM)
@@ -143,7 +143,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         }
         for field, desired_result in variants_cases.items():
             self.assertEqual(
-                variants_model.__getattribute__(field),
+                getattr(variants_model, field),
                 desired_result
             )
 
