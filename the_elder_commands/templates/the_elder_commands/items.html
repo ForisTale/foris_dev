@@ -11,7 +11,8 @@
 <script type="text/javascript" charset="utf8"
         src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
 <script src="/static/the_elder_commands/TEC.js"></script>
-<script>$(document).ready( function () { window.TEC.initialize({url: "{% url 'tec:items' %}",
+<script src="/static/the_elder_commands/TECItems.js"></script>
+<script>$(document).ready( function () { TECItems.initializeItems({url: "{% url 'tec:items' %}",
     messages: {{ items_messages }}, site: "items"}) });</script>
 {% endblock %}
 
@@ -23,10 +24,10 @@
     <ul class="nav nav-tabs bg-dark justify-content-around" id="id_items_categories" role="tablist">
         {% for category in items_categories %}
         <li class="nav-item">
-            <a class="nav-link text-info {% if category == "Weapons" %}active show{% endif %}"
-               id="id_{{ category|lower }}" data-toggle="tab" role="tab"
-               href="#id_{{ category|lower }}_panel" aria-controls="id_{{ category|lower }}_panel"
-               aria-selected="{% if category == "Weapons" %}true{% else %}false{% endif %}">{{ category }}</a>
+            <a class="nav-link text-info {% if category == "weapons" %}active show{% endif %}"
+               id="id_{{ category|strip_space }}" data-toggle="tab" role="tab"
+               href="#id_{{ category|strip_space }}_panel" aria-controls="id_{{ category|strip_space }}_panel"
+               aria-selected="{% if category == "weapons" %}true{% else %}false{% endif %}">{{ category|title }}</a>
         </li>
         {% endfor %}
     </ul>
