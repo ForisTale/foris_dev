@@ -83,6 +83,9 @@ def convert_input(parsed_input):
 
 
 def spells_view(request):
+    if not SelectedPlugins(request).exist():
+        MessagesSystem(request).append_plugin(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
+        return redirect("tec:plugins")
     return render(request, "the_elder_commands/spells.html", {"active": "spells"})
 
 

@@ -1,2 +1,8 @@
-TODO Change character data from database to cookies.
 TODO psycopg2 need python 64-bot and postgresql installed, UPDATE ANSIBLE
+TODO add gzip to nginx
+TODO can save presets
+TODO log in by google or facebook to save presets
+TODO home page with instructions
+TODO perks
+TODO default load order for basic plugins
+TODO companions! Summon, create or teleport to, check it!

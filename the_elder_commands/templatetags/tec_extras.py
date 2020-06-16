@@ -18,3 +18,8 @@ def get_chosen_amount(service, item):
     form_id = item.get("formId")
     amount = service.chosen.get(form_id, "")
     return amount
+
+
+@register.filter
+def strip_space(string):
+    return string.replace(" ", "")

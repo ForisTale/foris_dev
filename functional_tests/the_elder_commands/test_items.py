@@ -57,7 +57,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
 
         # Foris sees items category he can chose from.
         categories = self.driver.find_element_by_id("id_items_categories")
-        expected = "Weapons\nArmors\nAmmo\nBooks\nIngredients\nAlchemy\nScrolls\nSoulGems\nKeys\nMiscellaneous"
+        expected = "Weapons\nArmors\nAmmo\nBooks\nIngredients\nAlchemy\nScrolls\nSoul Gems\nKeys\nMiscellaneous"
         self.assertEqual(categories.text, expected)
 
         # Weapons is selected, Foris change to armors.
@@ -90,9 +90,9 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
                     "Miód", "Spostrzeżenia Shalidora: Magia", "Klejnot duszy Wylandriah",
                     "Klucz do pokoju Malurila", "Posąg Dibelli"]
         for index in range(1, len(categories)):
-            self.driver.find_element_by_link_text(categories[index]).click()
-            self.check_table_first_data(f"id_{categories[index].lower()}_tbody", expected[index])
-            table = self.driver.find_element_by_id(f"id_{categories[index].lower()}_tbody")
+            self.driver.find_element_by_link_text(categories[index].title()).click()
+            self.check_table_first_data(f"id_{categories[index].replace(' ', '')}_tbody", expected[index])
+            table = self.driver.find_element_by_id(f"id_{categories[index].replace(' ', '')}_tbody")
             self.wait_for(lambda: table.find_element_by_tag_name("input").send_keys("1"))
 
         # After that he submit all of them
