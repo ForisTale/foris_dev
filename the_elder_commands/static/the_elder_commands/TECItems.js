@@ -109,159 +109,159 @@ TECItems.getItems = function() {
             url: `/api/tec/items/WEAP/`,
             tableId: "id_weapons_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Damage"},
-                 {data: "Value"},
-                 {data: "Type"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "damage"},
+                 {data: "value"},
+                 {data: "type"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
-                 {data: "Description"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
+                 {data: "description"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/ARMO/`,
             tableId: "id_armors_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Armor rating"},
-                 {data: "Armor type"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "armor_rating"},
+                 {data: "armor_type"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
-                 {data: "Description"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
+                 {data: "description"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/AMMO/`,
             tableId: "id_ammo_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Damage"},
-                 {data: "Value"},
+                 {data: "name"},
+                 {data: "damage"},
+                 {data: "value"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/BOOK/`,
             tableId: "id_books_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/INGR/`,
             tableId: "id_ingredients_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
-                 {data: "Effects"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
+                 {data: "effects"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/ALCH/`,
             tableId: "id_alchemy_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
-                 {data: "Effects"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
+                 {data: "effects"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/SCRL/`,
             tableId: "id_scrolls_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
-                 {data: "Effects"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
+                 {data: "effects"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/SLGM/`,
             tableId: "id_soulgems_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/KEYM/`,
             tableId: "id_keys_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
                  {data: "selected", visible: false}],
         },
         {
             url: `/api/tec/items/MISC/`,
             tableId: "id_miscellaneous_table",
             fields: [{data: null, "render": function (data) {
-                         return '<label><input type="text" name="' + data.formId +
+                         return '<label><input type="text" name="' + data.form_id +
                              '" value="' + data.quantity + '"></label>';
                          }},
-                 {data: "fullName"},
-                 {data: "Value"},
-                 {data: "Weight"},
+                 {data: "name"},
+                 {data: "value"},
+                 {data: "weight"},
                  {data: "plugin_name"},
-                 {data: "editorId"},
-                 {data: "formId"},
+                 {data: "editor_id"},
+                 {data: "form_id"},
                  {data: "selected", visible: false}],
         },
     ];

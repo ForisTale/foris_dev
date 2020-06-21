@@ -130,7 +130,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         # all earlier chosen items are still chosen
         table = self.wait_for(lambda: self.driver.find_element_by_id("id_weapons_tbody"))
         self.assertEqual(
-            table.find_element_by_tag_name("input").get_attribute("value"),
+            self.wait_for(lambda: table.find_element_by_tag_name("input").get_attribute("value")),
             "5"
         )
 

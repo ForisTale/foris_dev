@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.test.utils import tag
-from the_elder_commands.models import Plugins, PluginVariants
+from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, AlterationSpells, Ammo, Armors, \
+    Alchemy, Miscellaneous, RestorationSpells, ConjurationSpells, Scrolls, SoulsGems, OtherSpells, Ingredients, Books, \
+    Keys, Perks, DestructionSpells, IllusionSpells
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
     PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, \
     PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
@@ -122,30 +124,52 @@ class AddPluginTest(TestCase, ManageTestFiles):
     @tag("create_test_file")
     def test_pass_POST_to_model(self):
         self.send_default_post_and_return_response()
-
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM)
         plugin_model = Plugins.objects.first()
-        variants_model = PluginVariants.objects.first()
+        plugin_variant = PluginVariants.objects.first()
+        self.assertEqual(plugin_model.name, "test 015an")
+        self.assertEqual(plugin_model.usable_name, "test_015an")
+        self.assertEqual(plugin_variant.version, "0.1")
+        self.assertEqual(plugin_variant.language, "Polish")
+        self.assertEqual(plugin_variant.instance, plugin_model)
+        self.assertEqual(plugin_variant.is_esl, False)
 
-        plugin_cases = {
-            "name": "test 015an",
-            "usable_name": "test_015an",
-            }
-        for field, desired_result in plugin_cases.items():
-            self.assertEqual(
-                getattr(plugin_model, field),
-                desired_result
-            )
-        correct_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM)
-        variants_cases = {
-            "version": "0.1",
-            "language": "Polish",
-            "plugin_data": correct_dict,
-        }
-        for field, desired_result in variants_cases.items():
-            self.assertEqual(
-                getattr(variants_model, field),
-                desired_result
-            )
+        self.assertEqual(Weapons.objects.first().items, test_dict.get("WEAP"))
+        self.assertEqual(Weapons.objects.first().variant, plugin_variant)
+        self.assertEqual(Armors.objects.first().items, test_dict.get("ARMO"))
+        self.assertEqual(Armors.objects.first().variant, plugin_variant)
+        self.assertEqual(Books.objects.first().items, test_dict.get("BOOK"))
+        self.assertEqual(Books.objects.first().variant, plugin_variant)
+        self.assertEqual(Ingredients.objects.first().items, test_dict.get("INGR"))
+        self.assertEqual(Ingredients.objects.first().variant, plugin_variant)
+        self.assertEqual(Alchemy.objects.first().items, test_dict.get("ALCH"))
+        self.assertEqual(Alchemy.objects.first().variant, plugin_variant)
+        self.assertEqual(Miscellaneous.objects.first().items, test_dict.get("MISC"))
+        self.assertEqual(Miscellaneous.objects.first().variant, plugin_variant)
+        self.assertEqual(Perks.objects.first().perks, test_dict.get("PERK"))
+        self.assertEqual(Perks.objects.first().variant, plugin_variant)
+        self.assertEqual(Ammo.objects.first().items, test_dict.get("AMMO"))
+        self.assertEqual(Ammo.objects.first().variant, plugin_variant)
+        self.assertEqual(SoulsGems.objects.first().items, test_dict.get("SLGM"))
+        self.assertEqual(SoulsGems.objects.first().variant, plugin_variant)
+        self.assertEqual(Scrolls.objects.first().items, test_dict.get("SCRL"))
+        self.assertEqual(Scrolls.objects.first().variant, plugin_variant)
+        self.assertEqual(Keys.objects.first().items, test_dict.get("KEYM"))
+        self.assertEqual(Keys.objects.first().variant, plugin_variant)
+        self.assertEqual(WordsOfPower.objects.first().words, test_dict.get("WOOP"))
+        self.assertEqual(WordsOfPower.objects.first().variant, plugin_variant)
+        self.assertEqual(AlterationSpells.objects.first().spells[0], test_dict.get("SPEL")[0])
+        self.assertEqual(AlterationSpells.objects.first().variant, plugin_variant)
+        self.assertEqual(ConjurationSpells.objects.first().spells[0], test_dict.get("SPEL")[2])
+        self.assertEqual(ConjurationSpells.objects.first().variant, plugin_variant)
+        self.assertEqual(DestructionSpells.objects.first().spells[0], test_dict.get("SPEL")[1])
+        self.assertEqual(DestructionSpells.objects.first().variant, plugin_variant)
+        self.assertEqual(IllusionSpells.objects.first().spells[0], test_dict.get("SPEL")[3])
+        self.assertEqual(IllusionSpells.objects.first().variant, plugin_variant)
+        self.assertEqual(RestorationSpells.objects.first().spells[0], test_dict.get("SPEL")[4])
+        self.assertEqual(RestorationSpells.objects.first().variant, plugin_variant)
+        self.assertEqual(OtherSpells.objects.first().spells[0], test_dict.get("SPEL")[5])
+        self.assertEqual(OtherSpells.objects.first().variant, plugin_variant)
 
 
 class SelectedPluginsTest(TestCase):

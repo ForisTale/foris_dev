@@ -2,12 +2,16 @@ from django.test import TestCase
 from django.http import QueryDict
 from django.forms import ValidationError
 from the_elder_commands.forms import AddPluginsForm, PluginVariantsForm, SelectedPluginsForm, ValidateSkills, \
-    SkillsValidationError
-from the_elder_commands.models import Plugins, PluginVariants
+    SkillsValidationError, WeaponsForm, WordsOfPowerForm, AmmoForm, ArmorsForm, AlchemyForm, BooksForm, \
+    IngredientsForm, MiscellaneousForm, PerksForm, SoulsGemsForm, ScrollsForm, SpellsForm, KeysForm, \
+    escape_html_for_forms, get_data, AlterationSpellsForm, ConjurationSpellsForm, DestructionSpellsForm, \
+    IllusionSpellsForm, RestorationSpellsForm, OtherSpellsForm, BaseSpellForm, BaseItemsForm, get_cleaned_data
+from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, Keys, Books, Perks, Ammo, \
+    Armors, Alchemy, Miscellaneous, Ingredients, Scrolls, SoulsGems, AlterationSpells, OtherSpells, ConjurationSpells,\
+    DestructionSpells, IllusionSpells, RestorationSpells
 from the_elder_commands.inventory import ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_DICT, DEFAULT_SKILL_POST, \
-    PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, PLUGIN_TEST_EMPTY_DICT, \
-    SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, PLUGIN_TEST_FILE, \
-    SKILLS_ERROR_DESIRED_LEVEL, DEFAULT_SKILLS, \
+    PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, INCORRECT_LOAD_ORDER, DEFAULT_SKILLS, \
+    SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_NEW_VALUE_BIGGER, PLUGIN_TEST_FILE, SKILLS_ERROR_DESIRED_LEVEL, \
     SKILLS_ERROR_MULTIPLIER, SKILLS_ERROR_BASE_SKILL, SKILLS_ERROR_DESIRED_SKILL
 from io import StringIO, BytesIO
 from unittest.mock import patch
@@ -22,7 +26,8 @@ class AddPluginsFormTest(TestCase):
             self.POST.update({"plugin_version": "01", "plugin_language": "english"})
 
     class FakeSelf:
-        pass
+        def __init__(self):
+            self.errors = []
 
     def test_form_pass_data_to_model(self):
         with StringIO(PLUGIN_TEST_FILE) as file:
@@ -148,8 +153,98 @@ class AddPluginsFormTest(TestCase):
         result = AddPluginsForm.pop_is_esl(dictionary)
         self.assertEqual(result, None)
 
+    def test_handle_data_form_save_data(self):
+        fake_self = self.FakeSelf()
+        fake_self.all_items_are_empty = AddPluginsForm.all_items_are_empty
+        items_models = [Weapons, Armors, Books, Ingredients, Alchemy, Miscellaneous, Ammo, Scrolls, SoulsGems, Keys]
+        spells_models = [AlterationSpells, ConjurationSpells, DestructionSpells,
+                         IllusionSpells, RestorationSpells, OtherSpells]
+        plugin = Plugins.objects.create(name="Some")
+        variant = PluginVariants.objects.create(instance=plugin)
+        data = {"plugin_data": copy.deepcopy(PLUGIN_TEST_DICT)}
+        AddPluginsForm.handle_data_forms(fake_self, data, variant)
+        for model in items_models:
+            self.assertEqual(1, model.objects.count(), msg=f"Fail on {model}")
+            self.assertNotEqual([], model.objects.first().items, msg=f"Fail on {model}")
 
-class PluginFormValidationTest(TestCase):
+        self.assertEqual(1, Perks.objects.count())
+        self.assertNotEqual([], Perks.objects.first().perks)
+        self.assertEqual(1, WordsOfPower.objects.count())
+        self.assertNotEqual([], WordsOfPower.objects.first().words)
+        for model in spells_models:
+            self.assertEqual(1, model.objects.count(), msg=f"Fail on {model}")
+            self.assertNotEqual([], model.objects.first().spells, msg=f"Fail on {model}")
+
+    def test_handle_data_pass_error_when_forms_are_not_valid(self):
+        with StringIO("""{\"isEsl\": 1, \"WEAP\": 1}""") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 01"})
+            form = AddPluginsForm(request)
+        self.assertEqual(form.errors, [ADD_PLUGIN_ERROR_FILE])
+
+    def test_if_all_empty_then_send_error(self):
+        with StringIO("""{\"isEsl\": 1}""") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 01"})
+            form = AddPluginsForm(request)
+        self.assertEqual(form.errors, [ADD_PLUGIN_ERROR_FILE])
+
+    def test_all_items_are_empty(self):
+        some_data = {"WEAP": ["1"], "ARMO": ["1"], "BOOK": ["1"], "INGR": ["1"], "ALCH": ["1"], "MISC": ["1"],
+                     "PERK": ["1"], "AMMO": ["1"], "SCRL": ["1"], "SLGM": ["1"], "KEYM": ["1"], "SPEL": ["1"],
+                     "WOOP": ["1"]}
+        self.assertFalse(AddPluginsForm.all_items_are_empty(some_data))
+        empty_data = {}
+        self.assertTrue(AddPluginsForm.all_items_are_empty(empty_data))
+        mix_data = {"WEAP": ["1"], "ARMO": ["1"], "WOOP": ["1"]}
+        self.assertFalse(AddPluginsForm.all_items_are_empty(mix_data))
+
+    def test_handle_data_form_delete_variant_if_all_empty(self):
+        with StringIO("""{\"isEsl\": 1}""") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 01"})
+            AddPluginsForm(request)
+        self.assertEqual(PluginVariants.objects.count(), 0)
+
+    def test_handle_data_form_delete_variant_if_forms_dont_valid(self):
+        with StringIO("""{\"isEsl\": 1, \"WEAP\": 1}""") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 01"})
+            AddPluginsForm(request)
+        self.assertEqual(PluginVariants.objects.count(), 0)
+
+    def test_forms_not_valid(self):
+        fake_self = self.FakeSelf()
+        plugin = Plugins.objects.create(name="Some")
+        variant = PluginVariants.objects.create(instance=plugin)
+        AddPluginsForm.forms_not_valid(fake_self, variant)
+        self.assertEqual(fake_self.errors, [ADD_PLUGIN_ERROR_FILE])
+        self.assertEqual(PluginVariants.objects.count(), 0)
+
+    def test_handle_data_do_not_take_empty_dict(self):
+        with StringIO("""{}""") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 01"})
+            form = AddPluginsForm(request)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form.errors, [ADD_PLUGIN_ERROR_FILE])
+
+    def test_plugin_data_have_correct_structure(self):
+        with StringIO("""{'test': 1}""") as file:
+            request = self.FakeRequest()
+            request.FILES = {"plugin_file": file}
+            request.POST.update({"plugin_name": "test 02"})
+            form = AddPluginsForm(request)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(form.errors, [ADD_PLUGIN_ERROR_FILE])
+
+
+class PluginVariantsFormTest(TestCase):
 
     def setUp(self):
         plugin = Plugins.objects.create(name="test 01")
@@ -177,51 +272,6 @@ class PluginFormValidationTest(TestCase):
         else:
             self.assertEqual(len(Plugins.objects.all()), 1)
             self.assertEqual(len(PluginVariants.objects.filter(instance=instance)), amount)
-
-    def test_plugin_data_do_not_take_empty_dict(self):
-        self.data.update({"plugin_data": {}})
-
-        variant_form = PluginVariantsForm(data=self.data)
-        self.assertFalse(variant_form.is_valid())
-        self.assertEqual(
-            variant_form.errors,
-            {"plugin_data": [ADD_PLUGIN_ERROR_FILE]}
-        )
-
-    def test_plugin_data_have_correct_structure(self):
-        self.data.update({"plugin_data": {"test": 1}})
-        variant_form = PluginVariantsForm(data=self.data)
-        self.assertFalse(variant_form.is_valid())
-        self.assertEqual(variant_form.errors, {"plugin_data": [ADD_PLUGIN_ERROR_FILE]})
-
-    def test_plugin_data_is_stripped_from_html_char(self):
-        self.data.update({"plugin_data": PLUGIN_TEST_EMPTY_DICT})
-        self.data["plugin_data"]["WEAP"].append({"name": "&<>test'\""})
-        variant_form = PluginVariantsForm(data=self.data)
-        variant_form.save()
-        variant = PluginVariants.objects.first()
-        weap_list = variant.plugin_data.get("WEAP")
-        item = weap_list[0]
-        tested_string = item.get("name")
-        self.assertEqual("&amp;&lt;&gt;test&#39;&quot;", tested_string)
-
-    def test_escape_items(self):
-        items = [
-            {"name": "&test",
-             "other": ">some"},
-        ]
-        expected = [
-            {"name": "&amp;test",
-             "other": "&gt;some"},
-        ]
-        actual = PluginVariantsForm.escape_items(items)
-        self.assertEqual(expected, actual)
-
-    def test_escape_items_can_handle_wrong_data(self):
-        cases = [None, [None], [{None}]]
-        for case in cases:
-            with self.assertRaises(ValidationError, msg=f"Fail on {case}"):
-                PluginVariantsForm.escape_items(case)
 
     def test_unique_validation(self):
         form = PluginVariantsForm(data=self.data)
@@ -264,6 +314,296 @@ class PluginFormValidationTest(TestCase):
         form.save()
         plugin_variant = PluginVariants.objects.first()
         self.assertEqual(plugin_variant.version, "a_-;:,.")
+
+
+class EscapeHtmlForFormsTest(TestCase):
+    def test_escape(self):
+        self.assertEqual("&amp;test", escape_html_for_forms("&test"))
+        self.assertEqual("&gt;some", escape_html_for_forms(">some"))
+
+    def test_escape_can_handle_wrong_data(self):
+        cases = [None, [None], [{None}]]
+        for case in cases:
+            with self.assertRaises(ValidationError, msg=f"Fail on {case}"):
+                escape_html_for_forms(case)
+
+
+class GetDataTest(TestCase):
+    def test_return_data_from_dict(self):
+        item = {"test": "a"}
+        result = get_data(item, "test")
+        self.assertEqual("a", result)
+
+    def test_result_is_html_escaped(self):
+        item = {"test": "&yes<>"}
+        result = get_data(item, "test")
+        self.assertEqual("&amp;yes&lt;&gt;", result)
+
+    def test_data_are_stringify(self):
+        item = {"test": 1}
+        result = get_data(item, "test")
+        self.assertEqual("1", result)
+
+    def test_raise_validation_error_on_attribute_error(self):
+        with self.assertRaises(ValidationError):
+            get_data(None, "")
+
+
+class GetCleanedDataTest(TestCase):
+    def setUp(self):
+        self.cleaned_data = {"field": ["Some data!"]}
+
+    def test_return_data(self):
+        actual = get_cleaned_data(self, "field")
+        self.assertEqual(actual, ["Some data!"])
+
+    def test_if_none_return_empty_list(self):
+        self.cleaned_data = {"field": None}
+        actual = get_cleaned_data(self, "field")
+        self.assertEqual(actual, [])
+
+    def test_if_not_list_raise_validation_error(self):
+        self.cleaned_data = {"field": 1}
+        with self.assertRaises(ValidationError):
+            get_cleaned_data(self, "field")
+
+
+class ItemsBaseTest(TestCase):
+    def setUp(self):
+        plugin = Plugins.objects.create(name="test")
+        self.variant = PluginVariants.objects.create(instance=plugin, version="1", language="any", is_esl=False)
+        self.all_data = copy.deepcopy(PLUGIN_TEST_DICT)
+
+
+class BaseItemsFormTest(ItemsBaseTest):
+    def setUp(self):
+        super().setUp()
+        self.data = self.all_data.get("WEAP")
+
+    def test_forms_are_subclass_of_base_items_form(self):
+        forms = [WeaponsForm, ArmorsForm, AmmoForm, AlchemyForm, BooksForm, IngredientsForm, MiscellaneousForm,
+                 KeysForm, ScrollsForm, SoulsGemsForm]
+        for form in forms:
+            self.assertTrue(issubclass(form, BaseItemsForm), msg=f"Fail on: {form}")
+
+    def test_pass_data_to_model(self):
+        form = WeaponsForm({"items": self.data, "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(Weapons.objects.count(), 1)
+
+    def test_data_are_stringify(self):
+        form = WeaponsForm({"items": self.data, "variant": self.variant})
+        form.save()
+        self.assertEqual(Weapons.objects.first().items[0].get("weight"), "17")
+
+    def test_data_are_html_escaped(self):
+        self.data[0].update({"fullName": "&html<escaped>"})
+        form = WeaponsForm({"items": self.data, "variant": self.variant})
+        form.save()
+        self.assertEqual(Weapons.objects.first().items[0].get("name"), "&amp;html&lt;escaped&gt;")
+
+    def test_form_can_take_empty_list(self):
+        form = WeaponsForm({"weapons": [], "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual([], Weapons.objects.first().items)
+
+
+class WeaponsFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": "", "damage": "",
+                    "description": "", "type": ""}
+        actual = WeaponsForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "", "Damage": "",
+                                            "Type": "", "Description": "", "Value": ""})
+        self.assertEqual(expected, actual)
+
+
+class ArmorsFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": "", "armor_rating": "",
+                    "description": "", "armor_type": ""}
+        actual = ArmorsForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "", "Value": "",
+                                           "Description": "", "Armor type": "", "Armor rating": ""})
+        self.assertEqual(expected, actual)
+
+
+class BooksFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": ""}
+        actual = BooksForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "", "Value": ""})
+        self.assertEqual(expected, actual)
+
+
+class IngredientsFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": "", "effects": ""}
+        actual = IngredientsForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "",
+                                                "Value": "", "Effects": ""})
+        self.assertEqual(expected, actual)
+
+
+class AlchemyFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": "", "effects": ""}
+        actual = AlchemyForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "",
+                                            "Value": "", "Effects": ""})
+        self.assertEqual(expected, actual)
+
+
+class MiscellaneousFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": ""}
+        actual = MiscellaneousForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "",
+                                                  "Value": ""})
+        self.assertEqual(expected, actual)
+
+
+class AmmoFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": "", "damage": ""}
+        actual = AmmoForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "",
+                                         "Value": "", "Damage": ""})
+        self.assertEqual(expected, actual)
+
+
+class ScrollsFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": "", "effects": ""}
+        actual = ScrollsForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "",
+                                            "Value": "", "Effects": ""})
+        self.assertEqual(expected, actual)
+
+
+class SoulGemsFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": ""}
+        actual = SoulsGemsForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "", "Value": ""})
+        self.assertEqual(expected, actual)
+
+
+class KeysFormTest(TestCase):
+    def test_get_item_data(self):
+        expected = {"name": "", "editor_id": "", "form_id": "", "weight": "", "value": ""}
+        actual = KeysForm.get_item_data({"fullName": "", "editorId": "", "formId": "", "Weight": "", "Value": ""})
+        self.assertEqual(expected, actual)
+
+
+class PerksFormTest(ItemsBaseTest):
+    def setUp(self):
+        super().setUp()
+        self.data = self.all_data.get("PERK")
+
+    def test_pass_data_to_model_data_are_stringify_and_html_escape(self):
+        form = PerksForm({"perks": self.data, "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(Perks.objects.count(), 1)
+        self.assertEqual(Perks.objects.first().perks[0].get("name"), "Dopasowane blachy")
+        self.assertEqual(Perks.objects.first().perks[0].get("editor_id"), "DBWellFitted")
+        self.assertEqual(Perks.objects.first().perks[0].get("form_id"), "01711C")
+        self.assertEqual(Perks.objects.first().perks[0].get("description"),
+                         "Premia +25 do pancerza, jeśli nosisz całą zbroję mroku.")
+
+    def test_form_can_take_empty_list(self):
+        form = PerksForm({"perks": [], "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual([], Perks.objects.first().perks)
+
+
+class WordsOfPowerTest(ItemsBaseTest):
+    def setUp(self):
+        super().setUp()
+        self.data = self.all_data.get("WOOP")
+
+    def test_pass_data_to_model_data_are_stringify_and_html_escape(self):
+        form = WordsOfPowerForm({"words": self.data, "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(WordsOfPower.objects.count(), 1)
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("name"), "Nus")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("editor_id"), "WordNus")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("form_id"), "0602A5")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("translation"), "Posąg")
+
+    def test_form_can_take_empty_list(self):
+        form = WordsOfPowerForm({"words": [], "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual([], WordsOfPower.objects.first().words)
+
+
+class SpellsFormTest(ItemsBaseTest):
+    def setUp(self):
+        super().setUp()
+        self.data = self.all_data.get("SPEL")
+        self.sorted_spells = {"alteration": [self.data[0]], "conjuration": [self.data[2]],
+                              "destruction": [self.data[1]], "illusion": [self.data[3]], "restoration": [self.data[4]],
+                              "other": [self.data[5]]}
+        self.maxDiff = None
+
+    def test_sort_post(self):
+        actual = SpellsForm.sort_spells(self.data)
+        self.assertDictEqual(actual, self.sorted_spells)
+
+    def test_assign_spells_forms(self):
+        actual = SpellsForm.assign_forms(self.sorted_spells, self.variant)
+        expected = [AlterationSpellsForm, ConjurationSpellsForm, DestructionSpellsForm, IllusionSpellsForm,
+                    RestorationSpellsForm, OtherSpellsForm]
+        for index in range(6):
+            self.assertIsInstance(actual[index], expected[index])
+
+    def test_can_validate_correct_data(self):
+        form = SpellsForm({"spells": self.data, "variant": self.variant})
+        self.assertTrue(form.is_valid())
+
+    def test_can_validate_incorrect_data(self):
+        form = SpellsForm({})
+        self.assertFalse(form.is_valid())
+
+    def test_form_can_take_none(self):
+        form = SpellsForm({"spells": None, "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+
+    def test_can_save(self):
+        form = SpellsForm({"spells": self.data, "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        models = [AlterationSpells, ConjurationSpells, DestructionSpells,
+                  RestorationSpells, IllusionSpells, OtherSpells]
+        self.assertEqual(0, sum(model.objects.count() for model in models))
+        form.save()
+        self.assertEqual(6, sum(model.objects.count() for model in models))
+
+
+class BaseSpellsFormTest(ItemsBaseTest):
+    def setUp(self):
+        super().setUp()
+
+    def test_forms_are_subclass_of_base_spell_form(self):
+        forms = [AlterationSpellsForm, ConjurationSpellsForm, DestructionSpellsForm,
+                 IllusionSpellsForm, RestorationSpellsForm, OtherSpellsForm]
+        for form in forms:
+            self.assertTrue(issubclass(form, BaseSpellForm), msg=f"Fail on {form}")
+
+    def test_pass_data_to_model_data_are_stringify_and_html_escape(self):
+        data = self.all_data.get("SPEL")[0]
+        form = AlterationSpellsForm({"spells": [data], "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(AlterationSpells.objects.count(), 1)
+        self.assertEqual(AlterationSpells.objects.first().spells[0].get("name"), "Alternation Spell")
+        self.assertEqual(AlterationSpells.objects.first().spells[0].get("editor_id"), "DragonPriest")
+        self.assertEqual(AlterationSpells.objects.first().spells[0].get("form_id"), "000001")
+        self.assertEqual(AlterationSpells.objects.first().spells[0].get("effects"), "obrażeń od ognia na sekundę.")
+        self.assertEqual(AlterationSpells.objects.first().spells[0].get("mastery"), "Expert")
+
+    def test_form_can_take_empty_list(self):
+        form = AlterationSpellsForm({"spells": [], "variant": self.variant})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual([], AlterationSpells.objects.first().spells)
 
 
 class SelectPluginFormTest(TestCase):

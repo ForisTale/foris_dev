@@ -1,7 +1,8 @@
 from django.test import TestCase
-from the_elder_commands.models import Plugins, PluginVariants
+from the_elder_commands.models import Plugins, PluginVariants, Weapons, Keys, Books, Ammo, Armors, Alchemy, \
+    Miscellaneous, Ingredients, Scrolls, SoulsGems
 from the_elder_commands.services import PluginsService, ItemsService, SkillsService
-from the_elder_commands.inventory import PLUGIN_TEST_DICT, DEFAULT_SKILLS
+from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils import default_skills_race_update
 from the_elder_commands.utils_for_tests import populate_plugins_table, set_up_default_nord
 import copy
@@ -14,10 +15,10 @@ class PluginsServiceTest(TestCase):
             plugin = Plugins.objects.create(name="test 0" + str(plugin_num), usable_name="test_0" + str(plugin_num))
             for index in range(1, 4):
                 PluginVariants.objects.create(version="0." + str(index), language="english", is_esl=False,
-                                              plugin_data={"test": index}, instance=plugin)
+                                              instance=plugin)
                 if index == 2:
                     PluginVariants.objects.create(version="0." + str(index), language="polish", is_esl=True,
-                                                  plugin_data={"test": index}, instance=plugin)
+                                                  instance=plugin)
 
     def set_up_fake_request_and_return_plugin_service(self):
         class Request:
@@ -139,9 +140,9 @@ class ItemsServiceTest(TestCase):
             }]}
 
         service = ItemsService(FakeRequest, "WEAP")
-        test_dict = copy.deepcopy(PLUGIN_TEST_DICT.get("WEAP"))
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM.get("WEAP"))
         for item in test_dict:
-            item.update({"formId": f"A5{item.get('formId', '')}", "plugin_name": "test 01", "quantity": "",
+            item.update({"form_id": f"A5{item.get('form_id', '')}", "plugin_name": "test 01", "quantity": "",
                          "selected": False})
 
         self.assertDictEqual({1: service.items}, {1: test_dict})
@@ -161,6 +162,19 @@ class ItemsServiceTest(TestCase):
 
         service = ItemsService(FakeRequest, "WEAP")
         self.assertEqual(service.chosen, {})
+
+    def test_get_item_model(self):
+        variant = PluginVariants.objects.first()
+        self.assertEqual(ItemsService.get_item_model("WEAP", variant), Weapons.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("ARMO", variant), Armors.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("AMMO", variant), Ammo.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("BOOK", variant), Books.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("INGR", variant), Ingredients.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("ALCH", variant), Alchemy.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("MISC", variant), Miscellaneous.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("KEYM", variant), Keys.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("SCRL", variant), Scrolls.objects.get(variant=variant))
+        self.assertEqual(ItemsService.get_item_model("SLGM", variant), SoulsGems.objects.get(variant=variant))
 
 
 class SkillsServiceTest(TestCase):

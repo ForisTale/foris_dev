@@ -1,7 +1,7 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from django.test.utils import tag
 from the_elder_commands.utils_for_tests import check_test_tag, populate_plugins_table
-from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, template_variables
+from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE
 
 
 class SpellsTest(FunctionalTest):
