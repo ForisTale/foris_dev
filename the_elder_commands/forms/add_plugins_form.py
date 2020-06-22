@@ -1,17 +1,15 @@
-from django.forms.models import ModelForm
-from django.http import QueryDict
-from django.forms import ValidationError
-from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, Keys, Books, Perks, Ammo, \
-    Armors, Alchemy, Miscellaneous, Ingredients, Scrolls, SoulsGems, AlterationSpells, OtherSpells, ConjurationSpells,\
-    DestructionSpells, IllusionSpells, RestorationSpells
-from the_elder_commands.inventory import ADD_PLUGIN_ERROR_FILE, INCORRECT_LOAD_ORDER, \
-    PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
-    SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_DESIRED_LEVEL_RANGE, \
-    SKILLS_ERROR_DESIRED_LEVEL, SKILLS_ERROR_MULTIPLIER, DEFAULT_SKILLS, SKILLS_ERROR_DESIRED_SKILL, \
-    SKILLS_ERROR_BASE_SKILL, ADD_PLUGIN_ERROR_PLUGIN_EXIST
-from the_elder_commands.utils import SelectedPlugins, Skills, escape_html
-import copy
 import json
+
+from django.core.exceptions import ValidationError
+from django.forms import ModelForm
+from django.http import QueryDict
+
+from the_elder_commands.inventory import PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
+    ADD_PLUGIN_ERROR_FILE, ADD_PLUGIN_ERROR_PLUGIN_EXIST
+from the_elder_commands.models import Plugins, PluginVariants, Weapons, Armors, Books, Ingredients, Alchemy, \
+    Miscellaneous, Ammo, Scrolls, SoulsGems, Keys, Perks, WordsOfPower, AlterationSpells, ConjurationSpells, \
+    DestructionSpells, RestorationSpells, IllusionSpells, OtherSpells
+from the_elder_commands.utils import escape_html
 
 
 class AddPluginsForm:
@@ -216,7 +214,6 @@ class ArmorsForm(BaseItemsForm):
         }
 
 
-# noinspection DuplicatedCode
 class BooksForm(BaseItemsForm):
     class Meta:
         model = Books
@@ -233,7 +230,6 @@ class BooksForm(BaseItemsForm):
         }
 
 
-# noinspection DuplicatedCode
 class IngredientsForm(BaseItemsForm):
     class Meta:
         model = Ingredients
@@ -251,7 +247,6 @@ class IngredientsForm(BaseItemsForm):
         }
 
 
-# noinspection DuplicatedCode
 class AlchemyForm(BaseItemsForm):
     class Meta:
         model = Alchemy
@@ -302,7 +297,6 @@ class AmmoForm(BaseItemsForm):
         }
 
 
-# noinspection DuplicatedCode
 class ScrollsForm(BaseItemsForm):
     class Meta:
         model = Scrolls
@@ -336,7 +330,6 @@ class SoulsGemsForm(BaseItemsForm):
         }
 
 
-# noinspection DuplicatedCode
 class KeysForm(BaseItemsForm):
     class Meta:
         model = Keys
@@ -450,42 +443,36 @@ class BaseSpellForm(ModelForm):
         return correct_data
 
 
-# noinspection DuplicatedCode
 class AlterationSpellsForm(BaseSpellForm):
     class Meta:
         model = AlterationSpells
         fields = ("variant", "spells")
 
 
-# noinspection DuplicatedCode
 class ConjurationSpellsForm(BaseSpellForm):
     class Meta:
         model = ConjurationSpells
         fields = ("variant", "spells")
 
 
-# noinspection DuplicatedCode
 class DestructionSpellsForm(BaseSpellForm):
     class Meta:
         model = DestructionSpells
         fields = ("variant", "spells")
 
 
-# noinspection DuplicatedCode
 class RestorationSpellsForm(BaseSpellForm):
     class Meta:
         model = RestorationSpells
         fields = ("variant", "spells")
 
 
-# noinspection DuplicatedCode
 class IllusionSpellsForm(BaseSpellForm):
     class Meta:
         model = IllusionSpells
         fields = ("variant", "spells")
 
 
-# noinspection DuplicatedCode
 class OtherSpellsForm(BaseSpellForm):
     class Meta:
         model = OtherSpells
@@ -505,161 +492,3 @@ def get_data(item, item_key):
     except AttributeError:
         raise ValidationError("")
     return escape_html_for_forms(value)
-
-
-class SelectedPluginsForm:
-    def __init__(self, request):
-        self.data = request.POST.copy()
-        self.request = request
-        self.errors = []
-
-        self.clean_load_order()
-        if self.is_valid():
-            self.collect_selected()
-
-    def clean_load_order(self):
-        selected = self.data.getlist("selected", [])
-        for usable_name in selected:
-            if usable_name == "":
-                continue
-
-            load_order = self.data.get(f"{usable_name}_load_order", "")
-            length = len(load_order)
-            if length == 2 and not self.is_esl(usable_name):
-                if load_order.isalnum():
-                    continue
-            elif length == 5 and self.is_esl(usable_name):
-                if load_order.isalnum():
-                    if load_order[:2] in ["FE", "FF"]:
-                        continue
-
-            self.errors.append(INCORRECT_LOAD_ORDER)
-
-    def is_esl(self, usable_name):
-        variant = self.split_variant(usable_name)
-        return variant[2] == "esl"
-
-    def is_valid(self):
-        return self.errors == []
-
-    def collect_selected(self):
-        selected_from_post = self.data.getlist("selected", [])
-        collected = []
-        for usable_name in selected_from_post:
-            if usable_name == "":
-                continue
-            variant = self.split_variant(usable_name)
-            collected.append({
-                "name": self.get_name(usable_name),
-                "usable_name": usable_name,
-                "version": variant[0],
-                "language": variant[1],
-                "esl": variant[2],
-                "load_order": self.data.get(f"{usable_name}_load_order")
-            })
-        SelectedPlugins(self.request).set(collected)
-
-    def split_variant(self, usable_name):
-        variant = self.request.POST.get(f"{usable_name}_variant")
-        return variant.split("&")
-
-    @staticmethod
-    def get_name(usable_name):
-        plugin = Plugins.objects.get(usable_name=usable_name)
-        return plugin.name
-
-
-class SkillsValidationError(Exception):
-    pass
-
-
-class ValidateSkills:
-    def __init__(self, request):
-        self.request = request
-        self.errors = []
-        self.desired_level = self._desired_level_validation()
-        self.multiplier = self._priority_multiplier_validation()
-        self.fill_skills = self._get_fill_skills()
-        self.skills = self.prepare_skills()
-
-    def is_valid(self):
-        return self.errors == []
-
-    def _desired_level_validation(self):
-        desired_level = self.request.POST.get("desired_level")
-        try:
-            level = int(desired_level)
-            if 81 >= level >= 1:
-                return level
-            self.errors.append(SKILLS_ERROR_DESIRED_LEVEL_RANGE)
-        except ValueError:
-            self.errors.append(SKILLS_ERROR_DESIRED_LEVEL)
-
-    def _priority_multiplier_validation(self):
-        multiplier = self.request.POST.get("priority_multiplier")
-        try:
-            return float(multiplier)
-        except ValueError:
-            self.errors.append(SKILLS_ERROR_MULTIPLIER)
-
-    def prepare_skills(self):
-        base_skills = copy.deepcopy(DEFAULT_SKILLS)
-        for skills in base_skills.values():
-            for skill, properties in skills.items():
-                skill_name = properties.get("name")
-                default_skill = self._get_default_skill(skill, skill_name)
-                desired_skill = self._get_desired_skill(skill, skill_name)
-                multiplier = self._get_multiplier(skill)
-                if not self.is_new_skill_bigger(default_skill, desired_skill):
-                    self.errors.append(SKILLS_ERROR_NEW_VALUE_BIGGER.format(skill=skill_name))
-                properties.update({
-                  "default_value": default_skill,
-                  "desired_value": desired_skill,
-                  "multiplier": multiplier
-                })
-        return base_skills
-
-    @staticmethod
-    def is_new_skill_bigger(default_skill, desired_skill):
-        try:
-            return default_skill <= desired_skill
-        except TypeError:
-            return True
-
-    def _get_default_skill(self, skill, skill_name):
-        try:
-            value = int(self.request.POST.get(f"{skill}_base"))
-            if 15 <= value <= 100:
-                return value
-        except ValueError:
-            pass
-        self.errors.append(SKILLS_ERROR_BASE_SKILL.format(skill=skill_name))
-
-    def _get_desired_skill(self, skill, skill_name):
-        value = self.request.POST.get(f"{skill}_new")
-        if value == "":
-            return value
-        try:
-            value = int(value)
-            if 15 <= value <= 100:
-                return value
-        except ValueError:
-            pass
-        self.errors.append(SKILLS_ERROR_DESIRED_SKILL.format(skill=skill_name))
-
-    def _get_multiplier(self, skill):
-        multiplier = self.request.POST.get(f"{skill}_multiplier")
-        return multiplier == "on"
-
-    def _get_fill_skills(self):
-        return self.request.POST.get("fill_skills")
-
-    def save(self):
-        if self.is_valid():
-            skills = Skills(self.request)
-            skills.save_skills(self.skills)
-            skills.save_desired_level(self.desired_level)
-            skills.save_multiplier(self.multiplier)
-            skills.save_fill_skills(self.fill_skills)
-        else:
-            raise SkillsValidationError(self.errors)

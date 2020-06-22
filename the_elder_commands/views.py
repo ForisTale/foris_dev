@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, FileResponse
-from .forms import AddPluginsForm, SelectedPluginsForm, ValidateSkills
+from .forms.add_plugins_form import AddPluginsForm
+from .forms.selected_plugin_form import SelectedPluginsForm
+from .forms.validate_skills import ValidateSkills
 from .services import PluginsService, SkillsService
 from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
     ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR
