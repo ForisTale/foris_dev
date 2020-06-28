@@ -12,8 +12,8 @@
         src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
 <script src="/static/the_elder_commands/TEC.js"></script>
 <script src="/static/the_elder_commands/TECItems.js"></script>
-<script>$(document).ready( function () { TECItems.initializeItems({url: "{% url 'tec:items' %}",
-    messages: {{ items_messages }}, site: "items"}) });</script>
+<script>$(document).ready( function () { new TECItems({url: "{% url 'tec:items' %}",
+    messages: {{ items_messages }}}) });</script>
 {% endblock %}
 
 {% block body %}

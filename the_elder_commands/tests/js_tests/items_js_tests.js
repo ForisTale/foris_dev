@@ -14,7 +14,7 @@ QUnit.testDone(function () {
 
 
 QUnit.test("InitializeDatatable call ajax with correct url", function (assert) {
-    TECItems.initializeItemsTables("items");
+    new TECItems(parameters);
     assert.equal(server.requests.length, 10);
     let request = server.requests[0];
 
@@ -57,15 +57,15 @@ QUnit.test("First column is type input", function (assert) {
 });
 
 QUnit.test("Column selected is not visible", function (assert) {
-    let tables = TECItems.initializeItems(parameters),
-        table = tables[0],
+    let tec = new TECItems(parameters),
+        table = tec.tables[0],
         lastColumn = table.api().column(-1);
 
     assert.equal(lastColumn.visible(), false);
 });
 
 QUnit.test("Adjust table wrapper", function (assert) {
-    TECItems.initializeItems(parameters);
+    new TECItems(parameters);
     let firstTable = $("#id_weapons_panel"),
         wrapper = $(".dataTables_wrapper:first-child > .row:first-child > div", firstTable);
 
@@ -77,14 +77,14 @@ QUnit.test("Adjust table wrapper", function (assert) {
 });
 
 QUnit.test("Inject button in table wrapper", function (assert) {
-    TECItems.initializeItems(parameters);
+    new TECItems(parameters);
     let wrapper = $(".table_wrapper > .col-md-1 > button");
 
     assert.equal(wrapper.hasClass("submit_table"), true);
 });
 
 QUnit.test("Show messages in table wrapper", function (assert) {
-    TECItems.initializeItems(parameters);
+    new TECItems(parameters);
     let wrapper = $(".table_wrapper");
 
     assert.equal(wrapper.html().includes("Test message!"), true);
@@ -292,9 +292,9 @@ function fakeResponse() {
     ]);
 
 
-    let tables = TECItems.initializeItems(parameters);
+    let tables = new TECItems(parameters);
     server.respond();
-    return tables;
+    return tables.tables;
 }
 
 
