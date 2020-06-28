@@ -93,29 +93,12 @@ class TECItems extends TEC{
         }
     }
 
-    getPostData() {
-        let table_input = [],
-                stringifyInput;
-            for (let table of this.tables) {
-                table_input = table_input.concat(table.$("input").serializeArray());
-            }
-            let clearInput = [];
-            for (let item of table_input) {
-                if (item.value !== "") {
-                    clearInput = clearInput.concat(item);
-                }
-            }
-
-            stringifyInput = JSON.stringify(clearInput)
-        return {"table_input": stringifyInput}
-    }
-
     getItems() {
         return [
             {
                 url: `/api/tec/items/WEAP/`,
                 tableId: "id_weapons_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -133,7 +116,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/ARMO/`,
                 tableId: "id_armors_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -151,7 +134,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/AMMO/`,
                 tableId: "id_ammo_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -166,7 +149,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/BOOK/`,
                 tableId: "id_books_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -181,7 +164,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/INGR/`,
                 tableId: "id_ingredients_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -197,7 +180,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/ALCH/`,
                 tableId: "id_alchemy_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -213,7 +196,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/SCRL/`,
                 tableId: "id_scrolls_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -229,7 +212,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/SLGM/`,
                 tableId: "id_soulgems_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -244,7 +227,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/KEYM/`,
                 tableId: "id_keys_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},
@@ -259,7 +242,7 @@ class TECItems extends TEC{
             {
                 url: `/api/tec/items/MISC/`,
                 tableId: "id_miscellaneous_table",
-                fields: [{data: null, "render": function (data) {
+                fields: [{data: null, render: function (data) {
                              return '<label><input type="text" name="' + data.form_id +
                                  '" value="' + data.quantity + '"></label>';
                              }},

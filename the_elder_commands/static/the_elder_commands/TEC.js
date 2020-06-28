@@ -61,4 +61,21 @@ class TEC {
             });
         });
     };
+
+    getPostData() {
+        let table_input = [],
+                stringifyInput;
+            for (let table of this.tables) {
+                table_input = table_input.concat(table.$("input").serializeArray());
+            }
+            let clearInput = [];
+            for (let item of table_input) {
+                if (item.value !== "") {
+                    clearInput = clearInput.concat(item);
+                }
+            }
+
+            stringifyInput = JSON.stringify(clearInput)
+        return {"table_input": stringifyInput}
+    };
 }

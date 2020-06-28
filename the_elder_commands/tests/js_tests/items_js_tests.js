@@ -73,7 +73,6 @@ QUnit.test("Adjust table wrapper", function (assert) {
     assert.equal(wrapper.hasClass("col-sm-12 col-md-2"), true);
     assert.equal(wrapper.hasClass("col-md-8 col-12"), true);
     assert.equal(wrapper.hasClass("col-sm-12 col-md-2"), true);
-
 });
 
 QUnit.test("Inject button in table wrapper", function (assert) {
@@ -104,7 +103,6 @@ QUnit.test("Messages are show only on visible table", function (assert) {
     assert.equal(firstWrapper.html().includes(("Other test message!")), true)
     assert.equal(secondWrapper.html().includes(("Test message!")), false)
     assert.equal(secondWrapper.html().includes(("Other test message!")), false)
-
 });
 
 QUnit.test("Test sending ajax post", function (assert) {
