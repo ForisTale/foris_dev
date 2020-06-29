@@ -71,13 +71,13 @@ def populate_plugins_table():
             SoulsGems.objects.create(variant=variant, items=corrected_dict.get("SLGM"))
             Scrolls.objects.create(variant=variant, items=corrected_dict.get("SCRL"))
             Keys.objects.create(variant=variant, items=corrected_dict.get("KEYM"))
-            WordsOfPower.objects.create(variant=variant, words=corrected_dict.get("WOOP"))
-            AlterationSpells.objects.create(variant=variant, spells=corrected_dict.get("SPEL")[0])
-            ConjurationSpells.objects.create(variant=variant, spells=corrected_dict.get("SPEL")[2])
-            DestructionSpells.objects.create(variant=variant, spells=corrected_dict.get("SPEL")[1])
-            IllusionSpells.objects.create(variant=variant, spells=corrected_dict.get("SPEL")[3])
-            RestorationSpells.objects.create(variant=variant, spells=corrected_dict.get("SPEL")[4])
-            OtherSpells.objects.create(variant=variant, spells=corrected_dict.get("SPEL")[5])
+            WordsOfPower.objects.create(variant=variant, spells=corrected_dict.get("WOOP"))
+            AlterationSpells.objects.create(variant=variant, spells=[corrected_dict.get("SPEL")[0]])
+            ConjurationSpells.objects.create(variant=variant, spells=[corrected_dict.get("SPEL")[2]])
+            DestructionSpells.objects.create(variant=variant, spells=[corrected_dict.get("SPEL")[1]])
+            IllusionSpells.objects.create(variant=variant, spells=[corrected_dict.get("SPEL")[3]])
+            RestorationSpells.objects.create(variant=variant, spells=[corrected_dict.get("SPEL")[4]])
+            OtherSpells.objects.create(variant=variant, spells=[corrected_dict.get("SPEL")[5]])
 
 
 def set_up_default_nord():
