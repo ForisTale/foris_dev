@@ -199,5 +199,5 @@ class SelectedPluginsTest(TestCase):
         post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
         self.client.post(self.base_url, data=post)
         session = self.client.session
-        self.assertEqual(session.get("selected"), [{'esl': '', 'language': 'polish', 'load_order': '01',
+        self.assertEqual(session.get("selected"), [{'is_esl': False, 'language': 'polish', 'load_order': '01',
                                                     'name': 'test 01', 'usable_name': 'test_01', 'version': '0.1'}])

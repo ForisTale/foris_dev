@@ -33,7 +33,7 @@ class SelectedPluginsForm:
 
     def is_esl(self, usable_name):
         variant = self.split_variant(usable_name)
-        return variant[2] == "esl"
+        return bool(variant[2])
 
     def is_valid(self):
         return self.errors == []
@@ -50,7 +50,7 @@ class SelectedPluginsForm:
                 "usable_name": usable_name,
                 "version": variant[0],
                 "language": variant[1],
-                "esl": variant[2],
+                "is_esl": self.is_esl(usable_name),
                 "load_order": self.data.get(f"{usable_name}_load_order")
             })
         SelectedPlugins(self.request).set(collected)

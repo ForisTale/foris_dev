@@ -130,7 +130,7 @@ class ItemsServiceTest(TestCase):
                 "name": "test 01",
                 "usable_name": "test_01",
                 "version": "03",
-                "esl": False,
+                "is_esl": False,
                 "language": "english",
                 "load_order": "A5"
             }],
@@ -177,7 +177,7 @@ class SpellsServiceTest(TestCase):
                 "name": "test 01",
                 "usable_name": "test_01",
                 "version": "03",
-                "esl": False,
+                "is_esl": False,
                 "language": "english",
                 "load_order": "A5"
             }],

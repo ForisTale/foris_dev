@@ -18,7 +18,8 @@ class ItemsApiTest(TestCase):
             "usable_name": "test_01",
             "version": "03",
             "language": "english",
-            "load_order": "A5"
+            "load_order": "A5",
+            "is_esl": False,
         }]})
         session.save()
 
@@ -50,7 +51,8 @@ class SpellsApiTest(TestCase):
             "usable_name": "test_01",
             "version": "03",
             "language": "english",
-            "load_order": "A5"
+            "load_order": "A5",
+            "is_esl": False
         }]})
         session.save()
 

@@ -168,7 +168,7 @@ class ItemsService:
         items = []
         for selected in self.selected:
             variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
-                                                 language=selected.get("language"))
+                                                 language=selected.get("language"), is_esl=selected.get("is_esl"))
             items_model = self.get_item_model(category, variant)
             for item in items_model.items:
                 form_id = f"{selected.get('load_order')}{item.get('form_id')}"
@@ -212,7 +212,7 @@ class SpellsService:
         spells = []
         for selected in self.selected:
             variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
-                                                 language=selected.get("language"))
+                                                 language=selected.get("language"), is_esl=selected.get("is_esl"))
             model = self.get_spells_model(category, variant)
             for spell in model.spells:
                 form_id = f"{selected.get('load_order')}{spell.get('form_id')}"

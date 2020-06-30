@@ -1,4 +1,6 @@
+from django.core.exceptions import ObjectDoesNotExist
 from .inventory import RACES_EXTRA_SKILLS, DEFAULT_SKILLS
+from .models import PluginVariants
 import copy
 
 
@@ -113,7 +115,17 @@ class SelectedPlugins:
         self._unselect_key = "unselect"
 
     def exist(self):
-        return self.request.session.get(self._key, []) != []
+        selected_plugins = self.request.session.get(self._key)
+        if selected_plugins:
+            for selected in selected_plugins:
+                try:
+                    PluginVariants.objects.get(instance__name=selected.get("name"), language=selected.get("language"),
+                                               version=selected.get("version"), is_esl=selected.get("is_esl"))
+                except ObjectDoesNotExist:
+                    self.request.session.update({self._key: []})
+                    return False
+            return True
+        return False
 
     def set(self, selected):
         self.request.session.update({self._key: selected})

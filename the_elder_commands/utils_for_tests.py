@@ -46,7 +46,8 @@ def select_plugin(self):
             "usable_name": "test_01",
             "version": "03",
             "language": "english",
-            "load_order": "A5"
+            "load_order": "A5",
+            "is_esl": False,
         }]})
     session.save()
 
@@ -57,7 +58,8 @@ def populate_plugins_table():
         plugin.save()
         corrected_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM)
         for num in range(4):
-            variant = PluginVariants.objects.create(instance=plugin, version="0" + str(num+1), language="english",)
+            variant = PluginVariants.objects.create(instance=plugin, version="0" + str(num+1), language="english",
+                                                    is_esl=False)
             variant.save()
 
             Weapons.objects.create(variant=variant, items=corrected_dict.get("WEAP"))

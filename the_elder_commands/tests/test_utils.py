@@ -1,7 +1,7 @@
 from django.test import TestCase
 from the_elder_commands.utils import MessagesSystem, Commands, SelectedPlugins, escape_js, \
     escape_html, Skills, default_skills_race_update, BaseChosen
-from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord
+from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord, populate_plugins_table
 from unittest.mock import patch
 from django.http import QueryDict
 
@@ -155,19 +155,27 @@ class CommandsTest(TestCase):
 class SelectedPluginsTest(TestCase):
 
     def setUp(self):
+        populate_plugins_table()
+
         class FakeRequest:
             POST = QueryDict("", mutable=True)
-            session = {}
-
+            session = {"selected": [{"usable_name": "test_01", "language": "english", "version": "01",
+                                     "is_esl": False, "name": "test 01"}]}
         self.request = FakeRequest()
 
-    def test_plugins_are_selected(self):
+    def test_exist_return_true_when_plugins_are_selected(self):
         selected = SelectedPlugins(self.request)
+        self.assertEqual(selected.exist(), True)
 
+        self.request.session = {}
         self.assertEqual(selected.exist(), False)
 
-        self.request.session.update({"selected": ["plugin"]})
-        self.assertEqual(selected.exist(), True)
+    def test_exist_check_if_all_selected_plugins_exist_in_database(self):
+        self.request.session.update({"selected": [{"usable_name": "wrong_name", "language": "english", "version": "01",
+                                     "is_esl": False, "name": "wrong name"}]})
+        selected = SelectedPlugins(self.request)
+        self.assertEqual(selected.exist(), False)
+        self.assertEqual(self.request.session.get("selected"), [])
 
     def test_set(self):
         selected = SelectedPlugins(self.request)
@@ -177,11 +185,14 @@ class SelectedPluginsTest(TestCase):
     def test_get(self):
         selected = SelectedPlugins(self.request)
         actual = selected.get()
-        self.assertEqual([], actual)
+        self.assertEqual([{'usable_name': 'test_01', 'language': 'english', 'version': '01', 'is_esl': False,
+                           'name': 'test 01'}], actual)
 
-        self.request.session.update({"selected": ["one"]})
+    def test_get_default_return(self):
+        self.request.session = {}
+        selected = SelectedPlugins(self.request)
         actual = selected.get()
-        self.assertEqual(["one"], actual)
+        self.assertEqual([], actual)
 
     def test_unselect_one(self):
         self.request.session.update({"selected": [{"usable_name": "test"}, {"usable_name": "test_02"}]})
@@ -190,6 +201,7 @@ class SelectedPluginsTest(TestCase):
         self.assertEqual(self.request.session.get("selected"), [{"usable_name": "test_02"}])
 
     def test_unselect_one_can_handle_missing_key(self):
+        self.request.session = {}
         selected = SelectedPlugins(self.request)
         selected._unselect_one("test")
         self.assertEqual(self.request.session.get("selected"), [])
@@ -218,7 +230,7 @@ class SelectedPluginsTest(TestCase):
     def test_unselect_for_all(self, one, un_all):
         post = QueryDict("", mutable=True)
         post.update({"unselect": "unselect_all"})
-        self.request.session.update({"selected": [{"usable_name": "test"}, {"usable_name": "test_02"}]})
+        self.request.session.update({"selected": [{"usable_name": "test"}, {"usable_name": "test_01"}]})
         self.request.POST.update(post)
         selected = SelectedPlugins(self.request)
         selected.unselect()

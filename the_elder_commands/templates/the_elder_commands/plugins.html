@@ -105,7 +105,8 @@
                     <tr>
                         <td><form action="{% url "tec:plugins" %}" method="post">
                             {{ selected|get_value:"name" }} ver: {{ selected|get_value:"version" }}
-                            {{ selected|get_value:"language"|capfirst }} {{ selected|get_value:"esl" }}
+                            {{ selected|get_value:"language"|capfirst }}
+                            {% if selected|get_value:"is_esl" %}esl{% endif %}
                             <span style="float:right"><button
                                 type="submit" class="btn btn-dark text-info btn-sm btn-outline-info"
                                 value="{{ selected|get_value:"usable_name" }}" name="unselect">Unselect</button></span>

@@ -68,7 +68,7 @@ class SelectPluginFormTest(TestCase):
             "version": "0.1",
             "language": "english",
             "load_order": "01",
-            "esl": "",
+            "is_esl": False,
         }]
         self.assertDictEqual(request.session.get("selected", [])[0], expected[0])
-        self.assertEqual(request.session.get("selected")[1].get("esl"), "esl")
+        self.assertEqual(request.session.get("selected")[1].get("is_esl"), True)
