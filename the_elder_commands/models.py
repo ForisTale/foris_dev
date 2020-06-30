@@ -106,4 +106,4 @@ class OtherSpells(models.Model):
 
 class WordsOfPower(models.Model):
     variant = models.ForeignKey(PluginVariants, default=None, on_delete=models.CASCADE)
-    spells = models.JSONField(default=list, blank=True)
+    words = models.JSONField(default=list, blank=True)

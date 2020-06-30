@@ -112,7 +112,7 @@ class AddPluginsForm:
                  SoulsGemsForm({"items": data.get("SLGM"), "variant": variant}),
                  KeysForm({"items": data.get("KEYM"), "variant": variant}),
                  SpellsForm({"spells": data.get("SPEL"), "variant": variant}),
-                 WordsOfPowerForm({"spells": data.get("WOOP"), "variant": variant})]
+                 WordsOfPowerForm({"words": data.get("WOOP"), "variant": variant})]
         are_valid = all(form.is_valid() for form in forms)
         if are_valid:
             [form.save() for form in forms]
@@ -367,14 +367,14 @@ class PerksForm(BaseItemsForm):
 class WordsOfPowerForm(ModelForm):
     class Meta:
         model = WordsOfPower
-        fields = ("variant", "spells")
+        fields = ("variant", "words")
 
-    def clean_spells(self):
-        data = get_cleaned_data(self, "spells")
+    def clean_words(self):
+        data = get_cleaned_data(self, "words")
         correct_data = []
         for item in data:
             correct_data.append({
-                "name": get_data(item, "fullName"),
+                "word": get_data(item, "fullName"),
                 "editor_id": get_data(item, "editorId"),
                 "form_id": get_data(item, "formId"),
                 "translation": get_data(item, "Translation"),

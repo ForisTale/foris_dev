@@ -11,8 +11,8 @@ from the_elder_commands.forms.add_plugins_form import AddPluginsForm, PluginVari
     MiscellaneousForm, KeysForm, ScrollsForm, SoulsGemsForm, BaseItemsForm, PerksForm, WordsOfPowerForm, SpellsForm, \
     AlterationSpellsForm, ConjurationSpellsForm, DestructionSpellsForm, IllusionSpellsForm, RestorationSpellsForm, \
     OtherSpellsForm, BaseSpellForm
-from the_elder_commands.inventory import PLUGIN_TEST_FILE, PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
-    PLUGIN_TEST_DICT, ADD_PLUGIN_ERROR_FILE
+from the_elder_commands.inventory import PLUGIN_TEST_FILE, PLUGINS_ERROR_NAME_IS_EMTPY, PLUGIN_TEST_DICT, \
+    PLUGINS_ERROR_NAME_BECOME_EMPTY, ADD_PLUGIN_ERROR_FILE
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, Armors, Books, Ingredients, Alchemy, \
     Miscellaneous, Ammo, Scrolls, SoulsGems, Keys, AlterationSpells, ConjurationSpells, DestructionSpells, \
     IllusionSpells, RestorationSpells, OtherSpells, Perks, WordsOfPower
@@ -158,7 +158,7 @@ class AddPluginsFormTest(TestCase):
         fake_self.all_items_are_empty = AddPluginsForm.all_items_are_empty
         items_models = [Weapons, Armors, Books, Ingredients, Alchemy, Miscellaneous, Ammo, Scrolls, SoulsGems, Keys]
         spells_models = [AlterationSpells, ConjurationSpells, DestructionSpells,
-                         IllusionSpells, RestorationSpells, OtherSpells, WordsOfPower]
+                         IllusionSpells, RestorationSpells, OtherSpells]
         plugin = Plugins.objects.create(name="Some")
         variant = PluginVariants.objects.create(instance=plugin)
         data = {"plugin_data": copy.deepcopy(PLUGIN_TEST_DICT)}
@@ -169,6 +169,8 @@ class AddPluginsFormTest(TestCase):
 
         self.assertEqual(1, Perks.objects.count())
         self.assertNotEqual([], Perks.objects.first().perks)
+        self.assertEqual(1, WordsOfPower.objects.count())
+        self.assertNotEqual([], WordsOfPower.objects.first().words)
         for model in spells_models:
             self.assertEqual(1, model.objects.count(), msg=f"Fail on {model}")
             self.assertNotEqual([], model.objects.first().spells, msg=f"Fail on {model}")
@@ -516,20 +518,20 @@ class WordsOfPowerTest(ItemsBaseTest):
         self.data = self.all_data.get("WOOP")
 
     def test_pass_data_to_model_data_are_stringify_and_html_escape(self):
-        form = WordsOfPowerForm({"spells": self.data, "variant": self.variant})
+        form = WordsOfPowerForm({"words": self.data, "variant": self.variant})
         self.assertTrue(form.is_valid())
         form.save()
         self.assertEqual(WordsOfPower.objects.count(), 1)
-        self.assertEqual(WordsOfPower.objects.first().spells[0].get("name"), "Nus")
-        self.assertEqual(WordsOfPower.objects.first().spells[0].get("editor_id"), "WordNus")
-        self.assertEqual(WordsOfPower.objects.first().spells[0].get("form_id"), "0602A5")
-        self.assertEqual(WordsOfPower.objects.first().spells[0].get("translation"), "Posąg")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("word"), "Nus")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("editor_id"), "WordNus")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("form_id"), "0602A5")
+        self.assertEqual(WordsOfPower.objects.first().words[0].get("translation"), "Posąg")
 
     def test_form_can_take_empty_list(self):
-        form = WordsOfPowerForm({"spells": [], "variant": self.variant})
+        form = WordsOfPowerForm({"words": [], "variant": self.variant})
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertEqual([], WordsOfPower.objects.first().spells)
+        self.assertEqual([], WordsOfPower.objects.first().words)
 
 
 class SpellsFormTest(ItemsBaseTest):
