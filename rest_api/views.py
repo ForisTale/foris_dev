@@ -3,7 +3,7 @@ from lists.models import List, Item
 from rest_framework import viewsets
 
 from django.http import JsonResponse
-from the_elder_commands.services import ItemsService
+from the_elder_commands.services import ItemsService, SpellsService
 
 
 class ListViewSet(viewsets.ModelViewSet):
@@ -20,3 +20,7 @@ def api_items(request, category):
     items_service = ItemsService(request, category)
     return JsonResponse(items_service.items, safe=False)
 
+
+def api_spells(request, category):
+    service = SpellsService(request, category)
+    return JsonResponse(service.spells, safe=False)

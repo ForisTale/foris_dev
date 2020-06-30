@@ -1,12 +1,13 @@
 from .models import PluginVariants, Plugins, Weapons, Keys, Books, Ammo, Armors, Alchemy, \
-    Miscellaneous, Ingredients, Scrolls, SoulsGems
-from .utils import ChosenItems, SelectedPlugins, Skills as NewSkills, default_skills_race_update
+    Miscellaneous, Ingredients, Scrolls, SoulsGems, ConjurationSpells, AlterationSpells, OtherSpells, IllusionSpells, \
+    RestorationSpells, DestructionSpells
+from .utils import ChosenItems, SelectedPlugins, Skills, default_skills_race_update, ChosenSpells
 import math
 
 
 class SkillsService:
     def __init__(self, request):
-        skills = NewSkills(request)
+        skills = Skills(request)
         self.race = skills.get_race()
         self.skills = skills.get_skills()
         self.multiplier = skills.get_multiplier()
@@ -32,7 +33,7 @@ class SkillsService:
         return int(level)
 
     def predict_desired_level(self, request):
-        skill = NewSkills(request)
+        skill = Skills(request)
         target_level = skill.get_desired_level()
         if self.default_level < target_level and self.fill_skills:
             self.set_skills_to_desired_level(target_level)
@@ -175,7 +176,6 @@ class ItemsService:
                 item.update({"form_id": form_id, "plugin_name": selected.get("name"), "quantity": quantity,
                              "selected": quantity != ""})
                 items.append(item)
-
         return items
 
     @staticmethod
@@ -200,3 +200,38 @@ class ItemsService:
             return Scrolls.objects.get(variant=variant)
         elif category == "SLGM":
             return SoulsGems.objects.get(variant=variant)
+
+
+class SpellsService:
+    def __init__(self, request, category):
+        self.chosen = ChosenSpells(request).get()
+        self.selected = SelectedPlugins(request).get()
+        self.spells = self.get_spells(category)
+
+    def get_spells(self, category):
+        spells = []
+        for selected in self.selected:
+            variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
+                                                 language=selected.get("language"))
+            model = self.get_spells_model(category, variant)
+            for spell in model.spells:
+                form_id = f"{selected.get('load_order')}{spell.get('form_id')}"
+                is_selected = self.chosen.get(form_id)
+                spell.update({"form_id": form_id, "plugin_name": selected.get("name"), "selected": is_selected})
+                spells.append(spell)
+        return spells
+
+    @staticmethod
+    def get_spells_model(category, variant):
+        if category == "alteration":
+            return AlterationSpells.objects.get(variant=variant)
+        elif category == "destruction":
+            return DestructionSpells.objects.get(variant=variant)
+        elif category == "conjuration":
+            return ConjurationSpells.objects.get(variant=variant)
+        elif category == "illusion":
+            return IllusionSpells.objects.get(variant=variant)
+        elif category == "restoration":
+            return RestorationSpells.objects.get(variant=variant)
+        elif category == "other":
+            return OtherSpells.objects.get(variant=variant)

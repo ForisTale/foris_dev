@@ -9,7 +9,7 @@ class TECSpells extends TEC {
     }
 
     initializeSpellsTables() {
-        this.tables = []
+        this.tables = [];
 
         for (let category of this.getSpells()) {
             this.tables.push(this.initializeDataTable(category));
@@ -101,22 +101,6 @@ class TECSpells extends TEC {
                     {data: "editor_id"},
                     {data: "form_id"},
                     {data: "effects"},
-                ],
-            },
-            {
-                url: `/api/tec/spells/wordsofpower/`,
-                tableId: "id_wordsofpower_table",
-                fields: [
-                    {data: null, render: function (data) {
-                        let checked = '';
-                        if (data.selected){ checked = 'checked' }
-                        return `<label><input type="checkbox" ${checked} name="${data.form_id}"></label>`
-                        }},
-                    {data: "word"},
-                    {data: "translation"},
-                    {data: "plugin_name"},
-                    {data: "editor_id"},
-                    {data: "form_id"},
                 ],
             },
             {

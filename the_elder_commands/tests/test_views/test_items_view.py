@@ -2,9 +2,9 @@ from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
 from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
-    ITEMS_CONVERT_POST_ERROR, NO_PLUGIN_SELECTED_ERROR_MESSAGE
+    CONVERT_POST_JS_ERROR, NO_PLUGIN_SELECTED_ERROR_MESSAGE
 from the_elder_commands.utils_for_tests import check_test_tag, select_plugin, populate_plugins_table
-from the_elder_commands.views import convert_items_post, convert_input
+from the_elder_commands.views import convert_items_post, convert_items_input
 
 
 class ItemsViewTest(TestCase):
@@ -40,14 +40,16 @@ class ItemsViewTest(TestCase):
         self.assertIsInstance(response, JsonResponse)
 
     def test_view_convert_post_to_console_codes(self):
-        cases = {'[{"name":"010282E9","value":"12"}]': {"010282E9": "12"},
-                 '[{"name":"010282E9","value":""}]': {}}
+        cases = {'[{"name":"010282E9","value":"12"}]': [{"010282E9": "12"}, ['player.additem 010282E9 12']],
+                 '[{"name":"010282E9","value":""}]': [{}, []]}
         for table_input, expected in cases.items():
             post = {"table_input": [table_input]}
             self.client.post(self.base_url, data=post)
             session = self.client.session
-            codes = session.get("chosen_items")
-            self.assertEqual(codes, expected)
+            chosen = session.get("chosen_items")
+            self.assertEqual(chosen, expected[0], msg=f"Fail on: {chosen}")
+            codes = session.get("items_commands")
+            self.assertEqual(codes, expected[1], msg=f"Fail on: {codes}")
 
     def test_successful_post_give_message_to_view(self):
         post = {"table_input": ['[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"}]']}
@@ -62,8 +64,7 @@ class ItemsViewTest(TestCase):
 
 
 class ConvertItemsFromPostTest(TestCase):
-    def test_convert_post_to_list_of_formid_and_amount(self):
-
+    def test_convert_post_to_list_of_form_id_and_amount(self):
         class FakeRequest:
             POST = {"table_input": '[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"},'
                     '{"name":"010282E6","value":""}]'}
@@ -79,13 +80,13 @@ class ConvertItemsFromPostTest(TestCase):
 
         request = FakeRequest()
         output = convert_items_post(request)
-        self.assertEqual(request.session.get("items_messages"), [ITEMS_CONVERT_POST_ERROR])
+        self.assertEqual(request.session.get("items_messages"), [CONVERT_POST_JS_ERROR])
         self.assertEqual(output, {})
 
 
-class ConvertInputTest(TestCase):
+class ConvertItemsInputTest(TestCase):
     def test_convert_input(self):
         case = [{"value": "1", "name": "A1"}, {"value": "", "name": "A2"}, {"value": "3", "name": "A3"}]
-        result = convert_input(case)
+        result = convert_items_input(case)
         expected = {"A1": "1", "A3": "3"}
         self.assertEqual(expected, result)

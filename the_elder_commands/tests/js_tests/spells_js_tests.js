@@ -80,19 +80,17 @@ QUnit.test("Test sending ajax post", function (assert) {
     let button = $("#id_alteration_table_wrapper > .row > div > .table_wrapper > .col-md-1 > .submit_table");
     button.click();
 
-    assert.equal(server.requests.length, 8);
-    let request = server.requests[7];
+    assert.equal(server.requests.length, 7);
+    let request = server.requests[6];
 
     assert.equal(request.url, "/fakeUrl/");
     assert.equal(request.method, "POST");
-    console.log(request.requestBody);
     assert.equal(
         request.requestBody,
-        "csrfmiddlewaretoken=fakeToken&table_input=%5B%7B%22name%22%3A%22957528%22%2C%22value%22%3A%22on%22%7" +
-        "D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22" +
-        "%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22" +
-        "%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%" +
-        "3A%22017288%22%2C%22value%22%3A%22on%22%7D%5D"
+        "csrfmiddlewaretoken=fakeToken&table_input=%5B%7B%22name%22%3A%22957528%22%2C%22value%22%3A%22on%22" +
+        "%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%" +
+        "22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%" +
+        "22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%5D"
     );
 
 });
@@ -123,11 +121,6 @@ function fakeResponse() {
         200,
         {"Content-Type": "application/json"},
         JSON.stringify(parameters.restoration),
-    ]);
-    server.respondWith("GET", "/api/tec/spells/wordsofpower/", [
-        200,
-        {"Content-Type": "application/json"},
-        JSON.stringify(parameters.wordsofpower),
     ]);
     server.respondWith("GET", "/api/tec/spells/other/", [
         200,
@@ -208,16 +201,6 @@ function data() {
                 "form_id": "017288",
                 "mastery": "adept",
                 "effects": "Something",
-            },
-        ],
-        wordsofpower: [
-            {
-                "selected": "on",
-                "plugin_name": "Skyrim",
-                "word": "Sword!",
-                "editor_id": "DA14",
-                "form_id": "017288",
-                "translation": "meaning",
             },
         ],
         other: [

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from the_elder_commands.utils import MessagesSystem, Commands, SelectedPlugins, escape_js, \
-    escape_html, Skills, default_skills_race_update
+    escape_html, Skills, default_skills_race_update, BaseChosen
 from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord
 from unittest.mock import patch
 from django.http import QueryDict
@@ -56,6 +56,18 @@ class MessageSystemTest(TestCase):
         messages_system = MessagesSystem(self.request)
         message = messages_system.pop_skills()
         self.assertEqual(self.request.session.get("skills_messages"), [])
+        self.assertEqual(message, ["test"])
+
+    def test_append_spells_messages(self):
+        message_system = MessagesSystem(self.request)
+        message_system.append_spells("test")
+        self.assertEqual(self.request.session.get("spells_messages"), ["test"])
+
+    def test_pop_spells_messages(self):
+        self.request.session.update({"spells_messages": ["test"]})
+        messages_system = MessagesSystem(self.request)
+        message = messages_system.pop_spells()
+        self.assertEqual(self.request.session.get("spells_messages"), [])
         self.assertEqual(message, ["test"])
 
     def test_pop_messages(self):
@@ -117,15 +129,22 @@ class CommandsTest(TestCase):
         commands.set_items({"item_01": "1"})
         self.assertEqual(self.request.session.get("items_commands"), ["player.additem item_01 1"])
 
+    def test_can_set_spells_commands(self):
+        commands = Commands(self.request)
+        commands.set_spells({"spell_01": True})
+        self.assertEqual(self.request.session.get("spells_commands"), ["player.addspell spell_01"])
+
     def test_get_commands(self):
-        self.request.session.update({"skills_commands": ["skills"], "items_commands": ["items"]})
+        self.request.session.update({"skills_commands": ["skills"], "items_commands": ["items"],
+                                     "spells_commands": ["spells"]})
         commands = Commands(self.request)
         actual = commands.get_commands()
-        expected = ["skills", "items"]
+        expected = ["skills", "items", "spells"]
 
         self.assertEqual(expected, actual)
         self.assertEqual(self.request.session.get("skills_commands"), ["skills"])
         self.assertEqual(self.request.session.get("items_commands"), ["items"])
+        self.assertEqual(self.request.session.get("spells_commands"), ["spells"])
 
     def test_get_commands_can_handle_empty_keys(self):
         commands = Commands(self.request)
@@ -225,7 +244,7 @@ class EscapeHTMLTest(TestCase):
         self.assertEqual(expected, actual)
 
 
-class NewSkillsTest(TestCase):
+class SkillsTest(TestCase):
 
     class FakeRequest:
         def __init__(self):
@@ -311,3 +330,28 @@ class DefaultRaceSkillsUpdateTest(TestCase):
         expected = set_up_default_nord()
         actual = default_skills_race_update("nord")
         self.assertDictEqual(actual, expected)
+
+
+class BaseChosenTest(TestCase):
+    class FakeRequest:
+        session = {"chosen_key": "Result!"}
+
+    def test_get_return_key_value(self):
+        request = self.FakeRequest()
+        chosen = BaseChosen(request)
+        chosen._key = "chosen_key"
+        self.assertEqual(chosen.get(), "Result!")
+
+    def test_if_key_dont_exist_return_empty_dict(self):
+        request = self.FakeRequest()
+        chosen = BaseChosen(request)
+        chosen._key = "chosen_wrong_key"
+
+        self.assertEqual(chosen.get(), {})
+
+    def test_set_value_to_chosen_key(self):
+        request = self.FakeRequest()
+        chosen = BaseChosen(request)
+        chosen._key = "chosen_set_key"
+        chosen.set("New value!")
+        self.assertEqual(request.session.get("chosen_set_key"), "New value!")

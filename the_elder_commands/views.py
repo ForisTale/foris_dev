@@ -5,8 +5,9 @@ from .forms.selected_plugin_form import SelectedPluginsForm
 from .forms.validate_skills import ValidateSkills
 from .services import PluginsService, SkillsService
 from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
-    ITEMS_COMMANDS_POST_EMPTY_MESSAGE, ITEMS_CONVERT_POST_ERROR
-from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update
+    ITEMS_COMMANDS_POST_EMPTY_MESSAGE, CONVERT_POST_JS_ERROR, SPELLS_COMMANDS_POST_EMPTY_MESSAGE
+from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update, \
+    ChosenSpells
 import json
 from io import BytesIO
 
@@ -50,31 +51,30 @@ def items_view(request):
         return redirect("tec:plugins")
 
     if request.method == "POST":
-        commands = convert_items_post(request)
-        ChosenItems(request).set(commands)
-        Commands(request).set_items(commands)
-        if commands:
+        items = convert_items_post(request)
+        ChosenItems(request).set(items)
+        Commands(request).set_items(items)
+        if items:
             message = COMMANDS_SUCCESS_MESSAGE
         else:
             message = ITEMS_COMMANDS_POST_EMPTY_MESSAGE
         return JsonResponse({"message": message})
 
     messages = MessagesSystem(request).pop_items()
-    return render(request, "the_elder_commands/items.html", {"active": "items", "items_messages": messages})
+    return render(request, "the_elder_commands/items.html", {"active": "items", "messages": messages})
 
 
 def convert_items_post(request):
     table_input = request.POST.get("table_input")
     if table_input is None:
-        MessagesSystem(request).append_item(ITEMS_CONVERT_POST_ERROR)
+        MessagesSystem(request).append_item(CONVERT_POST_JS_ERROR)
         return {}
-
     parsed_input = json.loads(table_input)
-    converted = convert_input(parsed_input)
+    converted = convert_items_input(parsed_input)
     return converted
 
 
-def convert_input(parsed_input):
+def convert_items_input(parsed_input):
     converted = {}
     for item in parsed_input:
         if item.get("value") == "":
@@ -88,7 +88,38 @@ def spells_view(request):
     if not SelectedPlugins(request).exist():
         MessagesSystem(request).append_plugin(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
         return redirect("tec:plugins")
-    return render(request, "the_elder_commands/spells.html", {"active": "spells"})
+
+    if request.method == "POST":
+        spells = convert_spells_post(request)
+        ChosenSpells(request).set(spells)
+        Commands(request).set_spells(spells)
+        if spells:
+            message = COMMANDS_SUCCESS_MESSAGE
+        else:
+            message = SPELLS_COMMANDS_POST_EMPTY_MESSAGE
+        return JsonResponse({"message": message})
+    message = MessagesSystem(request).pop_spells()
+    return render(request, "the_elder_commands/spells.html", {"active": "spells", "messages": message})
+
+
+def convert_spells_post(request):
+    table_input = request.POST.get("table_input")
+    if table_input is None:
+        MessagesSystem(request).append_spells(CONVERT_POST_JS_ERROR)
+        return {}
+    parsed_input = json.loads(table_input)
+    converted = convert_spells_input(parsed_input)
+    return converted
+
+
+def convert_spells_input(parsed_input):
+    converted = {}
+    for item in parsed_input:
+        if item.get("value") == "":
+            continue
+        command = {item.get("name"): True}
+        converted.update(command)
+    return converted
 
 
 def other_view(request):

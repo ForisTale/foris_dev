@@ -1,7 +1,8 @@
 from django.test import TestCase
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, Keys, Books, Ammo, Armors, Alchemy, \
-    Miscellaneous, Ingredients, Scrolls, SoulsGems
-from the_elder_commands.services import PluginsService, ItemsService, SkillsService
+    Miscellaneous, Ingredients, Scrolls, SoulsGems, AlterationSpells, DestructionSpells, ConjurationSpells, \
+    OtherSpells, RestorationSpells, IllusionSpells
+from the_elder_commands.services import PluginsService, ItemsService, SkillsService, SpellsService
 from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils import default_skills_race_update
 from the_elder_commands.utils_for_tests import populate_plugins_table, set_up_default_nord
@@ -123,23 +124,26 @@ class PluginsServiceTest(TestCase):
 
 
 class ItemsServiceTest(TestCase):
-    def setUp(self):
-        populate_plugins_table()
-        self.maxDiff = None
-
-    def test_service_pass_selected_plugins(self):
-
-        class FakeRequest:
-            session = {"selected": [{
+    class FakeRequest:
+        session = {
+            "selected": [{
                 "name": "test 01",
                 "usable_name": "test_01",
                 "version": "03",
                 "esl": False,
                 "language": "english",
                 "load_order": "A5"
-            }]}
+            }],
+            "chosen_items": {"test_01": 1, "test_02": "2"}
+        }
 
-        service = ItemsService(FakeRequest, "WEAP")
+    def setUp(self):
+        populate_plugins_table()
+        self.maxDiff = None
+
+    def test_service_pass_selected_plugins(self):
+        request = self.FakeRequest()
+        service = ItemsService(request, "WEAP")
         test_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM.get("WEAP"))
         for item in test_dict:
             item.update({"form_id": f"A5{item.get('form_id', '')}", "plugin_name": "test 01", "quantity": "",
@@ -147,21 +151,10 @@ class ItemsServiceTest(TestCase):
 
         self.assertDictEqual({1: service.items}, {1: test_dict})
 
-    def test_service_pass_chosen_items_into_template(self):
-
-        class FakeRequest:
-            session = {"chosen_items": {"test_01": 1, "test_02": "2"}}
-
-        service = ItemsService(FakeRequest, "WEAP")
+    def test_service_use_chosen_items(self):
+        request = self.FakeRequest()
+        service = ItemsService(request, "WEAP")
         self.assertEqual(service.chosen, {"test_01": 1, "test_02": "2"})
-
-    def test_if_no_items_commands_return_empty_dict(self):
-
-        class FakeRequest:
-            session = {}
-
-        service = ItemsService(FakeRequest, "WEAP")
-        self.assertEqual(service.chosen, {})
 
     def test_get_item_model(self):
         variant = PluginVariants.objects.first()
@@ -175,6 +168,61 @@ class ItemsServiceTest(TestCase):
         self.assertEqual(ItemsService.get_item_model("KEYM", variant), Keys.objects.get(variant=variant))
         self.assertEqual(ItemsService.get_item_model("SCRL", variant), Scrolls.objects.get(variant=variant))
         self.assertEqual(ItemsService.get_item_model("SLGM", variant), SoulsGems.objects.get(variant=variant))
+
+
+class SpellsServiceTest(TestCase):
+    class FakeRequest:
+        session = {
+            "selected": [{
+                "name": "test 01",
+                "usable_name": "test_01",
+                "version": "03",
+                "esl": False,
+                "language": "english",
+                "load_order": "A5"
+            }],
+            "chosen_spells": {"A510FD5F": True}
+        }
+
+    def setUp(self):
+        self.maxDiff = None
+        populate_plugins_table()
+
+    def test_service_pass_selected_plugins(self):
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM.get("SPEL"))
+        words_of_power = test_dict[0]
+        words_of_power.update({"form_id": f"A5{words_of_power.get('form_id', '')}", "plugin_name": "test 01",
+                               "selected": None})
+        request = self.FakeRequest()
+        service = SpellsService(request, "alteration")
+        self.assertEqual({1: [words_of_power]}, {1: service.spells})
+
+        destruction_spell = test_dict[1]
+        destruction_spell.update({"form_id": f"A5{destruction_spell.get('form_id', '')}", "plugin_name": "test 01",
+                                 "selected": True})
+        request = self.FakeRequest()
+        service = SpellsService(request, "destruction")
+        self.assertDictEqual({1: [destruction_spell]}, {1: service.spells})
+
+    def test_service_use_chosen_spells(self):
+        request = self.FakeRequest()
+        service = SpellsService(request, "alteration")
+        self.assertEqual(service.chosen, {"A510FD5F": True})
+
+    def test_get_spells_model(self):
+        variant = PluginVariants.objects.first()
+        self.assertEqual(SpellsService.get_spells_model("alteration", variant),
+                         AlterationSpells.objects.get(variant=variant))
+        self.assertEqual(SpellsService.get_spells_model("destruction", variant),
+                         DestructionSpells.objects.get(variant=variant))
+        self.assertEqual(SpellsService.get_spells_model("conjuration", variant),
+                         ConjurationSpells.objects.get(variant=variant))
+        self.assertEqual(SpellsService.get_spells_model("illusion", variant),
+                         IllusionSpells.objects.get(variant=variant))
+        self.assertEqual(SpellsService.get_spells_model("restoration", variant),
+                         RestorationSpells.objects.get(variant=variant))
+        self.assertEqual(SpellsService.get_spells_model("other", variant),
+                         OtherSpells.objects.get(variant=variant))
 
 
 class SkillsServiceTest(TestCase):

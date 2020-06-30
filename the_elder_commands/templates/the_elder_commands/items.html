@@ -2,7 +2,7 @@
 {% load tec_extras %}
 
 {% block head %}
-<link href="/static/the_elder_commands/items.css" rel="stylesheet">
+<link href="/static/the_elder_commands/dataTables.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
 {% endblock %}
 
@@ -13,7 +13,7 @@
 <script src="/static/the_elder_commands/TEC.js"></script>
 <script src="/static/the_elder_commands/TECItems.js"></script>
 <script>$(document).ready( function () { new TECItems({url: "{% url 'tec:items' %}",
-    messages: {{ items_messages }}}) });</script>
+                                                       messages: {{ messages }}}) });</script>
 {% endblock %}
 
 {% block body %}

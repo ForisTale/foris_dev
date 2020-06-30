@@ -5,8 +5,7 @@ def template_variables(request):
         "main_categories": ["skills", "items", "spells", "other", "plugins", "commands"],
         "items_categories": ["weapons", "armors", "ammo", "books", "ingredients", "alchemy", "scrolls", "soul gems",
                              "keys", "miscellaneous"],
-        "spells_categories": ["alteration", "conjuration", "destruction", "illusion", "restoration", "words of power",
-                              "other"],
+        "spells_categories": ["alteration", "conjuration", "destruction", "illusion", "restoration", "other"],
     }
 
 
@@ -20,7 +19,9 @@ COMMANDS_SUCCESS_MESSAGE = "Commands are ready on the Commands page."
 
 ITEMS_COMMANDS_POST_EMPTY_MESSAGE = "No items selected!"
 
-ITEMS_CONVERT_POST_ERROR = "Javascript error! Something went wrong! If the error persists, contact Foris."
+CONVERT_POST_JS_ERROR = "Javascript error! Something went wrong! If the error persists, contact Foris."
+
+SPELLS_COMMANDS_POST_EMPTY_MESSAGE = "No spells selected!"
 
 INCORRECT_LOAD_ORDER = "Load order need to be hex number between 00 and FF for esp files and from FE001 to "\
                        "FEFFF for esl files!"
@@ -871,13 +872,13 @@ PLUGIN_TEST_DICT_ALTERED_BY_FORM = {
     ],
     "WOOP": [
         {
-            "name": "Nus",
+            "word": "Nus",
             "editor_id": "WordNus",
             "form_id": "0602A5",
             "translation": "Posąg"
         },
         {
-            "name": "Slen",
+            "word": "Slen",
             "editor_id": "WordSlen",
             "form_id": "0602A4",
             "translation": "Ciało"

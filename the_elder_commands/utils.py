@@ -8,6 +8,7 @@ class MessagesSystem:
         self._items_key = "items_messages"
         self._plugins_key = "plugins_messages"
         self._skills_key = "skills_messages"
+        self._spells_key = "spells_messages"
 
     def append_plugin(self, message):
         self._append_message(self._plugins_key, message)
@@ -17,6 +18,9 @@ class MessagesSystem:
 
     def append_skills(self, message):
         self._append_message(self._skills_key, message)
+
+    def append_spells(self, message):
+        self._append_message(self._spells_key, message)
 
     def _append_message(self, key, message):
         if type(message) == list:
@@ -39,6 +43,9 @@ class MessagesSystem:
     def pop_skills(self):
         return self._pop_messages(self._skills_key)
 
+    def pop_spells(self):
+        return self._pop_messages(self._spells_key)
+
     def _pop_messages(self, key):
         message = self.request.session.get(key, [])
         self.request.session.update({key: []})
@@ -50,6 +57,7 @@ class Commands:
         self.request = request
         self._skills_key = "skills_commands"
         self._items_key = "items_commands"
+        self._spells_key = "spells_commands"
 
     def set_skills(self, commands):
         self.request.session.update({self._skills_key: commands})
@@ -60,23 +68,42 @@ class Commands:
             commands.append(f"player.additem {form_id} {quantity}")
         self.request.session.update({self._items_key: commands})
 
+    def set_spells(self, spells):
+        commands = []
+        for form_id in spells.keys():
+            commands.append(f"player.addspell {form_id}")
+        self.request.session.update({self._spells_key: commands})
+
     def get_commands(self):
         commands = []
         commands += self.request.session.get(self._skills_key, [])
         commands += self.request.session.get(self._items_key, [])
+        commands += self.request.session.get(self._spells_key, [])
         return commands
 
 
-class ChosenItems:
+class BaseChosen:
     def __init__(self, request):
         self.request = request
-        self._key = "chosen_items"
+        self._key = None
 
-    def set(self, items):
-        self.request.session.update({self._key: items})
+    def set(self, value):
+        self.request.session.update({self._key: value})
 
     def get(self):
         return self.request.session.get(self._key, {})
+
+
+class ChosenItems(BaseChosen):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self._key = "chosen_items"
+
+
+class ChosenSpells(BaseChosen):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self._key = "chosen_spells"
 
 
 class SelectedPlugins:
