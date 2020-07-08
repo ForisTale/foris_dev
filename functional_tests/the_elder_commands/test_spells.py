@@ -1,6 +1,6 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from django.test.utils import tag
-from the_elder_commands.utils_for_tests import check_test_tag, populate_plugins_table
+from the_elder_commands.utils_for_tests import check_test_tag, populate_plugins_table, click_javascript_button
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE
 
 
@@ -51,8 +51,8 @@ class SpellsTest(FunctionalTest):
             [checkbox.click() for checkbox in inputs if checkbox.is_displayed()]
 
             # then he press generate commands
-            button = self.driver.find_element_by_class_name("submit_table")
-            self.driver.execute_script("arguments[0].click()", button)
+            click_javascript_button(self, "submit_table")
+
             # after press he sees message
             wrappers = self.wait_for(lambda: self.driver.find_elements_by_class_name("alert-primary"))
             for wrapper in wrappers:
@@ -66,3 +66,13 @@ class SpellsTest(FunctionalTest):
         expected = "Commands List:\nplayer.addspell 01000001\nplayer.addspell 01000002\nplayer.addspell 0110FD5F\n" \
                    "player.addspell 01000003\nplayer.addspell 01000004\nplayer.addspell 01000005"
         self.assertEqual(commands_list, expected)
+
+    def test_reset_button(self):
+        # Foris add some gold, then generate commands
+        self.wait_for(lambda: self.driver.find_element_by_tag_name("input").click())
+        click_javascript_button(self, "submit_table")
+
+        # but he change mind and reset table.
+        click_javascript_button(self, "reset_tables")
+        self.wait_for(lambda: self.assertEqual(self.driver.find_element_by_tag_name("input").get_attribute("value"),
+                                               ""))

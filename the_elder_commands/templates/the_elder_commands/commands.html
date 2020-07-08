@@ -3,11 +3,14 @@
 {% block body %}
 <div class="row row-separator"></div>
 <div class="row">
-
-<div class="col-md-4 col-12">
-    <label><a class="btn-dark text-info btn-lg download" href="{% url 'tec:commands_download' %}"
-    >Download Commands</a></label>
-</div>
+    <div class="col-md-4 col-12">
+        <label><a class="btn-dark text-info btn-lg reset" href="{% url 'tec:commands_reset' %}"
+        >Reset All Commands</a></label>
+    </div>
+    <div class="col-md-4 col-12">
+        <label><a class="btn-dark text-info btn-lg download" href="{% url 'tec:commands_download' %}"
+        >Download Commands</a></label>
+    </div>
 </div>
 <div class="row row-separator"></div>
 

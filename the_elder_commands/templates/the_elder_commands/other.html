@@ -1,1 +1,147 @@
 {% extends "the_elder_commands/base.html" %}
+{% load tec_extras %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+<link href="/static/the_elder_commands/dataTables.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/the_elder_commands/TEC.js" type="application/javascript"></script>
+<script src="/static/the_elder_commands/TECOther.js" type="application/javascript"></script>
+<script>$(document).ready( function () { new TECOther({url: "{% url 'tec:other' %}",
+                                                        messages: {{ messages }}}) });</script>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col">
+    <ul class="nav nav-tabs bg-dark justify-content-around" id="id_spells_categories" role="tablist">
+        {% for category in other_categories %}
+        <li class="nav-item">
+            <a class="nav-link text-info {% if category == "variety" %}active show{% endif %}"
+               id="id_{{ category|strip_space }}" data-toggle="tab" role="tab"
+               href="#id_{{ category|strip_space }}_panel" aria-controls="id_{{ category|strip_space }}_panel"
+               aria-selected="{% if category == "variety" %}true{% else %}false{% endif %}">{{ category|title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+
+<div class="row row-separator"></div>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="id_variety_panel" role="tabpanel" aria-labelledby="id_variety">
+    <div class="row">
+    <div class="col-12 col-sm-2"></div>
+    <div class="col-12 col-sm-4">
+        <table class="table table-dark text-info" id="id_variety_table">
+            <thead>
+            <tr>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="id_variety_tbody">
+            <tr>
+                <td><label><input type="text" name="gold" value="{{ chosen|get_value:'gold' }}"></label></td>
+                <td>Add Gold</td>
+            </tr>
+            <tr>
+                <td><label><input type="text" name="dragon_souls" value="{{ chosen|get_value:'dragon_souls' }}"></label></td>
+                <td>Add Dragon Souls</td>
+            </tr>
+            <tr>
+                <td><label><input type="text" name="health" value="{{ chosen|get_value:'health' }}"></label></td>
+                <td>Add Health</td>
+            </tr>
+            <tr>
+                <td><label><input type="text" name="magicka" value="{{ chosen|get_value:'magicka' }}"></label></td>
+                <td>Add Magica</td>
+            </tr>
+            <tr>
+                <td><label><input type="text" name="stamina" value="{{ chosen|get_value:'stamina' }}"></label></td>
+                <td>Add Stamina</td>
+            </tr>
+            <tr>
+                <td><label><input type="text" name="carry_weight" value="{{ chosen|get_value:'carry_weight' }}"></label></td>
+                <td>Set Carry Weight</td>
+            </tr>
+            <tr>
+                <td><label><input type="text" name="movement_speed" value="{{ chosen|get_value:'movement_speed' }}"></label></td>
+                <td>Set movement speed by percentage, 110 equal 110%, sprint or sneak to activate change.</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-12 col-sm-4">
+        <table class="table table-dark text-info" id="id_locations_table">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Move to:</th>
+            </tr>
+            </thead>
+            <tbody id="id_locations_tbody">
+            {% for location in locations %}
+            <tr>
+                <td><label><input type="radio" name="location" value="{{ location|get_value:'location' }}"
+                                  {% if chosen|get_value:'location' == location|get_value:'location'  %}checked
+                                  {% endif %}></label></td>
+                <td><a href="{{ location|get_value:'url' }}" target="_blank"
+                       rel="noopener noreferrer">{{ location|get_value:'location' }}</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-sm-2"></div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_wordsofpower_panel" role="tabpanel" aria-labelledby="id_wordsofpower">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info" id="id_wordsofpower_table">
+            <thead>
+            <tr>
+                <th>Selected</th>
+                <th>Word</th>
+                <th>Translation</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+            </tr>
+            </thead>
+            <tbody id="id_wordsofpower_tbody">
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="id_perks_panel" role="tabpanel" aria-labelledby="id_perks">
+    <div class="row">
+    <div class="col">
+        <table class="table table-dark text-info" id="id_perks_table">
+            <thead>
+            <tr>
+                <th>Selected</th>
+                <th>Perk name</th>
+                <th>Plugin</th>
+                <th>Editor ID</th>
+                <th>Form ID</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody id="id_perks_tbody">
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+
+</div>
+
+{% csrf_token %}
+{% endblock %}

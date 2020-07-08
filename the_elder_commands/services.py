@@ -1,7 +1,7 @@
 from .models import PluginVariants, Plugins, Weapons, Keys, Books, Ammo, Armors, Alchemy, \
     Miscellaneous, Ingredients, Scrolls, SoulsGems, ConjurationSpells, AlterationSpells, OtherSpells, IllusionSpells, \
-    RestorationSpells, DestructionSpells
-from .utils import ChosenItems, SelectedPlugins, Skills, default_skills_race_update, ChosenSpells
+    RestorationSpells, DestructionSpells, WordsOfPower, Perks
+from .utils import ChosenItems, SelectedPlugins, Skills, default_skills_race_update, ChosenSpells, ChosenOther
 import math
 
 
@@ -48,6 +48,7 @@ class SkillsService:
             all_skills_filled = 0
             for category, skills in self.skills.items():
                 for skill_name, skill in skills.items():
+                    # noinspection PyUnresolvedReferences
                     value = values.get(skill_name, 1)
                     while value >= 1:
                         if skill.get("desired_value") == 100:
@@ -235,3 +236,43 @@ class SpellsService:
             return RestorationSpells.objects.get(variant=variant)
         elif category == "other":
             return OtherSpells.objects.get(variant=variant)
+
+
+class WordsOfPowerService:
+    def __init__(self, request):
+        self.chosen = ChosenOther(request).get()
+        self.selected = SelectedPlugins(request).get()
+        self.words = self.get_words()
+
+    def get_words(self):
+        words = []
+        for selected in self.selected:
+            variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
+                                                 language=selected.get("language"), is_esl=selected.get("is_esl"))
+            model = WordsOfPower.objects.get(variant=variant)
+            for word in model.words:
+                form_id = f"{selected.get('load_order')}{word.get('form_id')}"
+                is_selected = self.chosen.get("word" + form_id)
+                word.update({"form_id": form_id, "plugin_name": selected.get("name"), "selected": is_selected})
+                words.append(word)
+        return words
+
+
+class PerksService:
+    def __init__(self, request):
+        self.chosen = ChosenOther(request).get()
+        self.selected = SelectedPlugins(request).get()
+        self.perks = self.get_perks()
+
+    def get_perks(self):
+        perks = []
+        for selected in self.selected:
+            variant = PluginVariants.objects.get(instance__name=selected.get("name"), version=selected.get("version"),
+                                                 language=selected.get("language"), is_esl=selected.get("is_esl"))
+            model = Perks.objects.get(variant=variant)
+            for perk in model.perks:
+                form_id = f"{selected.get('load_order')}{perk.get('form_id')}"
+                is_selected = self.chosen.get("perk" + form_id)
+                perk.update({"form_id": form_id, "plugin_name": selected.get("name"), "selected": is_selected})
+                perks.append(perk)
+        return perks

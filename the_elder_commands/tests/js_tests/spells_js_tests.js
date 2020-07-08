@@ -46,9 +46,11 @@ QUnit.test("Adjust table wrapper", function (assert) {
 
 QUnit.test("Inject button in table wrapper", function (assert) {
     new TECSpells(parameters);
-    let wrapper = $(".table_wrapper > .col-md-1 > button");
+    let submit_buttons = $(".table_wrapper > .col-md-2 > .submit_table"),
+        reset_buttons = $(".table_wrapper > .col-md-2 > .reset_tables");
 
-    assert.equal(wrapper.hasClass("submit_table"), true);
+    assert.equal(submit_buttons.length, 6);
+    assert.equal(reset_buttons.length, 6);
 });
 
 QUnit.test("Show messages in table wrapper", function (assert) {
@@ -77,7 +79,7 @@ QUnit.test("Messages are show only on visible table", function (assert) {
 QUnit.test("Test sending ajax post", function (assert) {
     fakeResponse()
 
-    let button = $("#id_alteration_table_wrapper > .row > div > .table_wrapper > .col-md-1 > .submit_table");
+    let button = $("#id_alteration_table_wrapper > .row > div > .table_wrapper > .col-md-2 > .submit_table");
     button.click();
 
     assert.equal(server.requests.length, 7);
@@ -93,6 +95,20 @@ QUnit.test("Test sending ajax post", function (assert) {
         "22%2C%22value%22%3A%22on%22%7D%2C%7B%22name%22%3A%22017288%22%2C%22value%22%3A%22on%22%7D%5D"
     );
 
+});
+
+QUnit.test("Test reset button send ajax post", function (assert) {
+    fakeResponse()
+
+    let button = $("#id_alteration_table_wrapper > .row > div > .table_wrapper > .col-md-2 > .reset_tables");
+    button.click();
+
+    assert.equal(server.requests.length, 7);
+    let request = server.requests[6];
+
+    assert.equal(request.url, "/fakeUrl/");
+    assert.equal(request.method, "POST");
+    assert.equal(request.requestBody, "csrfmiddlewaretoken=fakeToken&reset=");
 });
 
 

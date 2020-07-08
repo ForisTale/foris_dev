@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.http import FileResponse
+from the_elder_commands.utils_for_tests import set_up_default_nord
 
 
 class CommandsViewTest(TestCase):
@@ -39,3 +40,27 @@ class CommandsDownloadTest(TestCase):
         new_list = list(content)
         commands = new_list[0]
         self.assertEqual("skills\nplayer.additem item01 01", commands.decode("utf-8"))
+
+
+class CommandsResetTest(TestCase):
+    base_url = "/the_elder_commands/commands/reset"
+
+    def test_redirect_to_commands(self):
+        response = self.client.get(self.base_url)
+        self.assertRedirects(response, "/the_elder_commands/commands/")
+
+    def test_reset_all(self):
+        session = self.client.session
+        session.update({"skills": "some", "fill_skills": True, "skills_commands": ["some"], "items_commands": ["some"],
+                        "spells_commands": ["some"], "other_commands": ["some"], "chosen_items": {"some": 1},
+                        "chosen_spells": {"some": 1}, "chosen_other": {"some": 1}})
+        session.save()
+        self.client.get(self.base_url)
+        session = dict(self.client.session)
+        skills = set_up_default_nord()
+        expected = {"skills": skills, "fill_skills": None, "skills_commands": [], "items_commands": [],
+                    "spells_commands": [], "other_commands": [], "chosen_items": {},
+                    "chosen_spells": {}, "chosen_other": {}}
+
+        self.maxDiff = None
+        self.assertDictEqual(session, expected)

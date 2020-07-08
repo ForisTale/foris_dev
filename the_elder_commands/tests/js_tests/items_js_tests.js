@@ -77,9 +77,11 @@ QUnit.test("Adjust table wrapper", function (assert) {
 
 QUnit.test("Inject button in table wrapper", function (assert) {
     new TECItems(parameters);
-    let wrapper = $(".table_wrapper > .col-md-1 > button");
+    let submit_buttons = $(".table_wrapper > .col-md-2 > .submit_table"),
+        reset_buttons = $(".table_wrapper > .col-md-2 > .reset_tables");
 
-    assert.equal(wrapper.hasClass("submit_table"), true);
+    assert.equal(submit_buttons.length, 10);
+    assert.equal(reset_buttons.length, 10);
 });
 
 QUnit.test("Show messages in table wrapper", function (assert) {
@@ -108,7 +110,7 @@ QUnit.test("Messages are show only on visible table", function (assert) {
 QUnit.test("Test sending ajax post", function (assert) {
     fakeResponse()
 
-    let button = $("#id_weapons_table_wrapper > .row > div > .table_wrapper > .col-md-1 > .submit_table");
+    let button = $("#id_weapons_table_wrapper > .row > div > .table_wrapper > .col-md-2 > .submit_table");
     button.click();
 
     assert.equal(server.requests.length, 11);
@@ -135,27 +137,41 @@ QUnit.test("Test sending ajax post", function (assert) {
 
 });
 
+QUnit.test("Test reset button send ajax post", function (assert) {
+    fakeResponse()
+
+    let button = $("#id_weapons_table_wrapper > .row > div > .table_wrapper > .col-md-2 > .reset_tables");
+    button.click();
+
+    assert.equal(server.requests.length, 11);
+    let request = server.requests[10];
+
+    assert.equal(request.url, "/fakeUrl/");
+    assert.equal(request.method, "POST");
+    assert.equal(request.requestBody, "csrfmiddlewaretoken=fakeToken&reset=");
+});
+
 
 QUnit.test("Test buttons hide not selected and show all, click on one remove it and show other.", function (assert) {
     fakeResponse();
     let only_test_table = $(".tab-content"),
         wrapper = $(".table_wrapper > .col-md-1 >", only_test_table);
 
-    assert.equal(wrapper.length, 20);
+    assert.equal(wrapper.length, 10);
     assert.equal(wrapper[1].outerHTML.includes('hide_not_selected'), true);
 
     wrapper[1].click();
 
     wrapper = $(".table_wrapper > .col-md-1 >", only_test_table);
 
-    assert.equal(wrapper.length, 20);
+    assert.equal(wrapper.length, 10);
     assert.equal(wrapper[1].outerHTML.includes('show_all'), true);
 
     wrapper[1].click();
 
     wrapper = $(".table_wrapper > .col-md-1 >", only_test_table);
 
-    assert.equal(wrapper.length, 20);
+    assert.equal(wrapper.length, 10);
     assert.equal(wrapper[1].outerHTML.includes('hide_not_selected'), true);
 });
 

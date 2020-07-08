@@ -246,10 +246,12 @@ function getEffectsDescriptions(effects){
     let description = "";
     for (let effect of effects){
         const hexID = sliceOfItself(effect, "F:", "]"),
-            formID = parseInt(hexID, 16),
-            effectRecord = xelib.GetRecord(0, formID);
+            formID = parseInt(hexID, 16);
+        if (! isNaN(formID)) {
+            let effectRecord = xelib.GetRecord(0, formID);
+            description += xelib.GetValue(effectRecord, "DNAM - Magic Item Description");
+        }
 
-        description += xelib.GetValue(effectRecord, "DNAM - Magic Item Description");
         description += "|";
     }
     return description;

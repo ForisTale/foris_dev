@@ -23,8 +23,8 @@
         {% for category in spells_categories %}
         <li class="nav-item">
             <a class="nav-link text-info {% if category == "alteration" %}active show{% endif %}"
-               id="id_{{ category|strip_space }}" data-toggle="tab" role="tab"
-               href="#id_{{ category|strip_space }}_panel" aria-controls="id_{{ category|strip_space }}_panel"
+               id="id_{{ category }}" data-toggle="tab" role="tab"
+               href="#id_{{ category }}_panel" aria-controls="id_{{ category }}_panel"
                aria-selected="{% if category == "alteration" %}true{% else %}false{% endif %}">{{ category|title }}</a>
         </li>
         {% endfor %}

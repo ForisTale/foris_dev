@@ -2,9 +2,8 @@ from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
 from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
-    CONVERT_POST_JS_ERROR, NO_PLUGIN_SELECTED_ERROR_MESSAGE
+    NO_PLUGIN_SELECTED_ERROR_MESSAGE
 from the_elder_commands.utils_for_tests import check_test_tag, select_plugin, populate_plugins_table
-from the_elder_commands.views import convert_items_post, convert_items_input
 
 
 class ItemsViewTest(TestCase):
@@ -62,31 +61,16 @@ class ItemsViewTest(TestCase):
         response = self.client.post(self.base_url, data=post)
         self.assertIn(ITEMS_COMMANDS_POST_EMPTY_MESSAGE, response.json().get("message"))
 
+    def test_reset_post_return_json_response(self):
+        response = self.client.post(self.base_url, {"reset": ""})
+        self.assertIsInstance(response, JsonResponse)
 
-class ConvertItemsFromPostTest(TestCase):
-    def test_convert_post_to_list_of_form_id_and_amount(self):
-        class FakeRequest:
-            POST = {"table_input": '[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"},'
-                    '{"name":"010282E6","value":""}]'}
+    def test_reset_post_clear_chosen_and_commands(self):
+        session = self.client.session
+        session.update({"chosen_items": {"some": 1}, "items_commands": ["some commands"]})
+        session.save()
+        self.client.post(self.base_url, {"reset": ""})
 
-        result = convert_items_post(FakeRequest())
-        self.assertEqual(result, {"0101BFEF": "1", "010282E9": "12"})
-
-    def test_incorrect_post_give_error_message(self):
-
-        class FakeRequest:
-            POST = {}
-            session = {"items_messages": []}
-
-        request = FakeRequest()
-        output = convert_items_post(request)
-        self.assertEqual(request.session.get("items_messages"), [CONVERT_POST_JS_ERROR])
-        self.assertEqual(output, {})
-
-
-class ConvertItemsInputTest(TestCase):
-    def test_convert_input(self):
-        case = [{"value": "1", "name": "A1"}, {"value": "", "name": "A2"}, {"value": "3", "name": "A3"}]
-        result = convert_items_input(case)
-        expected = {"A1": "1", "A3": "3"}
-        self.assertEqual(expected, result)
+        session = self.client.session
+        self.assertEqual(session.get("chosen_items"), {})
+        self.assertEqual(session.get("items_commands"), [])

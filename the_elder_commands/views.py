@@ -5,10 +5,9 @@ from .forms.selected_plugin_form import SelectedPluginsForm
 from .forms.validate_skills import ValidateSkills
 from .services import PluginsService, SkillsService
 from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
-    ITEMS_COMMANDS_POST_EMPTY_MESSAGE, CONVERT_POST_JS_ERROR, SPELLS_COMMANDS_POST_EMPTY_MESSAGE
+    ITEMS_COMMANDS_POST_EMPTY_MESSAGE, SPELLS_COMMANDS_POST_EMPTY_MESSAGE, OTHER_COMMANDS_POST_EMTPY_MESSAGE
 from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update, \
-    ChosenSpells
-import json
+    ChosenSpells, convert_value_post, ChosenOther
 from io import BytesIO
 
 
@@ -51,7 +50,7 @@ def items_view(request):
         return redirect("tec:plugins")
 
     if request.method == "POST":
-        items = convert_items_post(request)
+        items = convert_value_post(request)
         ChosenItems(request).set(items)
         Commands(request).set_items(items)
         if items:
@@ -64,33 +63,13 @@ def items_view(request):
     return render(request, "the_elder_commands/items.html", {"active": "items", "messages": messages})
 
 
-def convert_items_post(request):
-    table_input = request.POST.get("table_input")
-    if table_input is None:
-        MessagesSystem(request).append_item(CONVERT_POST_JS_ERROR)
-        return {}
-    parsed_input = json.loads(table_input)
-    converted = convert_items_input(parsed_input)
-    return converted
-
-
-def convert_items_input(parsed_input):
-    converted = {}
-    for item in parsed_input:
-        if item.get("value") == "":
-            continue
-        command = {item.get("name"): item.get("value")}
-        converted.update(command)
-    return converted
-
-
 def spells_view(request):
     if not SelectedPlugins(request).exist():
         MessagesSystem(request).append_plugin(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
         return redirect("tec:plugins")
 
     if request.method == "POST":
-        spells = convert_spells_post(request)
+        spells = convert_value_post(request)
         ChosenSpells(request).set(spells)
         Commands(request).set_spells(spells)
         if spells:
@@ -98,32 +77,30 @@ def spells_view(request):
         else:
             message = SPELLS_COMMANDS_POST_EMPTY_MESSAGE
         return JsonResponse({"message": message})
+
     message = MessagesSystem(request).pop_spells()
     return render(request, "the_elder_commands/spells.html", {"active": "spells", "messages": message})
 
 
-def convert_spells_post(request):
-    table_input = request.POST.get("table_input")
-    if table_input is None:
-        MessagesSystem(request).append_spells(CONVERT_POST_JS_ERROR)
-        return {}
-    parsed_input = json.loads(table_input)
-    converted = convert_spells_input(parsed_input)
-    return converted
-
-
-def convert_spells_input(parsed_input):
-    converted = {}
-    for item in parsed_input:
-        if item.get("value") == "":
-            continue
-        command = {item.get("name"): True}
-        converted.update(command)
-    return converted
-
-
 def other_view(request):
-    return render(request, "the_elder_commands/other.html", {"active": "other"})
+    if not SelectedPlugins(request).exist():
+        MessagesSystem(request).append_plugin(NO_PLUGIN_SELECTED_ERROR_MESSAGE)
+        return redirect("tec:plugins")
+
+    if request.method == "POST":
+        variety = convert_value_post(request)
+        ChosenOther(request).set(variety)
+        Commands(request).set_other(variety)
+        if variety:
+            message = COMMANDS_SUCCESS_MESSAGE
+        else:
+            message = OTHER_COMMANDS_POST_EMTPY_MESSAGE
+        return JsonResponse({"message": message})
+
+    messages = MessagesSystem(request).pop_other()
+    chosen = ChosenOther(request).get()
+    return render(request, "the_elder_commands/other.html", {"active": "other", "chosen": chosen,
+                                                             "messages": messages})
 
 
 def plugins_view(request):
@@ -172,3 +149,20 @@ def commands_download(request):
     encoded = content.encode("utf-8")
     file = BytesIO(encoded)
     return FileResponse(file, as_attachment=True, filename="TEC_Commands.txt")
+
+
+def commands_reset(request):
+    skills = Skills(request)
+    race = skills.get_race()
+    reset_skills = default_skills_race_update(race)
+    skills.save_skills(reset_skills)
+    skills.save_fill_skills(None)
+    commands = Commands(request)
+    commands.set_skills([])
+    commands.set_items({})
+    commands.set_spells({})
+    commands.set_other({})
+    ChosenItems(request).set({})
+    ChosenSpells(request).set({})
+    ChosenOther(request).set({})
+    return redirect("tec:commands")

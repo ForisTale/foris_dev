@@ -71,3 +71,67 @@ class SpellsApiTest(TestCase):
 
         actual = json.loads(response.content)
         self.assertEqual(actual, [alteration_spell])
+
+
+class WordsOfPowerApiTest(TestCase):
+    base_url = "/api/tec/wordsofpower/"
+
+    def setUp(self):
+        populate_plugins_table()
+        session = self.client.session
+        session.update({"selected": [{
+            "name": "test 01",
+            "usable_name": "test_01",
+            "version": "03",
+            "language": "english",
+            "load_order": "A5",
+            "is_esl": False
+        }]})
+        session.save()
+
+    def test_get_return_json_200(self):
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response, JsonResponse)
+
+    def test_api_return_json_with_correct_data(self):
+        response = self.client.get(self.base_url)
+
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM.get("WOOP"))
+        for word in test_dict:
+            word.update({"form_id": f"A5{word.get('form_id', '')}", "plugin_name": "test 01", "selected": None})
+
+        actual = json.loads(response.content)
+        self.assertEqual(actual, test_dict)
+
+
+class PerksApiTest(TestCase):
+    base_url = "/api/tec/perks/"
+
+    def setUp(self):
+        populate_plugins_table()
+        session = self.client.session
+        session.update({"selected": [{
+            "name": "test 01",
+            "usable_name": "test_01",
+            "version": "03",
+            "language": "english",
+            "load_order": "A5",
+            "is_esl": False
+        }]})
+        session.save()
+
+    def test_get_return_json_200(self):
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response, JsonResponse)
+
+    def test_api_return_json_with_correct_data(self):
+        response = self.client.get(self.base_url)
+
+        test_dict = copy.deepcopy(PLUGIN_TEST_DICT_ALTERED_BY_FORM.get("PERK"))
+        for perk in test_dict:
+            perk.update({"form_id": f"A5{perk.get('form_id', '')}", "plugin_name": "test 01", "selected": None})
+
+        actual = json.loads(response.content)
+        self.assertEqual(actual, test_dict)

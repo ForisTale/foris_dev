@@ -23,9 +23,15 @@ class TEC {
         let wrapperFirstCols = $(".dataTables_wrapper > div:nth-child(1) > div:first-child");
         wrapperFirstCols.after('<div class="col-md-8 col-12"><div class="row table_wrapper"></div></div>');
     };
+
     createSubmitButton() {
-        $('.table_wrapper').append('<div class="col-md-1 col-12"><button type="button" ' +
+        $('.table_wrapper').append('<div class="col-md-2 col-12"><button type="button" ' +
             'class="btn btn-dark text-info submit_table">Generate<br>Commands</button></div>');
+    };
+
+    createResetButton() {
+        $('.table_wrapper').append('<div class="col-md-2 col-12"><button type="submit" ' +
+            'class="btn btn-dark text-info reset_tables">Reset all tables<br>on page</button></div>');
     };
 
     checkForMessages(messages) {
@@ -36,12 +42,12 @@ class TEC {
 
     createMessage(message) {
         let visibleWrapper = $(".table_wrapper:visible");
-        visibleWrapper.append('<div class=" col-5 alert alert-primary alert-dismissible fade show" role="alert"><h4>' +
+        visibleWrapper.append('<div class=" col alert alert-primary alert-dismissible fade show" role="alert"><h4>' +
             `<strong>${message}</strong></h4> <button type="button" class="close" data-dismiss="alert" ` +
             'aria-label="close"><span aria-hidden="true">&times;</span></button></div>').show();
     };
 
-    sendAjaxPOST(url) {
+    sendAjaxPOST() {
         let tecThis = this;
         $('.submit_table').click(function() {
             let postData = tecThis.getPostData()
@@ -49,7 +55,7 @@ class TEC {
             $.ajax({
                 type: "POST",
                 dataType: "text",
-                url: url,
+                url: tecThis.url,
                 data: {"csrfmiddlewaretoken": jQuery("[name=csrfmiddlewaretoken]").val(), ...postData},
             }).done(function (result) {
                 let templateVariable = JSON.parse(result),
@@ -58,6 +64,20 @@ class TEC {
                 tecThis.createMessage(message);
             }).fail(function () {
                 console.log("Something went wrong! If the error persists, contact Foris.");
+            });
+        });
+    };
+
+    sendResetPost() {
+        let tecThis = this;
+        $(".reset_tables").click(function () {
+            $.ajax({
+                type: "POST",
+                dataType: "text",
+                url: tecThis.url,
+                data: {"csrfmiddlewaretoken": jQuery("[name=csrfmiddlewaretoken]").val(), "reset": ""}
+            }).done(function () {
+                window.location.replace(tecThis.url);
             });
         });
     };

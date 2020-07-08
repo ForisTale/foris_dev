@@ -2,7 +2,8 @@ from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from django.test.utils import tag
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, template_variables, \
     COMMANDS_SUCCESS_MESSAGE
-from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, populate_plugins_table
+from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, populate_plugins_table, \
+    click_javascript_button
 
 
 class ItemsTest(FunctionalTest, ManageTestFiles):
@@ -96,7 +97,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
             self.wait_for(lambda: table.find_element_by_tag_name("input").send_keys("1"))
 
         # After that he submit all of them
-        self.wait_for(lambda: self.submit_items_table())
+        click_javascript_button(self, "submit_table")
 
         # on screen he sees message that all codes will be shown on commands page
         wrappers = self.wait_for(lambda: self.driver.find_elements_by_class_name("alert-primary"))
@@ -121,7 +122,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
 
         table = self.wait_for(lambda: self.driver.find_element_by_id("id_armors_tbody"))
         table.find_element_by_tag_name("input").send_keys("2")
-        self.wait_for(lambda: self.submit_items_table())
+        click_javascript_button(self, "submit_table")
 
         # then he change page and come back to items page
         self.driver.find_element_by_link_text("Skills").click()
@@ -159,3 +160,14 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         # and now he sees all items
         inputs = table_body.find_elements_by_tag_name("input")
         self.assertEqual(len(inputs), 4)
+
+    def test_reset_button(self):
+        # Foris add some gold, then generate commands
+        table_body = self.driver.find_element_by_tag_name("tbody")
+        self.wait_for(lambda: table_body.find_element_by_tag_name("input").send_keys("1000"))
+        click_javascript_button(self, "submit_table")
+
+        # but he change mind and reset table.
+        click_javascript_button(self, "reset_tables")
+        self.wait_for(lambda: self.assertEqual(self.driver.find_element_by_tag_name("input").get_attribute("value"),
+                                               ""))

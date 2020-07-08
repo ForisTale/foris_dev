@@ -1,3 +1,5 @@
+import json
+
 from django.core.exceptions import ObjectDoesNotExist
 from .inventory import RACES_EXTRA_SKILLS, DEFAULT_SKILLS
 from .models import PluginVariants
@@ -11,6 +13,7 @@ class MessagesSystem:
         self._plugins_key = "plugins_messages"
         self._skills_key = "skills_messages"
         self._spells_key = "spells_messages"
+        self._other_key = "other_messages"
 
     def append_plugin(self, message):
         self._append_message(self._plugins_key, message)
@@ -23,6 +26,9 @@ class MessagesSystem:
 
     def append_spells(self, message):
         self._append_message(self._spells_key, message)
+
+    def append_other(self, message):
+        self._append_message(self._other_key, message)
 
     def _append_message(self, key, message):
         if type(message) == list:
@@ -48,6 +54,9 @@ class MessagesSystem:
     def pop_spells(self):
         return self._pop_messages(self._spells_key)
 
+    def pop_other(self):
+        return self._pop_messages(self._other_key)
+
     def _pop_messages(self, key):
         message = self.request.session.get(key, [])
         self.request.session.update({key: []})
@@ -60,6 +69,7 @@ class Commands:
         self._skills_key = "skills_commands"
         self._items_key = "items_commands"
         self._spells_key = "spells_commands"
+        self._other_key = "other_commands"
 
     def set_skills(self, commands):
         self.request.session.update({self._skills_key: commands})
@@ -76,11 +86,108 @@ class Commands:
             commands.append(f"player.addspell {form_id}")
         self.request.session.update({self._spells_key: commands})
 
+    def set_other(self, various):
+        commands = []
+        commands += self._prepare_variety_commands(various)
+        commands += self._prepare_words_of_power_commands(various)
+        commands += self._prepare_perks_commands(various)
+        commands += self._prepare_location_commands(various)
+        self.request.session.update({self._other_key: commands})
+
+    @staticmethod
+    def _prepare_variety_commands(various):
+        commands = []
+        if various.get("gold"):
+            commands.append(f"player.additem 0000000F {various.get('gold')}")
+        if various.get("dragon_souls"):
+            commands.append(f"player.modav dragonsouls {various.get('dragon_souls')}")
+        if various.get("health"):
+            commands.append(f"player.modav health {various.get('health')}")
+        if various.get("magicka"):
+            commands.append(f"player.modav magicka {various.get('magicka')}")
+        if various.get("stamina"):
+            commands.append(f"player.modav stamina {various.get('stamina')}")
+        if various.get("carry_weight"):
+            commands.append(f"player.modav carryweight {various.get('carry_weight')}")
+        if various.get("movement_speed"):
+            commands.append(f"player.setav speedmult {various.get('movement_speed')}")
+        return commands
+
+    @staticmethod
+    def _prepare_location_commands(various):
+        location = various.get("location")
+        locations_ids = {
+            "Whiterun": "Whiterun",
+            "Eldergleam Sanctuary": "EldergleamSanctuaryExterior",
+            "Solitude": "Solitude",
+            "Windhelm": "Windhelm",
+            "Markarth": "MarkarthOrigin",
+            "Riften": "RiftenOrigin",
+            "Morthal": "MorthalExterior01",
+            "Dawnstar": "DawnstarExterior01",
+            "Winterhold": "WinterholdExterior01",
+            "Falkreath": "FalkreathExterior01",
+            "Riverwood": "Riverwood",
+            "Dragon Bridge": "DragonBridgeExterior01",
+            "Karthwasten": "KarthwastenExterior01",
+            "Ivarstead": "IvarsteadExterior01",
+            "Helgen": "HelgenExterior",
+            "Shor's Stone": "ShorsStoneExterior01",
+            "The Atronach Stone": "DoomstoneVolcanicTundra",
+            "The Lady Stone": "DoomstonePineForest01",
+            "The Lord Stone": "DoomstoneSnowy02",
+            "The Lover Stone": "DoomstoneReach01",
+            "The Mage Stone": "GuardianStones",
+            "The Ritual Stone": "DoomstoneTundra01",
+            "The Serpent Stone": "DoomstoneNorthernCoast01",
+            "The Shadow Stone": "DoomstoneFallForest01",
+            "The Steed Stone": "DoomstoneNorthernPineForest01",
+            "The Thief Stone": "GuardianStones",
+            "The Tower Stone": "DoomstoneSnowy01",
+            "The Warrior Stone": "GuardianStones",
+            "The Apprentice Stone": "DoomstoneTundraMarsh01",
+            "Rorikstead": "RoriksteadExterior01",
+            "Mixwater Mill": "MixwaterMillExterior",
+            "Mzulft": "Mzulft01",
+            "Sacellum of Boethiah": "DA02BoethiahShrine",
+            "Darkwater Crossing": "DarkwaterCrossingExterior01",
+            "Kynesgrove": "Kynesgrove",
+            "Narzulbur": "Narzulburexterior01",
+            "Lakeview Manor": "BYOHHouse1Exterior",
+            "Forgotten Vale": "FalmerValleyStart",
+            "Mor Khazgur": "MorKhazgurExterior",
+            "Stonehills": "StonehillsExterior01",
+            "Raven Rock": "DLC2RavenRock01",
+            "Skaal Village": "DLC2SkaalVillage01",
+            "Soul Cairn": "DLC01SoulCairnOrigin",
+            "Sovngarde": "Sovngarde01",
+            "Blackreach": "BlackreachCity",
+            "Anga's Mill": "AngasMill",
+            "Dushnikh Yal": "DushnikhYalExterior01",
+            "Largashbur": "LargashburExterior01",
+        }
+        if location:
+            return [f"coc {locations_ids.get(location)}"]
+        return []
+
+    @staticmethod
+    def _prepare_words_of_power_commands(various):
+        words = [word[4:] for word in various.keys() if word[:4] == "word"]
+        commands = [f"player.teachword {word}" for word in words]
+        return commands
+
+    @staticmethod
+    def _prepare_perks_commands(various):
+        perks = [perk[4:] for perk in various.keys() if perk[:4] == "perk"]
+        commands = [f"player.addperk {perk}" for perk in perks]
+        return commands
+
     def get_commands(self):
         commands = []
         commands += self.request.session.get(self._skills_key, [])
         commands += self.request.session.get(self._items_key, [])
         commands += self.request.session.get(self._spells_key, [])
+        commands += self.request.session.get(self._other_key, [])
         return commands
 
 
@@ -106,6 +213,12 @@ class ChosenSpells(BaseChosen):
     def __init__(self, *args):
         super().__init__(*args)
         self._key = "chosen_spells"
+
+
+class ChosenOther(BaseChosen):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self._key = "chosen_other"
 
 
 class SelectedPlugins:
@@ -215,3 +328,22 @@ class Skills:
 
     def get_fill_skills(self):
         return self.request.session.get(self._fill_skills_key)
+
+
+def convert_value_post(request):
+    table_input = request.POST.get("table_input")
+    if table_input is None:
+        return {}
+    parsed_input = json.loads(table_input)
+    converted = convert_value_input(parsed_input)
+    return converted
+
+
+def convert_value_input(parsed_input):
+    converted = {}
+    for item in parsed_input:
+        if item.get("value") == "":
+            continue
+        command = {item.get("name"): item.get("value")}
+        converted.update(command)
+    return converted

@@ -1,12 +1,15 @@
 class TECItems extends TEC{
     constructor(templateVariables) {
         super();
+        this.url = templateVariables.url;
         this.initializeItemsTables();
         this.adjustWrapper();
         this.createSubmitButton();
+        this.createResetButton();
         this.createHideButton();
         this.checkForMessages(templateVariables.messages);
-        this.sendAjaxPOST(templateVariables.url);
+        this.sendAjaxPOST();
+        this.sendResetPost();
         this.hideButton();
         this.reactionToInput();
     };
@@ -76,19 +79,20 @@ class TECItems extends TEC{
     reactionToInput() {
         for (let table of this.tables) {
             table.on("keyup", "input", function () {
-                let inputValue = $(this).closest("tr").find("input").val();
+                let input = $(this).closest("tr").find("input"),
+                    inputValue = input.val();
                 if (inputValue === "") {
                     let row = $(this).parents("tr"),
                     col = table.api().column(-1),
                     cell = table.api().cell(row, col);
-                    cell.data("false").draw();
+                    cell.data("false");
                 } else {
                     let row = $(this).parents("tr"),
                     col = table.api().column(-1),
                     cell = table.api().cell(row, col);
-                    cell.data("true").draw();
+                    cell.data("true");
                 }
-                $(this).focus();
+                input.focus();
             });
         }
     }

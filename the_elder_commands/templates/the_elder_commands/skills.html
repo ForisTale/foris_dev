@@ -2,8 +2,7 @@
 {% block body %}
 
 <div class="row">
-<div class="col-xl-2 col-12"></div>
-<div class="col-md-8 col-12">
+<div class="col">
 <div class="row">
 <div class="col-xl-2 col-md-4 col-12">
     <div class="btn-group dropright">
@@ -27,7 +26,7 @@
 <div class="col-xl-1 col-12">
     <h6 class="text-info" id="id_race_name">Chosen race:<br>{{ service.race|title }}</h6>
 </div>
-<div class="col-xl-5 col-12 skills_messages">
+<div class="col-xl-3 col-12 skills_messages">
     {% for message in messages %}
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             <h4><strong>{{ message }}</strong></h4>

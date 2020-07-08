@@ -1,6 +1,7 @@
 from django.test import TestCase
+
 from the_elder_commands.utils import MessagesSystem, Commands, SelectedPlugins, escape_js, \
-    escape_html, Skills, default_skills_race_update, BaseChosen
+    escape_html, Skills, default_skills_race_update, BaseChosen, convert_value_post, convert_value_input
 from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord, populate_plugins_table
 from unittest.mock import patch
 from django.http import QueryDict
@@ -70,6 +71,18 @@ class MessageSystemTest(TestCase):
         self.assertEqual(self.request.session.get("spells_messages"), [])
         self.assertEqual(message, ["test"])
 
+    def test_append_other_messages(self):
+        message_system = MessagesSystem(self.request)
+        message_system.append_other("test")
+        self.assertEqual(self.request.session.get("other_messages"), ["test"])
+
+    def test_pop_other_messages(self):
+        self.request.session.update({"other_messages": ["test"]})
+        messages_system = MessagesSystem(self.request)
+        message = messages_system.pop_other()
+        self.assertEqual(self.request.session.get("other_messages"), [])
+        self.assertEqual(message, ["test"])
+
     def test_pop_messages(self):
         self.request.session.update({"messages": ["test"]})
         messages_system = MessagesSystem(self.request)
@@ -134,17 +147,27 @@ class CommandsTest(TestCase):
         commands.set_spells({"spell_01": True})
         self.assertEqual(self.request.session.get("spells_commands"), ["player.addspell spell_01"])
 
+    # coc should be always last in commands!
+    def test_can_set_other_commands(self):
+        commands = Commands(self.request)
+        commands.set_other({"location": "Winterhold", "gold": "1", "dragon_souls": "1", "health": "110",
+                            "magicka": "120", "stamina": "130", "carry_weight": "100", "movement_speed": "120",
+                            "word12345678": "on", "perk87654321": "on"})
+        expected = ["player.additem 0000000F 1", "player.modav dragonsouls 1",
+                    "player.modav health 110", "player.modav magicka 120", "player.modav stamina 130",
+                    "player.modav carryweight 100", "player.setav speedmult 120", "player.teachword 12345678",
+                    "player.addperk 87654321", "coc WinterholdExterior01"]
+        actual = self.request.session.get("other_commands")
+        self.assertEqual(expected, actual)
+
+    # other should be always last in commands!
     def test_get_commands(self):
         self.request.session.update({"skills_commands": ["skills"], "items_commands": ["items"],
-                                     "spells_commands": ["spells"]})
+                                     "spells_commands": ["spells"], "other_commands": ["other"]})
         commands = Commands(self.request)
         actual = commands.get_commands()
-        expected = ["skills", "items", "spells"]
-
+        expected = ["skills", "items", "spells", "other"]
         self.assertEqual(expected, actual)
-        self.assertEqual(self.request.session.get("skills_commands"), ["skills"])
-        self.assertEqual(self.request.session.get("items_commands"), ["items"])
-        self.assertEqual(self.request.session.get("spells_commands"), ["spells"])
 
     def test_get_commands_can_handle_empty_keys(self):
         commands = Commands(self.request)
@@ -367,3 +390,30 @@ class BaseChosenTest(TestCase):
         chosen._key = "chosen_set_key"
         chosen.set("New value!")
         self.assertEqual(request.session.get("chosen_set_key"), "New value!")
+
+
+class ConvertValueJSPostTest(TestCase):
+    def test_convert_post_to_list_of_form_id_and_amount(self):
+        class FakeRequest:
+            POST = {"table_input": '[{"name":"0101BFEF","value":"1"},{"name":"010282E9","value":"12"},'
+                    '{"name":"010282E6","value":""}]'}
+
+        result = convert_value_post(FakeRequest())
+        self.assertEqual(result, {"0101BFEF": "1", "010282E9": "12"})
+
+    def test_missing_table_input_return_empty_dict(self):
+
+        class FakeRequest:
+            POST = {}
+
+        request = FakeRequest()
+        output = convert_value_post(request)
+        self.assertEqual(output, {})
+
+
+class ConvertValueJSInputTest(TestCase):
+    def test_convert_input(self):
+        case = [{"value": "1", "name": "A1"}, {"value": "", "name": "A2"}, {"value": "3", "name": "A3"}]
+        result = convert_value_input(case)
+        expected = {"A1": "1", "A3": "3"}
+        self.assertEqual(expected, result)

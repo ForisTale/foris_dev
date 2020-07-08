@@ -1,11 +1,14 @@
 class TECSpells extends TEC {
     constructor(templateVariables) {
         super();
+        this.url = templateVariables.url;
         this.initializeSpellsTables();
         this.adjustWrapper();
         this.createSubmitButton();
+        this.createResetButton();
         this.checkForMessages(templateVariables.messages);
-        this.sendAjaxPOST(templateVariables.url);
+        this.sendAjaxPOST();
+        this.sendResetPost();
     }
 
     initializeSpellsTables() {
