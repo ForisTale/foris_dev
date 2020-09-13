@@ -1,12 +1,12 @@
 from django.urls import path
 from .views import skills_view, items_view, spells_view, other_view, plugins_view, commands_view, commands_download, \
-    commands_reset
+    commands_reset, home_view
 
 
 app_name = "tec"
 
 urlpatterns = [
-    path("", skills_view, name="home"),
+    path("", home_view, name="home"),
     path("skills/", skills_view, name="skills"),
     path("items/", items_view, name="items"),
     path("spells/", spells_view, name="spells"),

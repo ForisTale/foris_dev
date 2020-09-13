@@ -1,5 +1,17 @@
 {% extends "the_elder_commands/base.html" %}
 {% load tec_extras %}
+{% load static %}
+{% block scripts %}
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/the_elder_commands/TEC.js" type="application/javascript"></script>
+<script src="/static/the_elder_commands/TECPlugins.js" type="application/javascript"></script>
+<script>$(document).ready( function () { new TECPlugins() });</script>
+
+{% endblock %}
+
+
 {% block body %}
 <div class="row">
 <div class="col-12">
@@ -153,6 +165,40 @@
                     <button type="submit" id="id_add_plugin_submit" class="btn btn-dark text-info">Submit</button>
                     <input type="hidden" name="add_plugin" value="">
                     {% csrf_token %}
+                </div>
+            </div>
+            <div class="row row-separator"></div>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <a class="btn btn-dark text-info" data-toggle="collapse" role="button" aria-expanded="false"
+                       aria-controls="id_script"  href="#id_script">zEdit Script</a>
+                    <div class="collapse" id="id_script">
+                        <pre class="text-info">{{ zedit }}</pre>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <a class="btn btn-dark text-info" data-toggle="collapse" role="button" aria-expanded="false"
+                       aria-controls="id_instructions" href="#id_instructions">Instructions</a>
+                    <div class="collapse" id="id_instructions">
+                        <h5>First open zEdit, how to open depending on your mod manager. Use google if you don't know-how.</h5>
+                        <img src="{% static 'the_elder_commands/01_new_session.png' %}" class="img-fluid" alt="new session">
+                        <h5>Then choose plugins from which you want to take data.</h5>
+                        <img src="{% static 'the_elder_commands/02_chose_plugins.png' %}" class="img-fluid" alt="chose plugins">
+                        <h5>Select plugins. You can select more than one.</h5>
+                        <img src="{% static 'the_elder_commands/03_select_plugins.png' %}" class="img-fluid" alt="select plugins">
+                        <h5>With right-click open a menu and then chose to automate.</h5>
+                        <img src="{% static 'the_elder_commands/04_chose_automate.png' %}" class="img-fluid" alt="chose automate">
+                        <h5>In the window paste a script. The script you can find in this site under the button "zEdit Script".
+                            <br>Please make sure you copy the script in full.</h5>
+                        <img src="{% static 'the_elder_commands/05_paste_script.png' %}" class="img-fluid" alt="paste script">
+                        <h5>After executing the script you will get a message, if there is an error message please send it to me with information
+                            which mod cause it.</h5>
+                        <img src="{% static 'the_elder_commands/07_script_completed.png' %}" class="img-fluid" alt="script completed">
+                        <h5>In your zEdit folder should appear a new folder "The_Elder_Commands."</h5>
+                        <img src="{% static 'the_elder_commands/08_zEdit_folder.png' %}" class="img-fluid" alt="zEdit folder">
+                        <h5>Inside it, you will find files created from plugins data.</h5>
+                        <img src="{% static 'the_elder_commands/09_zEdit_TEC_folder.png' %}" class="img-fluid" alt="zEdit TEC folder">
+                    </div>
                 </div>
             </div>
         </form>

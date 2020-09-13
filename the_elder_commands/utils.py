@@ -14,6 +14,7 @@ class MessagesSystem:
         self._skills_key = "skills_messages"
         self._spells_key = "spells_messages"
         self._other_key = "other_messages"
+        self._contact_key = "contact_messages"
 
     def append_plugin(self, message):
         self._append_message(self._plugins_key, message)
@@ -29,6 +30,9 @@ class MessagesSystem:
 
     def append_other(self, message):
         self._append_message(self._other_key, message)
+
+    def append_contact(self, message):
+        self._append_message(self._contact_key, message)
 
     def _append_message(self, key, message):
         if type(message) == list:
@@ -56,6 +60,9 @@ class MessagesSystem:
 
     def pop_other(self):
         return self._pop_messages(self._other_key)
+
+    def pop_contact(self):
+        return self._pop_messages(self._contact_key)
 
     def _pop_messages(self, key):
         message = self.request.session.get(key, [])

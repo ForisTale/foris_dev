@@ -2,7 +2,7 @@ def template_variables(request):
     return {
         "playable_races": ["altmer", "argonian", "bosmer", "breton", "dunmer", "imperial", "khajiit", "nord",
                            "ork", "redguard"],
-        "main_categories": ["skills", "items", "spells", "other", "plugins", "commands"],
+        "main_categories": ["home", "skills", "items", "spells", "other", "plugins", "commands"],
         "items_categories": ["weapons", "armors", "ammo", "books", "ingredients", "alchemy", "scrolls", "soul gems",
                              "keys", "miscellaneous"],
         "spells_categories": ["alteration", "conjuration", "destruction", "illusion", "restoration", "other"],

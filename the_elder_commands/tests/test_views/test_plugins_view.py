@@ -1,4 +1,5 @@
 from django.test import TestCase
+# noinspection PyProtectedMember
 from django.test.utils import tag
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, AlterationSpells, Ammo, Armors, \
     Alchemy, Miscellaneous, RestorationSpells, ConjurationSpells, Scrolls, SoulsGems, OtherSpells, Ingredients, Books, \
@@ -201,3 +202,12 @@ class SelectedPluginsTest(TestCase):
         session = self.client.session
         self.assertEqual(session.get("selected"), [{'is_esl': False, 'language': 'polish', 'load_order': '01',
                                                     'name': 'test 01', 'usable_name': 'test_01', 'version': '0.1'}])
+
+
+class ZeditScriptTest(TestCase):
+    base_url = "/the_elder_commands/plugins/"
+
+    def test_zedit_script_is_transferred_to_plugins_page(self):
+        response = self.client.get(self.base_url)
+        zedit = response.context["zedit"]
+        self.assertIn("const itemsSignatures", zedit)

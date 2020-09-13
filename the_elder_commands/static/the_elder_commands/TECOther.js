@@ -7,7 +7,7 @@ class TECOther extends TEC {
         this.modifyVarietyTableWrapper();
         this.modifyLocationsTableWrapper();
         this.createSubmitButton();
-        this.createResetButton();
+        this.createResetButton("Others");
         this.checkForMessages(templateVariables.messages);
         this.sendAjaxPOST();
         this.sendResetPost();

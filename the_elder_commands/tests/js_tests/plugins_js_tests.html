@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Plugins Tests</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.10.0.css"
+          integrity="sha256-0qVb1rgTvRqgmXb5us49Z/TADxRfGlAWvjxUqrgCnYQ=" crossorigin="anonymous">
+</head>
+<body>
+
+<div id="qunit"></div>
+<div id="qunit-fixture">
+<div class="row">
+    <div class="col">
+        <table class="table table-dark text-info" id="id_plugins_table">
+                    <thead>
+                    <tr>
+                        <th>Plugin Name</th>
+                        <th>Version and Language</th>
+                        <th>Plugin Order</th>
+                        <th>Selected?</th>
+                    </tr>
+                    </thead>
+                    <tbody class="plugins_table">
+
+                    <tr>
+                        <td>Skyrim</td>
+                        <td><!--suppress HtmlFormInputWithoutLabel -->
+                            <select class="form-control" id="id_skyrim_variant" name="skyrim_variant">
+
+                                <option value="1.0&amp;polish&amp;" selected="selected">
+                                    1.0 Polish </option>
+
+                            </select>
+                        </td>
+                        <td>
+                            <label for="id_skyrim_load_order">
+                                <input type="text" name="skyrim_load_order" value="01">
+                            </label>
+                        </td>
+                        <td>
+                            <label><input type="checkbox" name="selected" class="skyrim" value="skyrim" checked=""></label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Apocalypse  Magic of Skyrim</td>
+                        <td><!--suppress HtmlFormInputWithoutLabel -->
+                            <select class="form-control" id="id_apocalypse__magic_of_skyrim_variant" name="apocalypse__magic_of_skyrim_variant">
+                                <option value="1.0&amp;english&amp;">
+                                    1.0 English </option>
+                            </select>
+                        </td>
+                        <td>
+                            <label for="id_apocalypse__magic_of_skyrim_load_order">
+                                <input type="text" name="apocalypse__magic_of_skyrim_load_order" value="">
+                            </label>
+                        </td>
+                        <td>
+                            <label><input type="checkbox" name="selected" class="apocalypse__magic_of_skyrim" value="apocalypse__magic_of_skyrim"></label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>ColorfulMagicSE</td>
+                        <td><!--suppress HtmlFormInputWithoutLabel -->
+                            <select class="form-control" id="id_colorfulmagicse_variant" name="colorfulmagicse_variant">
+                                <option value="1.0&amp;english&amp;">
+                                    1.0 English </option>
+                            </select>
+                        </td>
+                        <td>
+                            <label for="id_colorfulmagicse_load_order">
+                                <input type="text" name="colorfulmagicse_load_order" value="">
+                            </label>
+                        </td>
+                        <td>
+                            <label><input type="checkbox" name="selected" class="colorfulmagicse" value="colorfulmagicse"></label>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+    </div>
+
+</div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+<script src="https://code.jquery.com/qunit/qunit-2.10.0.js"
+        integrity="sha256-X1fQXHSYGxa4V2bqkEAQW0DQGSxJrKveasahr959o28=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sinon.js/9.0.2/sinon.js"></script>
+
+<script src="../../static/the_elder_commands/TEC.js" type="application/javascript"></script>
+<script src="../../static/the_elder_commands/TECPlugins.js" type="application/javascript"></script>
+<script src="plugins_js_tests.js" type="text/javascript"></script>
+</body>
+</html>

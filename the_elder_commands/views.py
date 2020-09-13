@@ -9,6 +9,11 @@ from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESS
 from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update, \
     ChosenSpells, convert_value_post, ChosenOther
 from io import BytesIO
+import os
+
+
+def home_view(request):
+    return render(request, "the_elder_commands/home.html")
 
 
 def skills_view(request):
@@ -115,8 +120,9 @@ def plugins_view(request):
 
     service = PluginsService(request)
     messages = MessagesSystem(request).pop_plugins()
+    zedit_data = get_zedit_data()
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
-                                                               "plugins_messages": messages})
+                                                               "plugins_messages": messages, "zedit": zedit_data})
 
 
 def manage_add_plugin_post(request):
@@ -135,6 +141,13 @@ def manage_selected_post(request):
 def manage_unselect_post(request):
     selected = SelectedPlugins(request)
     selected.unselect()
+
+
+def get_zedit_data():
+    path = os.getcwd()
+    path = os.path.join(path, "the_elder_commands", "script_for_zEdit.js")
+    with open(path, "r") as file:
+        return file.read()
 
 
 def commands_view(request):

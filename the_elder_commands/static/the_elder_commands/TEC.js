@@ -29,9 +29,9 @@ class TEC {
             'class="btn btn-dark text-info submit_table">Generate<br>Commands</button></div>');
     };
 
-    createResetButton() {
+    createResetButton(type) {
         $('.table_wrapper').append('<div class="col-md-2 col-12"><button type="submit" ' +
-            'class="btn btn-dark text-info reset_tables">Reset all tables<br>on page</button></div>');
+            `class="btn btn-dark text-info reset_tables">Reset all<br> ${type}</button></div>`);
     };
 
     checkForMessages(messages) {

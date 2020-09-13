@@ -48,8 +48,8 @@
                     <tr>
                         <th>Multiplier</th>
                         <th>{{ category }}</th>
-                        <th>Value</th>
-                        <th>New value</th>
+                        <th>Base Skill</th>
+                        <th>Desired Skill</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -85,7 +85,7 @@
 
         </div>
         <div class="col-md-4">
-            <h6 id="id_calculated_level">Calculated level: {{ service.default_level }}</h6>
+            <h6 id="id_calculated_level">Base level: {{ service.default_level }}</h6>
         </div>
         <div class="col-md-2">
             <label>Desired level:
@@ -100,7 +100,7 @@
     <div class="row">
         <div class="col-sm-5"></div>
         <div class="col-sm-2 center-block">
-            <button class="btn btn-dark text-info" id="id_calculate" type="submit">Calculate</button>
+            <button class="btn btn-dark text-info" id="id_calculate" type="submit">Generate Commands</button>
             {% csrf_token %}
         </div>
         <div class="col-sm-5"></div>

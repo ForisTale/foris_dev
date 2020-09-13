@@ -5,7 +5,7 @@ class TECSpells extends TEC {
         this.initializeSpellsTables();
         this.adjustWrapper();
         this.createSubmitButton();
-        this.createResetButton();
+        this.createResetButton("Spells");
         this.checkForMessages(templateVariables.messages);
         this.sendAjaxPOST();
         this.sendResetPost();

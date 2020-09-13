@@ -83,6 +83,18 @@ class MessageSystemTest(TestCase):
         self.assertEqual(self.request.session.get("other_messages"), [])
         self.assertEqual(message, ["test"])
 
+    def test_append_contact_messages(self):
+        message_system = MessagesSystem(self.request)
+        message_system.append_contact("test")
+        self.assertEqual(self.request.session.get("contact_messages"), ["test"])
+
+    def test_pop_contact_messages(self):
+        self.request.session.update({"contact_messages": ["test"]})
+        messages_system = MessagesSystem(self.request)
+        message = messages_system.pop_contact()
+        self.assertEqual(self.request.session.get("contact_messages"), [])
+        self.assertEqual(message, ["test"])
+
     def test_pop_messages(self):
         self.request.session.update({"messages": ["test"]})
         messages_system = MessagesSystem(self.request)

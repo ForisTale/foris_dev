@@ -5,7 +5,7 @@ class TECItems extends TEC{
         this.initializeItemsTables();
         this.adjustWrapper();
         this.createSubmitButton();
-        this.createResetButton();
+        this.createResetButton("Items");
         this.createHideButton();
         this.checkForMessages(templateVariables.messages);
         this.sendAjaxPOST();

@@ -13,10 +13,6 @@ class SkillsViewTest(TestCase):
         response = self.client.get(self.base_url)
         self.assertTemplateUsed(response, "the_elder_commands/skills.html")
 
-    def test_default_url_connect_to_correct_template(self):
-        response = self.client.get("/the_elder_commands/")
-        self.assertTemplateUsed(response, "the_elder_commands/skills.html")
-
     def test_race_post_is_saved_in_skills(self):
         self.client.post(self.base_url, data={"race": "ork"})
         session = self.client.session
