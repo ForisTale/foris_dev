@@ -1,0 +1,45 @@
+{% extends "main_page/base.html" %}
+{% block stylesheet %}
+    <link href="/static/main_page/contact.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="row row-separator"></div>
+    {% for message in messages %}
+        <div class="row messages">
+            <div class="col-auto">
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <h4><strong>{{ message }}</strong></h4>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <form action="{% url 'main_page:contact' %}" method="post">
+    <div class="row">
+        <div class="col-4">
+            <label for="id_subject">Subject:</label>
+            <input id="id_subject" class="form-control" name="subject" required>
+            <div class="row row-separator"></div>
+            <label for="id_email">Email:</label>
+            <input id="id_email" name="email" placeholder="Optional" class="form-control">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="id_message">Message:</label>
+            <textarea name="message" class="form-control" id="id_message" rows="10" required></textarea>
+        </div>
+    </div>
+    <div class="row row-separator"></div>
+    <div class="row">
+        <div class="col-sm-5 col-12"></div>
+        <div class="col-sm-2 col-12">
+            <button class="btn btn-dark text-info" id="id_submit" type="submit">Send</button>
+            {% csrf_token %}
+        </div>
+    </div>
+    </form>
+{% endblock %}

@@ -8,7 +8,7 @@ from datetime import datetime
 import os
 import time
 
-MAX_WAIT = 5
+MAX_WAIT = 2
 TEST_EMAIL = "staging_test_email@yahoo.com"
 FOR_TEST_EMAIL = "staging_test_email"
 SCREEN_DUMP_LOCATION = os.path.join(
@@ -39,8 +39,6 @@ class FunctionalTest(StaticLiveServerTestCase):
             self.live_server_url = "http://" + self.staging_server
             reset_database(self.staging_server)
             time.sleep(1)
-        else:
-            self.live_server_url = self.live_server_url
 
     def tearDown(self):
         if self._test_has_failed():

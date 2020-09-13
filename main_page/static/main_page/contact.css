@@ -1,0 +1,12 @@
+input, .form-control, .form-control:focus {
+    background-color: black;
+    color: #17a2b8;
+}
+
+.row.row-separator {
+    height: 25px;
+}
+
+::placeholder {
+    color: #17a2b8 !important;
+}

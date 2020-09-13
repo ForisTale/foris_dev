@@ -5,3 +5,6 @@ TODO log in by google or facebook to save presets
 TODO home page with instructions
 TODO default load order for basic plugins
 TODO message that IE/edge is not supported
+TODO separate views, services, utils, into folders
+TODO add captcha to contact and add plugins pages
+TODO datatable for plugins
