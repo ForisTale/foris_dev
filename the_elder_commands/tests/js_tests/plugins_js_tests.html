@@ -30,8 +30,10 @@
                         <td><!--suppress HtmlFormInputWithoutLabel -->
                             <select class="form-control" id="id_skyrim_variant" name="skyrim_variant">
 
-                                <option value="1.0&amp;polish&amp;" selected="selected">
+                                <option value="1.0&amp;polish&amp;">
                                     1.0 Polish </option>
+                                <option value="1.0&amp;english&amp;" selected="selected">
+                                    1.0 English </option>
 
                             </select>
                         </td>
@@ -73,11 +75,11 @@
                         </td>
                         <td>
                             <label for="id_colorfulmagicse_load_order">
-                                <input type="text" name="colorfulmagicse_load_order" value="">
+                                <input type="text" name="colorfulmagicse_load_order" value="02">
                             </label>
                         </td>
                         <td>
-                            <label><input type="checkbox" name="selected" class="colorfulmagicse" value="colorfulmagicse"></label>
+                            <label><input type="checkbox" name="selected" class="colorfulmagicse" value="colorfulmagicse" checked=""></label>
                         </td>
                     </tr>
 
@@ -85,6 +87,7 @@
                 </table>
     </div>
 
+<input type="hidden" name="csrfmiddlewaretoken" value="fakeToken">
 </div>
 </div>
 

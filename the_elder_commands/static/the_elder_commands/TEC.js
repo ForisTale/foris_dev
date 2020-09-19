@@ -50,7 +50,7 @@ class TEC {
     sendAjaxPOST() {
         let tecThis = this;
         $('.submit_table').click(function() {
-            let postData = tecThis.getPostData()
+            let postData = tecThis.getPostData();
 
             $.ajax({
                 type: "POST",
@@ -85,17 +85,17 @@ class TEC {
     getPostData() {
         let table_input = [],
                 stringifyInput;
-            for (let table of this.tables) {
-                table_input = table_input.concat(table.$("input").serializeArray());
+        for (let table of this.tables) {
+            table_input = table_input.concat(table.$("input").serializeArray());
+        }
+        let clearInput = [];
+        for (let item of table_input) {
+            if (item.value !== "") {
+                clearInput = clearInput.concat(item);
             }
-            let clearInput = [];
-            for (let item of table_input) {
-                if (item.value !== "") {
-                    clearInput = clearInput.concat(item);
-                }
-            }
+        }
 
-            stringifyInput = JSON.stringify(clearInput)
+        stringifyInput = JSON.stringify(clearInput)
         return {"table_input": stringifyInput}
     };
 }
