@@ -1,11 +1,12 @@
 from django.test import TestCase
 # noinspection PyProtectedMember
 from django.test.utils import tag
+from django.http import JsonResponse
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, AlterationSpells, Ammo, Armors, \
     Alchemy, Miscellaneous, RestorationSpells, ConjurationSpells, Scrolls, SoulsGems, OtherSpells, Ingredients, Books, \
     Keys, Perks, DestructionSpells, IllusionSpells
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
-    PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, \
+    PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, SELECTED_PLUGINS_SUCCESS, \
     PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag
 import copy
@@ -74,13 +75,13 @@ class AddPluginTest(TestCase, ManageTestFiles):
     def test_view_pass_messages(self):
         response = self.client.get(self.base_url)
         self.assertEqual(
-            response.context.get("plugins_messages"),
+            response.context.get("messages"),
             []
         )
         self.send_default_post_and_return_response()
         response = self.client.get(self.base_url)
         self.assertEqual(
-            response.context["plugins_messages"],
+            response.context["messages"],
             [ADD_PLUGIN_SUCCESS_MESSAGE]
         )
 
@@ -89,7 +90,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.send_default_post_and_return_response()
         response = self.client.get(self.base_url)
         self.assertEqual(
-            response.context["plugins_messages"],
+            response.context["messages"],
             [ADD_PLUGIN_ERROR_FILE]
         )
 
@@ -99,7 +100,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.send_default_post_and_return_response()
         response = self.client.get(self.base_url)
         self.assertEqual(
-            response.context["plugins_messages"][1],
+            response.context["messages"][1],
             ADD_PLUGIN_ERROR_PLUGIN_EXIST
         )
 
@@ -108,7 +109,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.send_default_post_and_return_response()
         response = self.client.get(self.base_url)
         self.assertEqual(
-            response.context["plugins_messages"],
+            response.context["messages"],
             [ADD_PLUGIN_ERROR_FILE]
         )
 
@@ -118,7 +119,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.client.get(self.base_url)
         response = self.client.get(self.base_url)
         self.assertEqual(
-            response.context["plugins_messages"],
+            response.context["messages"],
             []
         )
 
@@ -176,28 +177,34 @@ class AddPluginTest(TestCase, ManageTestFiles):
 class SelectedPluginsTest(TestCase):
     base_url = "/the_elder_commands/plugins/"
 
-    def test_redirect_after_correct_post(self):
+    def test_return_json_response_after_correct_post(self):
         Plugins.objects.create(name="test 01", usable_name="test_01")
-        post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
+        post = {"selected_plugins": '[{"name": "test_01", "variant": "0.1&polish&", "load_order": "01"}]'}
         response = self.client.post(self.base_url, data=post)
-        self.assertRedirects(response, self.base_url)
+        self.assertIsInstance(response, JsonResponse)
 
-    def test_redirect_after_wrong_post(self):
-        post = {"selected": "test_01", "test_01_variant": "0.1&english&", "test_01_load_order": "avva"}
+    def test_return_json_response_after_wrong_post(self):
+        post = {"selected_plugins": '[{"name": "test_01", "variant": "0.1&polish&", "load_order": "aaa"}]'}
         Plugins.objects.create(name="test 01", usable_name="test_01")
         response = self.client.post(self.base_url, data=post)
-        self.assertRedirects(response, self.base_url)
+        self.assertIsInstance(response, JsonResponse)
 
     def test_pass_error_message_after_wrong_post(self):
-        post = {"selected": "test_01", "test_01_variant": "0.1&english&", "test_01_load_order": "avva"}
-        Plugins.objects.create(name="test 01", usable_name="test_01")
+        post = {"selected_plugins": '[{"name": "test_01", "variant": "0.1&polish&", "load_order": "aaa"}]'}
         self.client.post(self.base_url, data=post)
         response = self.client.get(self.base_url)
-        self.assertEqual(response.context["plugins_messages"], [INCORRECT_LOAD_ORDER])
+        self.assertEqual(response.context["messages"], [INCORRECT_LOAD_ORDER])
+
+    def test_pass_success_message_after_correct_post(self):
+        Plugins.objects.create(name="test 01", usable_name="test_01")
+        post = {"selected_plugins": '[{"name": "test_01", "variant": "0.1&polish&", "load_order": "01"}]'}
+        self.client.post(self.base_url, data=post)
+        response = self.client.get(self.base_url)
+        self.assertEqual(response.context["messages"], [SELECTED_PLUGINS_SUCCESS])
 
     def test_data_are_passed_correctly(self):
         Plugins.objects.create(name="test 01", usable_name="test_01")
-        post = {"selected": "test_01", "test_01_variant": "0.1&polish&", "test_01_load_order": "01"}
+        post = {"selected_plugins": '[{"name": "test_01", "variant": "0.1&polish&", "load_order": "01"}]'}
         self.client.post(self.base_url, data=post)
         session = self.client.session
         self.assertEqual(session.get("selected"), [{'is_esl': False, 'language': 'polish', 'load_order': '01',

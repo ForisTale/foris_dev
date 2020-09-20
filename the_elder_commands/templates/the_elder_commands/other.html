@@ -13,7 +13,7 @@
 <script src="/static/the_elder_commands/TEC.js" type="application/javascript"></script>
 <script src="/static/the_elder_commands/TECOther.js" type="application/javascript"></script>
 <script>$(document).ready( function () { new TECOther({url: "{% url 'tec:other' %}",
-                                                        messages: {{ messages }}}) });</script>
+                                                        messages: {{ messages|safe }}}) });</script>
 {% endblock %}
 
 {% block body %}

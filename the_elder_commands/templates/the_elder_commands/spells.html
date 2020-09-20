@@ -13,7 +13,7 @@
 <script src="/static/the_elder_commands/TEC.js" type="application/javascript"></script>
 <script src="/static/the_elder_commands/TECSpells.js" type="application/javascript"></script>
 <script>$(document).ready( function () { new TECSpells({url: "{% url 'tec:spells' %}",
-                                                        messages: {{ messages }}}) });</script>
+                                                        messages: {{ messages|safe }}}) });</script>
 {% endblock %}
 
 {% block body %}

@@ -49,6 +49,9 @@ class TECPlugins extends TEC {
         return {"selected_plugins": stringifyInput};
     }
 
+    ajaxDone(result) {
+        location.reload();
+    }
 
     getVariant (plugin_name) {
         let variantSelector = this.table.$(`[name=${plugin_name}_variant]`);

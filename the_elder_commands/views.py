@@ -5,7 +5,8 @@ from .forms.selected_plugin_form import SelectedPluginsForm
 from .forms.validate_skills import ValidateSkills
 from .services import PluginsService, SkillsService
 from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
-    ITEMS_COMMANDS_POST_EMPTY_MESSAGE, SPELLS_COMMANDS_POST_EMPTY_MESSAGE, OTHER_COMMANDS_POST_EMTPY_MESSAGE
+    ITEMS_COMMANDS_POST_EMPTY_MESSAGE, SPELLS_COMMANDS_POST_EMPTY_MESSAGE, OTHER_COMMANDS_POST_EMTPY_MESSAGE, \
+    SELECTED_PLUGINS_SUCCESS
 from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update, \
     ChosenSpells, convert_value_post, ChosenOther
 from io import BytesIO
@@ -112,17 +113,19 @@ def plugins_view(request):
     if request.method == "POST":
         if "add_plugin" in request.POST:
             manage_add_plugin_post(request)
-        elif "selected" in request.POST:
-            manage_selected_post(request)
+            return redirect("tec:plugins")
         elif "unselect" in request.POST:
             manage_unselect_post(request)
-        return redirect("tec:plugins")
+            return redirect("tec:plugins")
+        if "selected_plugins" in request.POST:
+            manage_selected_post(request)
+            return JsonResponse({})
 
     service = PluginsService(request)
     messages = MessagesSystem(request).pop_plugins()
     zedit_data = get_zedit_data()
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
-                                                               "plugins_messages": messages, "zedit": zedit_data})
+                                                               "messages": messages, "zedit": zedit_data})
 
 
 def manage_add_plugin_post(request):
@@ -134,8 +137,11 @@ def manage_add_plugin_post(request):
 
 
 def manage_selected_post(request):
-    form = SelectedPluginsForm(request=request)
-    MessagesSystem(request).append_plugin(form.errors)
+    form = SelectedPluginsForm(request)
+    if form.is_valid():
+        MessagesSystem(request).append_plugin(SELECTED_PLUGINS_SUCCESS)
+    else:
+        MessagesSystem(request).append_plugin(form.errors)
 
 
 def manage_unselect_post(request):

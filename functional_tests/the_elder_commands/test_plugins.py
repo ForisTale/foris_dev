@@ -4,6 +4,7 @@ from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_ME
     ADD_PLUGIN_ERROR_FILE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, populate_plugins_table
 from django.test.utils import tag
+import time
 
 
 class PluginsTest(FunctionalTest):
@@ -47,10 +48,10 @@ class PluginsTest(FunctionalTest):
         self.check_is_active("id_plugins")
 
         # and there is table
-        self.assertEqual(
-            self.driver.find_element_by_id("id_plugins_table").text,
-            "Plugin Name Version and Language Plugin Order Selected?"
-        )
+        self.wait_for(lambda: self.assertIn(
+            "Plugin Name Version and Language Plugin Order Selected?",
+            self.driver.find_element_by_id("id_plugins_table").text
+        ))
         self.assertEqual(
             self.driver.find_element_by_id("id_selected_plugins_table").text,
             "Selected Plugins:\nUnselect All"
@@ -178,7 +179,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         self.driver.find_element_by_name("test_02_load_order").send_keys("02")
 
         # then he submit them
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
         # and after reload selected plugins appear in table on the side
         self.wait_for(lambda: self.assertEqual(
@@ -198,7 +199,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         # then he add one more plugin
         self.wait_for(lambda: self.driver.find_element_by_class_name("test_03").click())
         self.driver.find_element_by_name("test_03_load_order").send_keys("03")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_class_name("selected_plugins").text,
@@ -227,18 +228,16 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         # after he chose it, but write load order for esp
         self.driver.find_element_by_class_name("esl").click()
         self.driver.find_element_by_name("esl_load_order").send_keys("02")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
         # he sees error message,
-        self.wait_for(lambda: self.assertEqual(
-            self.driver.find_element_by_class_name("errors_messages").text,
-            INCORRECT_LOAD_ORDER + "\n×"
-        ))
+        self.wait_for(lambda: self.assertIn(INCORRECT_LOAD_ORDER, self.driver.find_element_by_class_name("alert").text))
 
         # then he write correct load order
-        self.driver.find_element_by_class_name("esl").click()
+        self.driver.find_element_by_name("esl_load_order").clear()
         self.driver.find_element_by_name("esl_load_order").send_keys("FE001")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+
+        self.driver.find_element_by_class_name("submit_table").click()
 
         # in selected plugin he sees again that there is esl info
         self.wait_for(lambda: self.assertEqual(
@@ -253,7 +252,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         # enable it
         self.wait_for(lambda: self.driver.find_element_by_class_name("test").click())
         self.driver.find_element_by_name("test_load_order").send_keys("01")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
         # then he change to items page
         self.wait_for(lambda: self.driver.find_element_by_link_text("Items").click())

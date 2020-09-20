@@ -78,6 +78,10 @@ OTHER_COMMANDS_POST_EMTPY_MESSAGE = "Nothing was chosen!"
 INCORRECT_LOAD_ORDER = "Load order need to be hex number between 00 and FF for esp files and from FE001 to "\
                        "FEFFF for esl files!"
 
+SELECTED_PLUGINS_SUCCESS = "Plugins have been successfully selected."
+
+NO_PLUGIN_SELECTED = "No plugin selected!"
+
 PLUGINS_ERROR_NAME_IS_EMTPY = "Name cannot be empty!"
 
 PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"

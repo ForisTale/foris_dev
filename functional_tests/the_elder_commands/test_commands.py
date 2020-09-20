@@ -9,7 +9,7 @@ class CommandsTest(FunctionalTest):
         self.base_url = self.live_server_url + "/commands/"
         self.download_url = self.live_server_url + "/commands/download"
 
-        self.driver.get(self.live_server_url)
+        self.driver.get(self.live_server_url + "/skills/")
         self.driver.find_element_by_name("onehanded_new").send_keys("50")
         self.driver.find_element_by_id("id_calculate").click()
         self.driver.find_element_by_link_text("Commands").click()
@@ -24,7 +24,7 @@ class CommandsTest(FunctionalTest):
         self.driver.get(self.live_server_url + "/plugins/")
         self.wait_for(lambda: self.driver.find_element_by_class_name("test_01").click())
         self.driver.find_element_by_name("test_01_load_order").send_keys("01")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
         # Foris generate skills
         self.driver.get(self.live_server_url + "/skills/")

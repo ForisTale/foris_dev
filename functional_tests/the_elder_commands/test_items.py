@@ -31,7 +31,7 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         self.driver.find_element_by_name("test_01_load_order").send_keys("01")
         self.driver.find_element_by_class_name("test_03").click()
         self.driver.find_element_by_name("test_03_load_order").send_keys("03")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
     def submit_items_table(self):
         table = self.driver.find_element_by_class_name("submit_table")
@@ -74,8 +74,8 @@ class ItemsTest(FunctionalTest, ManageTestFiles):
         # Foris forget to select plugin and when he arrive on items page he get reload to plugins page with
         # error message
         self.wait_for(lambda: self.assertEqual(self.driver.current_url, self.live_server_url+"/plugins/"))
-        error_message = self.driver.find_element_by_class_name("errors_messages").text
-        self.assertEqual(error_message, NO_PLUGIN_SELECTED_ERROR_MESSAGE + "\n×")
+        error_message = self.driver.find_element_by_class_name("alert").text
+        self.assertIn(NO_PLUGIN_SELECTED_ERROR_MESSAGE, error_message)
 
     def test_categories(self):
         # Foris sees weapons table with several items

@@ -20,14 +20,14 @@ class SpellsTest(FunctionalTest):
         self.driver.get(self.live_server_url + "/plugins/")
         self.wait_for(lambda: self.driver.find_element_by_class_name("test_01").click())
         self.driver.find_element_by_name("test_01_load_order").send_keys("01")
-        self.driver.find_element_by_id("id_select_plugin_submit").click()
+        self.driver.find_element_by_class_name("submit_table").click()
 
     @tag("dont_select")
     def test_need_selected_plugin(self):
         # Foris forgot to select plugin so he was redirected to plugin page
         self.wait_for(lambda: self.assertEqual(self.driver.current_url, self.live_server_url + "/plugins/"))
-        error_message = self.driver.find_element_by_class_name("errors_messages").text
-        self.assertEqual(error_message, NO_PLUGIN_SELECTED_ERROR_MESSAGE + "\n×")
+        error_message = self.driver.find_element_by_class_name("alert").text
+        self.assertIn(NO_PLUGIN_SELECTED_ERROR_MESSAGE, error_message)
 
     def test_selected_spells_show_in_commands_page(self):
         # Foris sees spell categories and WoP category

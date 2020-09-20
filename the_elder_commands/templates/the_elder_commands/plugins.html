@@ -7,7 +7,8 @@
         src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
 <script src="/static/the_elder_commands/TEC.js" type="application/javascript"></script>
 <script src="/static/the_elder_commands/TECPlugins.js" type="application/javascript"></script>
-<script>$(document).ready( function () { new TECPlugins() });</script>
+<script>$(document).ready( function () { new TECPlugins({url: "{% url 'tec:plugins' %}",
+                                                         messages: {{messages|safe}} })});</script>
 
 {% endblock %}
 
@@ -28,76 +29,49 @@
 </div>
 </div>
 
-{% if plugins_messages %}
-{% for message in plugins_messages %}
-<div class="row errors_messages">
-    <div class="col-auto">
-        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            <h4><strong>{{ message }}</strong></h4>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </div>
-</div>
-{% endfor %}
-{% endif %}
-
 <div class="tab-content container-fluid">
     <div class="tab-pane active" id="id_plugins_panel" role="tabpanel" aria-labelledby="id_plugins">
         <div class="row row-separator"></div>
         <div class="row">
         <div class="col-md-8 col-12">
-            <form action="{% url "tec:plugins" %}" method="post">
-                <table class="table table-dark text-info" id="id_plugins_table">
-                    <thead>
-                    <tr>
-                        <th>Plugin Name</th>
-                        <th>Version and Language</th>
-                        <th>Plugin Order</th>
-                        <th>Selected?</th>
-                    </tr>
-                    </thead>
-                    <tbody class="plugins_table">
-                    {% for plugin in service.all_plugins %}
-                    <tr>
-                        <td>{{ plugin.name }}</td>
-                        <td><!--suppress HtmlFormInputWithoutLabel -->
-                            <select class="form-control" id="id_{{ plugin.usable_name }}_variant"
-                                    name="{{ plugin.usable_name }}_variant">
-                                {% for variant in plugin.variants %}
-                                <option value="{{ variant.version }}&{{ variant.language }}&{{ variant.esl }}"
-                                {% if variant.selected %}selected="selected"{% endif %}>
-                                    {{ variant.version }} {{ variant.language|capfirst }} {{ variant.esl }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td>
-                            <label for="id_{{ plugin.usable_name }}_load_order">
-                                <input type="text" name="{{ plugin.usable_name }}_load_order"
-                                       value="{{ plugin.load_order }}">
-                            </label>
-                        </td>
-                        <td>
-                            <label><input type="checkbox" name="selected" class="{{ plugin.usable_name }}"
-                                          value="{{ plugin.usable_name }}"
-                                          {% if plugin.selected %}checked{% endif %}></label>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            <div class="row row-separator"></div>
-            <div class="row">
-                <div class="col-5"></div>
-                <div class="col-2">
-                    <button type="submit" id="id_select_plugin_submit" class="btn btn-dark text-info">Submit</button>
-                    <input type="hidden" name="selected" value="">
-                    {% csrf_token %}
-                </div>
-                <div class="col-5"></div>
-            </div>
-            </form>
+            <table class="table table-dark text-info" id="id_plugins_table">
+                <thead>
+                <tr>
+                    <th>Plugin Name</th>
+                    <th>Version and Language</th>
+                    <th>Plugin Order</th>
+                    <th>Selected?</th>
+                </tr>
+                </thead>
+                <tbody class="plugins_table">
+                {% for plugin in service.all_plugins %}
+                <tr>
+                    <td>{{ plugin.name }}</td>
+                    <td><!--suppress HtmlFormInputWithoutLabel -->
+                        <select class="form-control" id="id_{{ plugin.usable_name }}_variant"
+                                name="{{ plugin.usable_name }}_variant">
+                            {% for variant in plugin.variants %}
+                            <option value="{{ variant.version }}&{{ variant.language }}&{{ variant.esl }}"
+                            {% if variant.selected %}selected="selected"{% endif %}>
+                                {{ variant.version }} {{ variant.language|capfirst }} {{ variant.esl }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <label for="id_{{ plugin.usable_name }}_load_order">
+                            <input type="text" name="{{ plugin.usable_name }}_load_order"
+                                   value="{{ plugin.load_order }}">
+                        </label>
+                    </td>
+                    <td>
+                        <label><input type="checkbox" name="selected" class="{{ plugin.usable_name }}"
+                                      value="{{ plugin.usable_name }}"
+                                      {% if plugin.selected %}checked{% endif %}></label>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
             <div class="col-4">
                 <table class="table table-dark text-info" id="id_selected_plugins_table">
@@ -151,6 +125,13 @@
                     <select class="form-control" id="id_plugin_language" name="plugin_language">
                         <option value="english">English</option>
                         <option value="polish">Polish</option>
+                        <option value="japanese">Japanese</option>
+                        <option value="french">French</option>
+                        <option value="italian">Italian</option>
+                        <option value="german">German</option>
+                        <option value="spanish">Spanish</option>
+                        <option value="chinese">Chinese</option>
+                        <option value="russian">Russian</option>
                     </select>
                 </div>
             </div>

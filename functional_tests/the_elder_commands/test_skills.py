@@ -7,7 +7,7 @@ class SkillsTest(FunctionalTest):
     def setUp(self):
         super().setUp()
         # Foris open The elder commands website.
-        self.driver.get(self.live_server_url)
+        self.driver.get(self.live_server_url + "/skills/")
 
     def equal_find_element_by_id(self, id_text, value):
         self.wait_for(lambda: self.assertEqual(
@@ -85,7 +85,7 @@ class SkillsTest(FunctionalTest):
         self.equal_find_element_by_id("id_multiplier", "")
 
         # next to it are two boxes with calculated lvl
-        self.equal_find_element_by_id("id_calculated_level", "Calculated level: 1")
+        self.equal_find_element_by_id("id_calculated_level", "Base level: 1")
 
         # and desired lvl.
         self.equal_find_element_by_id("id_desired_level", "")
@@ -93,7 +93,7 @@ class SkillsTest(FunctionalTest):
         # On the bottom is button with name calculate.
         self.assertEqual(
             self.driver.find_elements_by_tag_name("button")[-1].text,
-            "Calculate"
+            "Generate Commands"
         )
 
     def test_validation(self):
@@ -140,7 +140,7 @@ class SkillsTest(FunctionalTest):
         # desired level and calculated level are correct
         self.wait_for(lambda: self.assertEqual(
             self.driver.find_element_by_id("id_calculated_level").text,
-            "Calculated level: 4"
+            "Base level: 4"
         ))
 
         self.assertEqual(
@@ -209,7 +209,7 @@ class SkillsTest(FunctionalTest):
         self.driver.find_element_by_id("id_calculate").click()
         # and default level changed
         self.wait_for(lambda: self.equal_find_element_by_id("id_calculated_level",
-                                                            "Calculated level: 5"))
+                                                            "Base level: 5"))
         self.assertEqual(
             self.driver.find_element_by_id("id_desired_level").get_attribute("value"),
             "5"

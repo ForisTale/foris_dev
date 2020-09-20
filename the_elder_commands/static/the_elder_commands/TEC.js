@@ -58,15 +58,20 @@ class TEC {
                 url: tecThis.url,
                 data: {"csrfmiddlewaretoken": jQuery("[name=csrfmiddlewaretoken]").val(), ...postData},
             }).done(function (result) {
-                let templateVariable = JSON.parse(result),
-                    message = templateVariable.message;
+                tecThis.ajaxDone(result);
 
-                tecThis.createMessage(message);
             }).fail(function () {
                 console.log("Something went wrong! If the error persists, contact Foris.");
             });
         });
     };
+
+    ajaxDone (result) {
+        let templateVariable = JSON.parse(result),
+            message = templateVariable.message;
+
+        this.createMessage(message);
+    }
 
     sendResetPost() {
         let tecThis = this;
