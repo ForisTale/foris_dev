@@ -3,6 +3,16 @@
     <link href="/static/main_page/contact.css" rel="stylesheet">
 {% endblock %}
 
+{% block script %}
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+   function onSubmit() {
+     let form = document.getElementById("id_contact_form");
+     form.submit();
+   }
+ </script>
+{% endblock %}
+
 {% block body %}
     <div class="row row-separator"></div>
     {% for message in messages %}
@@ -17,7 +27,7 @@
             </div>
         </div>
     {% endfor %}
-    <form action="{% url 'main_page:contact' %}" method="post">
+    <form action="{% url 'main_page:contact' %}" method="post" id="id_contact_form">
     <div class="row">
         <div class="col-4">
             <label for="id_subject">Subject:</label>
@@ -37,7 +47,8 @@
     <div class="row">
         <div class="col-sm-5 col-12"></div>
         <div class="col-sm-2 col-12">
-            <button class="btn btn-dark text-info" id="id_submit" type="submit">Send</button>
+            <button class="btn btn-dark text-info g-recaptcha" id="id_submit" data-sitekey ="{{ site_key }}"
+                    data-callback="onSubmit" data-action="submit">Send</button>
             {% csrf_token %}
         </div>
     </div>

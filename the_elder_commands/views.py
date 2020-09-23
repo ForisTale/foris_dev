@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, FileResponse
+from django.conf import settings
 from .forms.add_plugins_form import AddPluginsForm
 from .forms.selected_plugin_form import SelectedPluginsForm
 from .forms.validate_skills import ValidateSkills
@@ -8,7 +9,7 @@ from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESS
     ITEMS_COMMANDS_POST_EMPTY_MESSAGE, SPELLS_COMMANDS_POST_EMPTY_MESSAGE, OTHER_COMMANDS_POST_EMTPY_MESSAGE, \
     SELECTED_PLUGINS_SUCCESS
 from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update, \
-    ChosenSpells, convert_value_post, ChosenOther
+    ChosenSpells, convert_value_post, ChosenOther, check_recaptcha
 from io import BytesIO
 import os
 
@@ -125,9 +126,11 @@ def plugins_view(request):
     messages = MessagesSystem(request).pop_plugins()
     zedit_data = get_zedit_data()
     return render(request, "the_elder_commands/plugins.html", {"active": "plugins", "service": service,
-                                                               "messages": messages, "zedit": zedit_data})
+                                                               "messages": messages, "zedit": zedit_data,
+                                                               "site_key": settings.RECAPTCHA_SITE_KEY})
 
 
+@check_recaptcha("plugin")
 def manage_add_plugin_post(request):
     form = AddPluginsForm(request)
     if form.is_valid():

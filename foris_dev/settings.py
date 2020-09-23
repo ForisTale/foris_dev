@@ -30,7 +30,6 @@ else:
     SECRET_KEY = "insecure-key-for-dev"
     ALLOWED_HOSTS = ["*"]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -124,6 +123,11 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+
+# ReCaptcha
+RECAPTCHA_SITE_KEY = secret.get("recaptcha_site_key")
+RECAPTCHA_SECRET_KEY = secret.get("recaptcha_secret_key")
 
 
 # Password validation
