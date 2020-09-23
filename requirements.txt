@@ -1,7 +1,7 @@
-djangorestframework
-django
+djangorestframework~=3.11.0
+django~=3.1.1
 gunicorn
-pyyaml
+pyyaml~=5.3.1
 # psycopg2 need python 64-bit and postgresql installed
 psycopg2
 
@@ -11,3 +11,4 @@ psycopg2
 # fabric3
 # selenium
 # geckodriver set in PATH
+requests~=2.24.0

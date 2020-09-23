@@ -1,10 +1,12 @@
 from django.test import TestCase
-
 from the_elder_commands.utils import MessagesSystem, Commands, SelectedPlugins, escape_js, \
-    escape_html, Skills, default_skills_race_update, BaseChosen, convert_value_post, convert_value_input
-from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord, populate_plugins_table
-from unittest.mock import patch
+    escape_html, Skills, default_skills_race_update, BaseChosen, convert_value_post, convert_value_input, \
+    check_recaptcha
+from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord, populate_plugins_table, \
+    FakeRequest, FakeResponse
+from unittest.mock import patch, MagicMock
 from django.http import QueryDict
+from django.conf import settings
 
 
 class ManageTestFilesTest(TestCase):
@@ -429,3 +431,50 @@ class ConvertValueJSInputTest(TestCase):
         result = convert_value_input(case)
         expected = {"A1": "1", "A3": "3"}
         self.assertEqual(expected, result)
+
+
+class CheckRecaptchaTest(TestCase):
+
+    @staticmethod
+    @patch("the_elder_commands.utils.recaptcha_request")
+    @patch("the_elder_commands.utils.HttpRequest")
+    def make_request(content, http_request_patch, recaptcha_request_patch):
+        recaptcha_request_patch.post.return_value = FakeResponse(content)
+        http_request_patch.build_absolute_uri.return_value = "url"
+        request_data = {"g-recaptcha-response": "response",
+                        "secret": settings.RECAPTCHA_SECRET_KEY}
+
+        func = MagicMock()
+        request = FakeRequest(request_data)
+
+        check_recaptcha("contact")(func)(request)
+
+        return {"recaptcha_request_patch": recaptcha_request_patch, "function": func, "request": request}
+
+    def test_recaptcha_request_validation(self):
+        returns = self.make_request(b'{"success": true, "score": 0.4}')
+        recaptcha_request_patch = returns.get("recaptcha_request_patch")
+        func = returns.get("function")
+
+        func.assert_called_once()
+        recaptcha_request_patch.post.assert_called_once()
+
+        expected_data = {"response": "response",
+                         "secret": settings.RECAPTCHA_SECRET_KEY}
+        recaptcha_request_patch.post.assert_called_with("https://www.google.com/recaptcha/api/siteverify",
+                                                        expected_data)
+
+    def test_recaptcha_run_function_not_called_on_low_score(self):
+        returns = self.make_request(b'{"success": true, "score": 0.3}')
+        recaptcha_request_patch = returns.get("recaptcha_request_patch")
+        func = returns.get("function")
+
+        recaptcha_request_patch.post.assert_called_once()
+        func.assert_not_called()
+
+    def test_recaptcha_will_give_message_to_site_on_failure(self):
+        returns = self.make_request(b'{"success": true, "score": 0.3}')
+        request = returns.get("request")
+
+        message = MessagesSystem(request).pop_contact()
+        self.assertEqual(message, ["It looks like you're a bot. If not, contact me the other way. url"])

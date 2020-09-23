@@ -1,6 +1,9 @@
 import json
-
+import requests as recaptcha_request
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpRequest
+from django.shortcuts import reverse
+from django.conf import settings
 from .inventory import RACES_EXTRA_SKILLS, DEFAULT_SKILLS
 from .models import PluginVariants
 import copy
@@ -354,3 +357,22 @@ def convert_value_input(parsed_input):
         command = {item.get("name"): item.get("value")}
         converted.update(command)
     return converted
+
+
+def check_recaptcha(site):
+    def decorator(func):
+        def wrapper(request):
+            recaptcha_data = {"response": request.POST.get("g-recaptcha-response"),
+                              "secret": settings.RECAPTCHA_SECRET_KEY}
+            recaptcha_response = recaptcha_request.post("https://www.google.com/recaptcha/api/siteverify",
+                                                        recaptcha_data)
+            result = json.loads(recaptcha_response.content)
+            if result.get("success") and result.get("score") >= 0.4:
+                func(request)
+            else:
+                messages = MessagesSystem(request)
+                url = HttpRequest.build_absolute_uri(request, reverse('main_page:about_me'))
+                getattr(messages, "append_" + site)("It looks like you're a bot. If not, contact me the other way. "
+                                                    f"{url}")
+        return wrapper
+    return decorator

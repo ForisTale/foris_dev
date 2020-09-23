@@ -8,7 +8,8 @@ from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfP
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
     PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, SELECTED_PLUGINS_SUCCESS, \
     PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
-from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag
+from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, FakeResponse
+from unittest.mock import patch
 import copy
 
 
@@ -46,7 +47,9 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.delete_test_files()
         super().tearDown()
 
-    def send_default_post_and_return_response(self):
+    @patch("the_elder_commands.utils.recaptcha_request")
+    def send_default_post_and_return_response(self, recaptcha_request_patch):
+        recaptcha_request_patch.post.return_value = FakeResponse(b'{"success": true, "score": 1.0}')
         with open(self.test_file_full_path, "r", encoding="utf-8") as file:
             data = {
                 "plugin_name": ["test 01'5<>(){}[]a'n\"*"],
