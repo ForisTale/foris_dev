@@ -3,8 +3,8 @@ from selenium.webdriver.support.ui import Select
 from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, PLUGIN_TEST_ESCAPE_FILE, \
     ADD_PLUGIN_ERROR_FILE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
 from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, populate_plugins_table
+# noinspection PyProtectedMember
 from django.test.utils import tag
-import time
 
 
 class PluginsTest(FunctionalTest):
@@ -86,7 +86,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
 
     def submit_add_file(self, name, version, language, file_full_path):
         # then chose add plugin
-        self.wait_for(lambda: self.driver.find_element_by_link_text("Add Plugin").click())
+        self.driver.find_element_by_link_text("Add Plugin").click()
 
         self.driver.find_element_by_id("id_plugin_name").send_keys(name)
         self.driver.find_element_by_id("id_plugin_version").send_keys(version)
@@ -114,10 +114,10 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
         self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
 
         # in table he sees plugin that he add
-        self.assertEqual(
+        self.wait_for(lambda: self.assertEqual(
             "test mod\n0.1 Polish",
             self.driver.find_element_by_class_name("plugins_table").text
-        )
+        ))
 
         # with "Selected?" unchecked and empty "Plugin Order"
         self.assertFalse(self.driver.find_element_by_class_name("test_mod").is_selected())
@@ -138,7 +138,7 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     def test_files_with_same_data_return_error(self):
         # Foris by mistake send two the same files.
         self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
-        self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
+        self.wait_for(lambda: self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path))
 
         # and he sees error.
         self.check_errors_messages([ADD_PLUGIN_ERROR_PLUGIN_EXIST])
@@ -147,9 +147,9 @@ class AddPluginTest(FunctionalTest, ManageTestFiles):
     def test_plugins_with_same_name_show_options_to_chose_variants(self):
         # Foris submit few mods with different language and version
         self.submit_add_file("test mod", "0.1", "Polish", self.test_file_full_path)
-        self.submit_add_file("test mod", "0.1", "English", self.test_file_full_path)
-        self.submit_add_file("test mod", "0.2", "Polish", self.test_file_full_path)
-        self.submit_add_file("test mod", "0.2", "English", self.test_file_full_path)
+        self.wait_for(lambda: self.submit_add_file("test mod", "0.1", "English", self.test_file_full_path))
+        self.wait_for(lambda: self.submit_add_file("test mod", "0.2", "Polish", self.test_file_full_path))
+        self.wait_for(lambda: self.submit_add_file("test mod", "0.2", "English", self.test_file_full_path))
 
         # then he can chose between variants
         self.wait_for(lambda: self.assertEqual(
