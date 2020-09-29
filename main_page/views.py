@@ -29,7 +29,8 @@ def contact(request):
 def send_contact_email(request):
     messages = MessagesSystem(request)
     try:
-        send_mail(request.POST.get("subject"), request.POST.get("message"), request.POST.get("email"),
+        email_message = f"Email: {request.POST.get('email')} \nMessage: {request.POST.get('message')}"
+        send_mail(request.POST.get("subject"), email_message, "",
                   ["foris.dev@gmail.com"])
         messages.append_contact("Message was sent!")
     except SMTPException:
