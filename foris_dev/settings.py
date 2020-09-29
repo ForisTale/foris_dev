@@ -126,8 +126,12 @@ DATABASES = {
 
 
 # ReCaptcha
-RECAPTCHA_SITE_KEY = secret.get("recaptcha_site_key")
-RECAPTCHA_SECRET_KEY = secret.get("recaptcha_secret_key")
+if is_deployed:
+    RECAPTCHA_SITE_KEY = secret[f"recaptcha_{database_name}_site_key"]
+    RECAPTCHA_SECRET_KEY = secret[f"recaptcha_{database_name}_secret_key"]
+else:
+    RECAPTCHA_SITE_KEY = secret["recaptcha_site_key"]
+    RECAPTCHA_SECRET_KEY = secret["recaptcha_secret_key"]
 
 
 # Password validation
@@ -169,12 +173,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+# E-mail settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "foris.dev@gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_PASSWORD = secret["email_host_pass"]
 
+if is_deployed:
+    EMAIL_HOST_USER = "foris.dev@gmail.com"
+    EMAIL_HOST_PASSWORD = secret["email_host_pass"]
+else:
+    EMAIL_HOST_USER = ""
+    EMAIL_HOST_PASSWORD = ""
+
+
+# Security setting
 
 if is_deployed:
     # security tweaks from:
