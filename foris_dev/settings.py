@@ -53,6 +53,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Make that all error messages are displayed in terminal
+# noinspection PyUnresolvedReferences
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -61,10 +62,21 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
         },
+        'main_page_logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'main_page.log'),
+            'maxBytes': 1024*1024*15,  # 15MB
+            'backupCount': 10,
+        },
     },
     "loggers": {
         "django": {
             "handlers": ["console"],
+        },
+        'main_page': {
+            'handlers': ['main_page_logfile'],
+            'level': 'DEBUG',
         },
     },
     "root": {"level": "INFO"},
