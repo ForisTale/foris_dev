@@ -86,7 +86,7 @@ PLUGINS_ERROR_NAME_IS_EMTPY = "Name cannot be empty!"
 
 PLUGINS_ERROR_NAME_BECOME_EMPTY = "Name cannot consist only from special signs!"
 
-NO_PLUGIN_SELECTED_ERROR_MESSAGE = "Please select plugin before use Items or Spells."
+NO_PLUGIN_SELECTED_ERROR_MESSAGE = "Please select plugin before use Items, Spells or Other."
 
 SKILLS_ERROR_NEW_VALUE_BIGGER = "New value of {skill} must be bigger than a value!"
 

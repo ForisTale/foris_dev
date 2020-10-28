@@ -11,7 +11,7 @@ class TECSpells extends TEC {
         this.sendResetPost();
     }
 
-    initializeSpellsTables() {
+    initializeSpellsTables = () => {
         this.tables = [];
 
         for (let category of this.getSpells()) {
@@ -19,7 +19,7 @@ class TECSpells extends TEC {
         }
     };
 
-    getSpells() {
+    getSpells = () => {
         return [
             {
                 url: `/api/tec/spells/alteration/`,

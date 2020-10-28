@@ -14,7 +14,7 @@ class TECItems extends TEC{
         this.reactionToInput();
     };
 
-    initializeItemsTables() {
+    initializeItemsTables = () => {
         this.tables = [];
 
         for (let category of this.getItems()) {
@@ -22,7 +22,7 @@ class TECItems extends TEC{
         }
     };
 
-    hideButton() {
+    hideButton = () => {
         let tecThis = this;
         $(".hide_not_selected").click(function () {
             tecThis.removeHideButton();
@@ -32,51 +32,50 @@ class TECItems extends TEC{
         });
     };
 
-    showButton() {
-        let tecThis = this;
-        $(".show_all").click(function () {
-            tecThis.removeShowButton();
-            tecThis.createHideButton();
-            tecThis.hideButton();
-            tecThis.clearSearch();
+    showButton = () => {
+        $(".show_all").click(() => {
+            this.removeShowButton();
+            this.createHideButton();
+            this.hideButton();
+            this.clearSearch();
         });
     };
 
-    createShowButton() {
+    createShowButton = () => {
         $(".table_wrapper > div:first-child").after('<div class="col-md-1 col-12"><button type="button" ' +
             'class="btn btn-dark text-info show_all btn-block">Show<br>All</button></div>');
     };
 
-    createHideButton() {
+    createHideButton = () => {
         $(".table_wrapper > div:first-child").after('<div class="col-md-1 col-12"><button type="button" ' +
             'class="btn btn-dark text-info hide_not_selected">Hide&nbspNot<br>Selected</button></div>');
     };
 
-    removeHideButton() {
+    removeHideButton = () => {
         let show = $(".hide_not_selected");
         show.parent().remove();
     };
 
-    removeShowButton() {
+    removeShowButton = () => {
         let hide = $(".show_all");
         hide.parent().remove();
     };
 
-    searchSelected() {
+    searchSelected = () => {
         for (let table of this.tables) {
             table.api().search("");
             table.api().column(-1).search("true").draw();
         }
     };
 
-    clearSearch() {
+    clearSearch = () => {
         for (let table of this.tables) {
             table.api().search("");
             table.api().column(-1).search("").draw();
         }
     };
 
-    reactionToInput() {
+    reactionToInput = () => {
         for (let table of this.tables) {
             table.on("keyup", "input", function () {
                 let input = $(this).closest("tr").find("input"),
@@ -97,7 +96,7 @@ class TECItems extends TEC{
         }
     }
 
-    getItems() {
+    getItems = () => {
         return [
             {
                 url: `/api/tec/items/WEAP/`,

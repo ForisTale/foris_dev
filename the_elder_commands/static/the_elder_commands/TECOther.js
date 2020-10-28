@@ -13,7 +13,7 @@ class TECOther extends TEC {
         this.sendResetPost();
     }
 
-    initializeOtherTables() {
+    initializeOtherTables = () => {
         this.tables = [];
 
         this.tables.push(this.initializeVarietyTable());
@@ -24,9 +24,9 @@ class TECOther extends TEC {
         }
     };
 
-    initializeVarietyTable() {
+    initializeVarietyTable = () => {
         return $("#id_variety_table").dataTable({
-            "createdRow": function (row) {
+            "createdRow": (row) => {
                 $(row).addClass("bg-dark");
             },
             "order": [[1, "asc"]],
@@ -37,16 +37,16 @@ class TECOther extends TEC {
         })
     };
 
-    initializeLocationTable() {
+    initializeLocationTable = () => {
         return $("#id_locations_table").dataTable({
-            "createdRow": function (row) {
+            "createdRow": (row) => {
                 $(row).addClass("bg-dark");
             },
             "columnDefs": [{"orderable": false, "targets": [0, 1]},],
         })
     };
 
-    modifyVarietyTableWrapper() {
+    modifyVarietyTableWrapper = () => {
         let tableWrapper = $("#id_variety_table_wrapper > div:first-child");
         tableWrapper.empty();
         tableWrapper.append('<div class="col"><div class="row table_wrapper"></div></div>');
@@ -54,12 +54,12 @@ class TECOther extends TEC {
         tableWrapper.after('<div class="row row-separator"></div>');
     };
 
-    modifyLocationsTableWrapper() {
+    modifyLocationsTableWrapper = () => {
         let tableWrapper = $("#id_locations_table_wrapper > div:first-child > div:nth-child(2) > div:first-child");
         tableWrapper.removeClass("table_wrapper");
     };
 
-    getOthers() {
+    getOthers = () => {
         return [
             {
                 url: `/api/tec/wordsofpower/`,

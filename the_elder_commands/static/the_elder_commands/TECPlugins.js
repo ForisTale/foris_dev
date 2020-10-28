@@ -11,20 +11,20 @@ class TECPlugins extends TEC {
     }
 
 
-    initializePluginsTable () {
+    initializePluginsTable = () => {
         this.table = $("#id_plugins_table").dataTable({
-            "createdRow": function (row) {
+            "createdRow": (row) => {
                 $(row).addClass("bg-dark");
             },
         });
     };
 
-    injectSubmitButton () {
+    injectSubmitButton = () => {
          $('.table_wrapper').append('<div class="col-md-2 col-12"><button type="button" ' +
             'class="btn btn-dark text-info submit_table">Submit<br>Plugins</button></div>');
     };
 
-    getPostData () {
+    getPostData = () => {
         let selector_selected_plugins = this.table.$("[name=selected]"),
             selected_plugins = [],
             table_input = [],
@@ -49,17 +49,17 @@ class TECPlugins extends TEC {
         return {"selected_plugins": stringifyInput};
     }
 
-    ajaxDone(result) {
+    ajaxDone = () => {
         location.reload();
     }
 
-    getVariant (plugin_name) {
+    getVariant = (plugin_name) => {
         let variantSelector = this.table.$(`[name=${plugin_name}_variant]`);
         return variantSelector.val();
     }
 
 
-    getLoadOrder (plugin_name) {
+    getLoadOrder = (plugin_name) => {
         let loadOrderSelector = this.table.$(`[name=${plugin_name}_load_order]`);
         return loadOrderSelector.val();
     }

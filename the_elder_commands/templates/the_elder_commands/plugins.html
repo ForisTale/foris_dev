@@ -1,6 +1,11 @@
 {% extends "the_elder_commands/base.html" %}
 {% load tec_extras %}
 {% load static %}
+
+{% block head %}
+<link href="/static/the_elder_commands/dataTables.css" rel="stylesheet">
+{% endblock %}
+
 {% block scripts %}
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
 <script type="text/javascript" charset="utf8"

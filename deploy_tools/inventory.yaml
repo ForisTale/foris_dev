@@ -5,13 +5,16 @@ all:
       ansible_host: foris.dev
       ansible_become: yes
       ansible_user: Eien
+      database_name: foris_dev
 
     live-test:
       ansible_host: live-test.foris.dev
       ansible_become: yes
       ansible_user: Eien
+      database_name: live_test_foris_dev
 
     staging:
       ansible_host: staging.foris.dev
       ansible_become: yes
       ansible_user: Eien
+      database_name: staging_foris_dev

@@ -4,7 +4,7 @@
 
 - name: make sure required packages are installed
   apt:
-    name: ["nginx", "git", "python3.7", "python3.7-venv"]
+    name: ["nginx", "git", "python3.8", "python3.8-venv", "postgresql", "postgresql-contrib"]
     state: present
     update_cache: yes
 
@@ -66,6 +66,20 @@
     chdir: "{{ site_folder }}/deploy_tools/"
     executable: python3
   when: settings_exists.stat.exists == False
+
+#- name: check if postgresql role exist
+#  community.general.postgresql_user:
+#
+#
+#- name: if not exist, create postgresql role
+#  community.general.postgresql_user:
+#    db: foris
+#    name: foris
+#  when:
+#
+#- name: check if database for site exist
+#
+#- name: if database not exist, create it
 
 - name: Update static files.
   command: ./virtualenv/bin/python manage.py collectstatic --noinput

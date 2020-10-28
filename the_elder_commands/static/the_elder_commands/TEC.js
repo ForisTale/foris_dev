@@ -1,5 +1,5 @@
 class TEC {
-    initializeDataTable(item) {
+    initializeDataTable = (item) => {
         return $(`#${item.tableId}`).dataTable({
                 ajax:{
                     url: item.url,
@@ -16,7 +16,7 @@ class TEC {
             });
     };
 
-    adjustWrapper() {
+    adjustWrapper = () => {
         let wrapperCols = $(".dataTables_wrapper > div:nth-child(1) > div");
         wrapperCols.removeClass("col-md-6");
         wrapperCols.addClass("col-md-2");
@@ -24,70 +24,68 @@ class TEC {
         wrapperFirstCols.after('<div class="col-md-8 col-12"><div class="row table_wrapper"></div></div>');
     };
 
-    createSubmitButton() {
+    createSubmitButton = () => {
         $('.table_wrapper').append('<div class="col-md-2 col-12"><button type="button" ' +
             'class="btn btn-dark text-info submit_table">Generate<br>Commands</button></div>');
     };
 
-    createResetButton(type) {
+    createResetButton = (type) => {
         $('.table_wrapper').append('<div class="col-md-2 col-12"><button type="submit" ' +
             `class="btn btn-dark text-info reset_tables">Reset all<br> ${type}</button></div>`);
     };
 
-    checkForMessages(messages) {
+    checkForMessages = (messages) => {
         for (let message of messages) {
             this.createMessage(message);
         }
     };
 
-    createMessage(message) {
+    createMessage = (message) => {
         let visibleWrapper = $(".table_wrapper:visible");
         visibleWrapper.append('<div class=" col alert alert-primary alert-dismissible fade show" role="alert"><h4>' +
             `<strong>${message}</strong></h4> <button type="button" class="close" data-dismiss="alert" ` +
             'aria-label="close"><span aria-hidden="true">&times;</span></button></div>').show();
     };
 
-    sendAjaxPOST() {
-        let tecThis = this;
-        $('.submit_table').click(function() {
-            let postData = tecThis.getPostData();
+    sendAjaxPOST = () => {
+        $('.submit_table').click(() => {
+            let postData = this.getPostData();
 
             $.ajax({
                 type: "POST",
                 dataType: "text",
-                url: tecThis.url,
+                url: this.url,
                 data: {"csrfmiddlewaretoken": jQuery("[name=csrfmiddlewaretoken]").val(), ...postData},
-            }).done(function (result) {
-                tecThis.ajaxDone(result);
+            }).done((result) => {
+                this.ajaxDone(result);
 
-            }).fail(function () {
+            }).fail(() => {
                 console.log("Something went wrong! If the error persists, contact Foris.");
             });
         });
     };
 
-    ajaxDone (result) {
+    ajaxDone = (result) => {
         let templateVariable = JSON.parse(result),
             message = templateVariable.message;
 
         this.createMessage(message);
     }
 
-    sendResetPost() {
-        let tecThis = this;
-        $(".reset_tables").click(function () {
+    sendResetPost = () => {
+        $(".reset_tables").click(() => {
             $.ajax({
                 type: "POST",
                 dataType: "text",
-                url: tecThis.url,
+                url: this.url,
                 data: {"csrfmiddlewaretoken": jQuery("[name=csrfmiddlewaretoken]").val(), "reset": ""}
-            }).done(function () {
-                window.location.replace(tecThis.url);
+            }).done(() => {
+                window.location.replace(this.url);
             });
         });
     };
 
-    getPostData() {
+    getPostData = () => {
         let table_input = [],
                 stringifyInput;
         for (let table of this.tables) {
