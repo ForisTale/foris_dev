@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.http import FileResponse
-from the_elder_commands.utils_for_tests import set_up_default_nord
+from the_elder_commands.utils_for_tests.setup_default_nord import setup_default_nord
 
 
 class CommandsViewTest(TestCase):
@@ -57,7 +57,7 @@ class CommandsResetTest(TestCase):
         session.save()
         self.client.get(self.base_url)
         session = dict(self.client.session)
-        skills = set_up_default_nord()
+        skills = setup_default_nord()
         expected = {"skills": skills, "fill_skills": None, "skills_commands": [], "items_commands": [],
                     "spells_commands": [], "other_commands": [], "chosen_items": {},
                     "chosen_spells": {}, "chosen_other": {}}

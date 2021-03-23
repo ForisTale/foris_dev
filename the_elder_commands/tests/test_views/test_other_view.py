@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.http import JsonResponse
 from django.test.utils import tag
-from the_elder_commands.utils_for_tests import populate_plugins_table, check_test_tag, select_plugin
+from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
+from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
+from the_elder_commands.utils_for_tests.select_plugin import select_plugin
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
     OTHER_COMMANDS_POST_EMTPY_MESSAGE
 

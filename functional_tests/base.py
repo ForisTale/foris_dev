@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.firefox.options import Options
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 from functional_tests.superlists.server_tools import reset_database
@@ -33,7 +34,9 @@ def wait(fn):
 
 class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
-        self.driver = webdriver.Firefox()
+        options = Options()
+        options.headless = True
+        self.driver = webdriver.Firefox(options=options)
         self.staging_server = os.environ.get("STAGING_SERVER")
         if self.staging_server:
             self.live_server_url = "http://" + self.staging_server

@@ -1,6 +1,6 @@
 from the_elder_commands.inventory import INCORRECT_LOAD_ORDER, NO_PLUGIN_SELECTED
 from the_elder_commands.models import Plugins
-from the_elder_commands.utils import SelectedPlugins
+from the_elder_commands.utils.selected_plugins import SelectedPlugins
 import json
 
 

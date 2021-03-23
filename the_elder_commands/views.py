@@ -8,8 +8,14 @@ from .services import PluginsService, SkillsService
 from .inventory import ADD_PLUGIN_SUCCESS_MESSAGE, NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
     ITEMS_COMMANDS_POST_EMPTY_MESSAGE, SPELLS_COMMANDS_POST_EMPTY_MESSAGE, OTHER_COMMANDS_POST_EMTPY_MESSAGE, \
     SELECTED_PLUGINS_SUCCESS
-from .utils import MessagesSystem, Commands, ChosenItems, SelectedPlugins, Skills, default_skills_race_update, \
-    ChosenSpells, convert_value_post, ChosenOther, check_recaptcha
+from .utils.commands import Commands
+from .utils.chosen import ChosenItems,  ChosenSpells, ChosenOther
+from .utils.selected_plugins import SelectedPlugins
+from .utils.skills import Skills
+from .utils.defauld_skills_race_update import default_skills_race_update
+from .utils.convert_value_post import convert_value_post
+from .utils.check_recaptcha import check_recaptcha
+from .utils.messages_system import MessagesSystem
 from io import BytesIO
 import os
 

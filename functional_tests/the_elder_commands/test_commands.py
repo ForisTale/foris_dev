@@ -1,5 +1,6 @@
 from .tec_base import FunctionalTest
-from the_elder_commands.utils_for_tests import populate_plugins_table, click_javascript_button
+from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
+from the_elder_commands.utils_for_tests.click_javascript_button import click_javascript_button
 
 
 class CommandsTest(FunctionalTest):

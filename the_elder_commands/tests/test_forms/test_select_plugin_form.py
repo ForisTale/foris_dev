@@ -4,7 +4,7 @@ from django.test import TestCase
 from the_elder_commands.forms.selected_plugin_form import SelectedPluginsForm
 from the_elder_commands.inventory import INCORRECT_LOAD_ORDER, NO_PLUGIN_SELECTED
 from the_elder_commands.models import Plugins
-from the_elder_commands.utils_for_tests import FakeRequest
+from the_elder_commands.utils_for_tests.fake_request import FakeRequest
 
 
 class SelectPluginFormTest(TestCase):

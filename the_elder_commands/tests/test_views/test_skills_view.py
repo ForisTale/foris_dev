@@ -1,7 +1,7 @@
 from django.test import TestCase
 from the_elder_commands.services import SkillsService
 from the_elder_commands.inventory import DEFAULT_SKILL_POST, COMMANDS_SUCCESS_MESSAGE, SKILLS_ERROR_DESIRED_LEVEL
-from the_elder_commands.utils import default_skills_race_update
+from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update
 
 
 class SkillsViewTest(TestCase):

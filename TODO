@@ -1,9 +1,8 @@
-TODO psycopg2 need python 64-bot and postgresql installed, create database
-TODO UPDATE ANSIBLE to version 4 with all tests refactored to this version
-TODO can save presets
-TODO log in by google or facebook to save presets
-TODO default load order for basic plugins
-TODO separate views, services, utils, into folders
-TODO custom checkbox, not visible in ubuntu firefox
-TODO move static files somewhere and copy them with ansible
-TODO rewrite html to use React
+psycopg2 need python 64-bot and postgresql installed, create database
+UPDATE ANSIBLE to version 4 with all tests refactored to this version
+can save presets
+log in by google or facebook to save presets
+default load order for basic plugins
+separate views, services, into folders
+custom checkbox, not visible in ubuntu firefox
+move static files somewhere and copy them with ansible

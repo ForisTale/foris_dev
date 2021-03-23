@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from the_elder_commands.utils import MessagesSystem, check_recaptcha
+from the_elder_commands.utils.check_recaptcha import check_recaptcha
+from the_elder_commands.utils.messages_system import MessagesSystem
 from django.conf import settings
 from smtplib import SMTPException
 

@@ -3,7 +3,7 @@ import copy
 from the_elder_commands.inventory import SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_DESIRED_LEVEL, \
     SKILLS_ERROR_MULTIPLIER, DEFAULT_SKILLS, SKILLS_ERROR_NEW_VALUE_BIGGER, SKILLS_ERROR_BASE_SKILL, \
     SKILLS_ERROR_DESIRED_SKILL
-from the_elder_commands.utils import Skills
+from the_elder_commands.utils.skills import Skills
 
 
 class SkillsValidationError(Exception):

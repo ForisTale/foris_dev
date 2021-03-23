@@ -1,9 +1,19 @@
 from django.test import TestCase
-from the_elder_commands.utils import MessagesSystem, Commands, SelectedPlugins, escape_js, \
-    escape_html, Skills, default_skills_race_update, BaseChosen, convert_value_post, convert_value_input, \
-    check_recaptcha
-from the_elder_commands.utils_for_tests import ManageTestFiles, set_up_default_nord, populate_plugins_table, \
-    FakeRequest, FakeResponse
+from the_elder_commands.utils.commands import Commands
+from the_elder_commands.utils.selected_plugins import SelectedPlugins
+from the_elder_commands.utils.escape_js import escape_js
+from the_elder_commands.utils.escape_html import escape_html
+from the_elder_commands.utils.convert_value_post import convert_value_post, convert_value_input
+from the_elder_commands.utils.skills import Skills
+from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update
+from the_elder_commands.utils.chosen import BaseChosen
+from the_elder_commands.utils.check_recaptcha import check_recaptcha
+from the_elder_commands.utils.messages_system import MessagesSystem
+from the_elder_commands.utils_for_tests.setup_default_nord import setup_default_nord
+from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
+from the_elder_commands.utils_for_tests.fake_request import FakeRequest
+from the_elder_commands.utils_for_tests.fake_response import FakeResponse
+from the_elder_commands.utils_for_tests.manage_test_files import ManageTestFiles
 from unittest.mock import patch, MagicMock
 from django.http import QueryDict
 from django.conf import settings
@@ -249,8 +259,8 @@ class SelectedPluginsTest(TestCase):
         selected._unselect_all()
         self.assertEqual(self.request.session.get("selected"), [])
 
-    @patch("the_elder_commands.utils.SelectedPlugins._unselect_all")
-    @patch("the_elder_commands.utils.SelectedPlugins._unselect_one")
+    @patch("the_elder_commands.utils.selected_plugins.SelectedPlugins._unselect_all")
+    @patch("the_elder_commands.utils.selected_plugins.SelectedPlugins._unselect_one")
     def test_unselect_for_one(self, one, un_all):
         post = QueryDict("", mutable=True)
         post.update({"unselect": "test"})
@@ -262,8 +272,8 @@ class SelectedPluginsTest(TestCase):
         un_all.assert_not_called()
         one.assert_called_with("test")
 
-    @patch("the_elder_commands.utils.SelectedPlugins._unselect_all")
-    @patch("the_elder_commands.utils.SelectedPlugins._unselect_one")
+    @patch("the_elder_commands.utils.selected_plugins.SelectedPlugins._unselect_all")
+    @patch("the_elder_commands.utils.selected_plugins.SelectedPlugins._unselect_one")
     def test_unselect_for_all(self, one, un_all):
         post = QueryDict("", mutable=True)
         post.update({"unselect": "unselect_all"})
@@ -336,7 +346,7 @@ class SkillsTest(TestCase):
     def test_have_default_skills(self):
         request = self.FakeRequest()
         skills = Skills(request)
-        expected = set_up_default_nord()
+        expected = setup_default_nord()
         self.assertDictEqual(skills.get_skills(), expected)
 
     def test_can_get_desired_level(self):
@@ -376,7 +386,7 @@ class SkillsTest(TestCase):
 class DefaultRaceSkillsUpdateTest(TestCase):
 
     def test_service_have_default_skills_method(self):
-        expected = set_up_default_nord()
+        expected = setup_default_nord()
         actual = default_skills_race_update("nord")
         self.assertDictEqual(actual, expected)
 
@@ -436,8 +446,8 @@ class ConvertValueJSInputTest(TestCase):
 class CheckRecaptchaTest(TestCase):
 
     @staticmethod
-    @patch("the_elder_commands.utils.recaptcha_request")
-    @patch("the_elder_commands.utils.HttpRequest")
+    @patch("the_elder_commands.utils.check_recaptcha.recaptcha_request")
+    @patch("the_elder_commands.utils.check_recaptcha.HttpRequest")
     def make_request(content, http_request_patch, recaptcha_request_patch):
         recaptcha_request_patch.post.return_value = FakeResponse(content)
         http_request_patch.build_absolute_uri.return_value = "url"

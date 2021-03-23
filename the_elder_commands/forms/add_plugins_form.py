@@ -9,7 +9,7 @@ from the_elder_commands.inventory import PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ER
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, Armors, Books, Ingredients, Alchemy, \
     Miscellaneous, Ammo, Scrolls, SoulsGems, Keys, Perks, WordsOfPower, AlterationSpells, ConjurationSpells, \
     DestructionSpells, RestorationSpells, IllusionSpells, OtherSpells
-from the_elder_commands.utils import escape_html
+from the_elder_commands.utils.escape_html import escape_html
 
 
 class AddPluginsForm:

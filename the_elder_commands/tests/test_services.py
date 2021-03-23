@@ -4,8 +4,9 @@ from the_elder_commands.models import Plugins, PluginVariants, Weapons, Keys, Bo
 from the_elder_commands.services import PluginsService, ItemsService, SkillsService, SpellsService, PerksService, \
     WordsOfPowerService
 from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT_ALTERED_BY_FORM
-from the_elder_commands.utils import default_skills_race_update
-from the_elder_commands.utils_for_tests import populate_plugins_table, set_up_default_nord
+from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update
+from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
+from the_elder_commands.utils_for_tests.setup_default_nord import setup_default_nord
 import copy
 
 
@@ -283,7 +284,7 @@ class SkillsServiceTest(TestCase):
 
     class FakeRequest:
         def __init__(self):
-            self.session = {"skills": set_up_default_nord(), "desired_level": 1, "multiplier": 1.5, "race": "nord",
+            self.session = {"skills": setup_default_nord(), "desired_level": 1, "multiplier": 1.5, "race": "nord",
                             "fill_skills": "true"}
 
     def setUp(self):
@@ -305,7 +306,7 @@ class SkillsServiceTest(TestCase):
     def test_service_can_get_data_from_session(self):
         request = self.FakeRequest()
         service = SkillsService(request)
-        self.assertEqual(service.skills, set_up_default_nord())
+        self.assertEqual(service.skills, setup_default_nord())
         self.assertEqual(service.multiplier, 1.5)
         self.assertEqual(service.race, "nord")
         self.assertEqual(service.fill_skills, "true")

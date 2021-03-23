@@ -1,7 +1,10 @@
 from .models import PluginVariants, Plugins, Weapons, Keys, Books, Ammo, Armors, Alchemy, \
     Miscellaneous, Ingredients, Scrolls, SoulsGems, ConjurationSpells, AlterationSpells, OtherSpells, IllusionSpells, \
     RestorationSpells, DestructionSpells, WordsOfPower, Perks
-from .utils import ChosenItems, SelectedPlugins, Skills, default_skills_race_update, ChosenSpells, ChosenOther
+from .utils.chosen import ChosenItems, ChosenSpells, ChosenOther
+from .utils.selected_plugins import SelectedPlugins
+from .utils.skills import Skills
+from .utils.defauld_skills_race_update import default_skills_race_update
 import math
 
 

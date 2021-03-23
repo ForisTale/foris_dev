@@ -2,13 +2,15 @@ from django.test import TestCase
 # noinspection PyProtectedMember
 from django.test.utils import tag
 from django.http import JsonResponse
-from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, AlterationSpells, Ammo, Armors, \
-    Alchemy, Miscellaneous, RestorationSpells, ConjurationSpells, Scrolls, SoulsGems, OtherSpells, Ingredients, Books, \
+from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, AlterationSpells, Ammo, Armors,\
+    Alchemy, Miscellaneous, RestorationSpells, ConjurationSpells, Scrolls, SoulsGems, OtherSpells, Ingredients, Books,\
     Keys, Perks, DestructionSpells, IllusionSpells
 from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
     PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, SELECTED_PLUGINS_SUCCESS, \
     PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
-from the_elder_commands.utils_for_tests import ManageTestFiles, check_test_tag, FakeResponse
+from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
+from the_elder_commands.utils_for_tests.fake_response import FakeResponse
+from the_elder_commands.utils_for_tests.manage_test_files import ManageTestFiles
 from unittest.mock import patch
 import copy
 
@@ -47,7 +49,7 @@ class AddPluginTest(TestCase, ManageTestFiles):
         self.delete_test_files()
         super().tearDown()
 
-    @patch("the_elder_commands.utils.recaptcha_request")
+    @patch("the_elder_commands.utils.check_recaptcha.recaptcha_request")
     def send_default_post_and_return_response(self, recaptcha_request_patch):
         recaptcha_request_patch.post.return_value = FakeResponse(b'{"success": true, "score": 1.0}')
         with open(self.test_file_full_path, "r", encoding="utf-8") as file:

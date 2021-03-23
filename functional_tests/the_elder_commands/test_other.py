@@ -1,7 +1,10 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from django.test.utils import tag
-from the_elder_commands.utils_for_tests import check_test_tag, populate_plugins_table, click_javascript_button
+from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
+from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
+from the_elder_commands.utils_for_tests.click_javascript_button import click_javascript_button
 from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE
+from time import sleep
 
 
 class OtherTest(FunctionalTest):
@@ -15,6 +18,7 @@ class OtherTest(FunctionalTest):
             self.select_plugin()
 
         self.driver.get(self.live_server_url + "/other/")
+        sleep(1)
 
     def select_plugin(self):
         self.driver.get(self.live_server_url + "/plugins/")
