@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import skills_view, items_view, spells_view, other_view, plugins_view, commands_view, commands_download, \
-    commands_reset, home_view
+from .views import skills_view, items_view, spells_view, other_view, plugins_view, commands_view, commands_download_view, \
+    commands_reset_view, home_view
 
 
 app_name = "tec"
@@ -13,6 +13,6 @@ urlpatterns = [
     path("other/", other_view, name="other"),
     path("plugins/", plugins_view, name="plugins"),
     path("commands/", commands_view, name="commands"),
-    path("commands/download", commands_download, name="commands_download"),
-    path("commands/reset", commands_reset, name="commands_reset"),
+    path("commands/download", commands_download_view, name="commands_download"),
+    path("commands/reset", commands_reset_view, name="commands_reset"),
 ]

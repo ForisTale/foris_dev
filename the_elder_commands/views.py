@@ -171,7 +171,7 @@ def commands_view(request):
                                                                 "commands": commands})
 
 
-def commands_download(request):
+def commands_download_view(request):
     commands = Commands(request).get_commands()
     content = "\n".join(commands)
     encoded = content.encode("utf-8")
@@ -179,18 +179,30 @@ def commands_download(request):
     return FileResponse(file, as_attachment=True, filename="TEC_Commands.txt")
 
 
-def commands_reset(request):
+def commands_reset_view(request):
+    reset_skills(request)
+    reset_commands(request)
+    reset_chosen(request)
+    return redirect("tec:commands")
+
+
+def reset_skills(request):
     skills = Skills(request)
     race = skills.get_race()
-    reset_skills = default_skills_race_update(race)
-    skills.save_skills(reset_skills)
+    skills_after_reset = default_skills_race_update(race)
+    skills.save_skills(skills_after_reset)
     skills.save_fill_skills(None)
+
+
+def reset_commands(request):
     commands = Commands(request)
     commands.set_skills([])
     commands.set_items({})
     commands.set_spells({})
     commands.set_other({})
+
+
+def reset_chosen(request):
     ChosenItems(request).set({})
     ChosenSpells(request).set({})
     ChosenOther(request).set({})
-    return redirect("tec:commands")
