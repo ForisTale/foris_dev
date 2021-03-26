@@ -1,7 +1,13 @@
 from django.urls import path
-from .views import skills_view, items_view, spells_view, other_view, plugins_view, commands_view, commands_download_view, \
-    commands_reset_view, home_view
-
+from .views.home import home_view
+from .views.skills import skills_view
+from .views.items import items_view
+from .views.spells import spells_view
+from .views.other import other_view
+from .views.plugins import plugins_view
+from .views.commands import commands_view
+from .views.commands_download import commands_download_view
+from .views.commands_reset import commands_reset_view
 
 app_name = "tec"
 
