@@ -1,8 +1,12 @@
 from django.test import TestCase
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, Keys, Books, Ammo, Armors, Alchemy, \
     Miscellaneous, Ingredients, Scrolls, SoulsGems
-from the_elder_commands.services import PluginsService, ItemsService, SkillsService, SpellsService, PerksService, \
-    WordsOfPowerService
+from the_elder_commands.services.perks import PerksService
+from the_elder_commands.services.word_of_power import WordsOfPowerService
+from the_elder_commands.services.spells import SpellsService
+from the_elder_commands.services.items import ItemsService
+from the_elder_commands.services.plugins import PluginsService
+from the_elder_commands.services.skills import SkillsService
 from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILLS
 from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update

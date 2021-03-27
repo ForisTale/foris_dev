@@ -1,5 +1,5 @@
 from django.test import TestCase
-from the_elder_commands.services import SkillsService
+from the_elder_commands.services.skills import SkillsService
 from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILL_POST
 from the_elder_commands.inventory.messages import COMMANDS_SUCCESS_MESSAGE, SKILLS_ERROR_DESIRED_LEVEL
 from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update

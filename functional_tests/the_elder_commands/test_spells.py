@@ -4,6 +4,7 @@ from the_elder_commands.utils_for_tests.populate_plugins_table import populate_p
 from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
 from the_elder_commands.utils_for_tests.click_javascript_button import click_javascript_button
 from the_elder_commands.inventory.messages import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE
+from time import sleep
 
 
 class SpellsTest(FunctionalTest):

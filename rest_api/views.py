@@ -3,7 +3,10 @@ from lists.models import List, Item
 from rest_framework import viewsets
 
 from django.http import JsonResponse
-from the_elder_commands.services import ItemsService, SpellsService, WordsOfPowerService, PerksService
+from the_elder_commands.services.perks import PerksService
+from the_elder_commands.services.word_of_power import WordsOfPowerService
+from the_elder_commands.services.spells import SpellsService
+from the_elder_commands.services.items import ItemsService
 
 
 class ListViewSet(viewsets.ModelViewSet):

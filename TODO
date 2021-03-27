@@ -3,6 +3,5 @@ UPDATE ANSIBLE to version 4 with all tests refactored to this version
 can save presets
 log in by google or facebook to save presets
 default load order for basic plugins
-separate services, into folders
 custom checkbox, not visible in ubuntu firefox
 move static files somewhere and copy them with ansible
