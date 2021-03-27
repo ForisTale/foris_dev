@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 
 from the_elder_commands.forms.add_plugins_form import AddPluginsForm
 from the_elder_commands.forms.selected_plugin_form import SelectedPluginsForm
-from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, SELECTED_PLUGINS_SUCCESS
+from the_elder_commands.inventory.messages import ADD_PLUGIN_SUCCESS_MESSAGE, SELECTED_PLUGINS_SUCCESS
 from the_elder_commands.services import PluginsService
 from the_elder_commands.utils.check_recaptcha import check_recaptcha
 from the_elder_commands.utils.messages_system import MessagesSystem

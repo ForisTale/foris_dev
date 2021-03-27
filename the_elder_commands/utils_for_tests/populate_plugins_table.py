@@ -1,6 +1,6 @@
 import copy
 
-from the_elder_commands.inventory import PLUGIN_TEST_DICT_ALTERED_BY_FORM
+from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, Armors, Books, Ingredients, Alchemy, \
     Miscellaneous, Perks, Ammo, SoulsGems, Scrolls, Keys, WordsOfPower, AlterationSpells, ConjurationSpells, \
     DestructionSpells, IllusionSpells, RestorationSpells, OtherSpells

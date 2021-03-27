@@ -4,9 +4,10 @@ from django.http import QueryDict
 from django.test import TestCase
 
 from the_elder_commands.forms.validate_skills import ValidateSkills, SkillsValidationError
-from the_elder_commands.inventory import DEFAULT_SKILL_POST, SKILLS_ERROR_DESIRED_LEVEL, \
-    SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_MULTIPLIER, DEFAULT_SKILLS, SKILLS_ERROR_NEW_VALUE_BIGGER, \
+from the_elder_commands.inventory.messages import SKILLS_ERROR_DESIRED_LEVEL, \
+    SKILLS_ERROR_DESIRED_LEVEL_RANGE, SKILLS_ERROR_MULTIPLIER, SKILLS_ERROR_NEW_VALUE_BIGGER, \
     SKILLS_ERROR_BASE_SKILL, SKILLS_ERROR_DESIRED_SKILL
+from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILLS, DEFAULT_SKILL_POST
 
 
 class ValidateSkillsTest(TestCase):

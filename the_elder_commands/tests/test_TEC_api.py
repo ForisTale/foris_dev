@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.http import JsonResponse
-from the_elder_commands.inventory import PLUGIN_TEST_DICT_ALTERED_BY_FORM
+from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
 import json
 import copy

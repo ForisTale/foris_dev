@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 
 from the_elder_commands.forms.validate_skills import ValidateSkills
-from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE
+from the_elder_commands.inventory.messages import COMMANDS_SUCCESS_MESSAGE
 from the_elder_commands.services import SkillsService
 from the_elder_commands.utils.commands import Commands
 from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update

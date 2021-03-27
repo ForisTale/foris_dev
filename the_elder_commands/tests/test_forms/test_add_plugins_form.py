@@ -11,8 +11,9 @@ from the_elder_commands.forms.add_plugins_form import AddPluginsForm, PluginVari
     MiscellaneousForm, KeysForm, ScrollsForm, SoulsGemsForm, BaseItemsForm, PerksForm, WordsOfPowerForm, SpellsForm, \
     AlterationSpellsForm, ConjurationSpellsForm, DestructionSpellsForm, IllusionSpellsForm, RestorationSpellsForm, \
     OtherSpellsForm, BaseSpellForm
-from the_elder_commands.inventory import PLUGIN_TEST_FILE, PLUGINS_ERROR_NAME_IS_EMTPY, PLUGIN_TEST_DICT, \
-    PLUGINS_ERROR_NAME_BECOME_EMPTY, ADD_PLUGIN_ERROR_FILE
+from the_elder_commands.inventory.messages import PLUGINS_ERROR_NAME_IS_EMTPY, PLUGINS_ERROR_NAME_BECOME_EMPTY, \
+    ADD_PLUGIN_ERROR_FILE
+from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_FILE, PLUGIN_TEST_DICT
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, Armors, Books, Ingredients, Alchemy, \
     Miscellaneous, Ammo, Scrolls, SoulsGems, Keys, AlterationSpells, ConjurationSpells, DestructionSpells, \
     IllusionSpells, RestorationSpells, OtherSpells, Perks, WordsOfPower

@@ -3,7 +3,8 @@ from the_elder_commands.models import Plugins, PluginVariants, Weapons, Keys, Bo
     Miscellaneous, Ingredients, Scrolls, SoulsGems
 from the_elder_commands.services import PluginsService, ItemsService, SkillsService, SpellsService, PerksService, \
     WordsOfPowerService
-from the_elder_commands.inventory import DEFAULT_SKILLS, PLUGIN_TEST_DICT_ALTERED_BY_FORM
+from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILLS
+from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils.defauld_skills_race_update import default_skills_race_update
 from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
 from the_elder_commands.utils_for_tests.setup_default_nord import setup_default_nord

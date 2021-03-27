@@ -1,6 +1,7 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
-from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, DEFAULT_SKILLS, SKILLS_ERROR_BASE_SKILL, \
+from the_elder_commands.inventory.messages import COMMANDS_SUCCESS_MESSAGE, SKILLS_ERROR_BASE_SKILL, \
     SKILLS_ERROR_NEW_VALUE_BIGGER
+from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILLS
 
 
 class SkillsTest(FunctionalTest):

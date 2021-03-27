@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.utils import tag
 from django.http import JsonResponse
-from the_elder_commands.inventory import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
+from the_elder_commands.inventory.messages import COMMANDS_SUCCESS_MESSAGE, ITEMS_COMMANDS_POST_EMPTY_MESSAGE, \
     NO_PLUGIN_SELECTED_ERROR_MESSAGE
 from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
 from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag

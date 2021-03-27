@@ -1,7 +1,8 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from selenium.webdriver.support.ui import Select
-from the_elder_commands.inventory import PLUGIN_TEST_FILE, ADD_PLUGIN_SUCCESS_MESSAGE, PLUGIN_TEST_ESCAPE_FILE, \
-    ADD_PLUGIN_ERROR_FILE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, PLUGIN_TEST_ESL_FILE, INCORRECT_LOAD_ORDER
+from the_elder_commands.inventory.messages import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_FILE, \
+    ADD_PLUGIN_ERROR_PLUGIN_EXIST, INCORRECT_LOAD_ORDER
+from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_FILE, PLUGIN_TEST_ESCAPE_FILE, PLUGIN_TEST_ESL_FILE
 from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
 from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
 from the_elder_commands.utils_for_tests.manage_test_files import ManageTestFiles

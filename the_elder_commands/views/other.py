@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
-from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
+from the_elder_commands.inventory.messages import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
     OTHER_COMMANDS_POST_EMTPY_MESSAGE
 from the_elder_commands.utils.chosen import ChosenOther
 from the_elder_commands.utils.commands import Commands

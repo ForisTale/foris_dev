@@ -5,9 +5,10 @@ from django.http import JsonResponse
 from the_elder_commands.models import Plugins, PluginVariants, Weapons, WordsOfPower, AlterationSpells, Ammo, Armors,\
     Alchemy, Miscellaneous, RestorationSpells, ConjurationSpells, Scrolls, SoulsGems, OtherSpells, Ingredients, Books,\
     Keys, Perks, DestructionSpells, IllusionSpells
-from the_elder_commands.inventory import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
-    PLUGIN_TEST_FILE, ADD_PLUGIN_ERROR_FILE, PLUGIN_TEST_EMPTY_DATA, SELECTED_PLUGINS_SUCCESS, \
-    PLUGIN_TEST_DICT_ALTERED_BY_FORM, INCORRECT_LOAD_ORDER
+from the_elder_commands.inventory.messages import ADD_PLUGIN_SUCCESS_MESSAGE, ADD_PLUGIN_ERROR_PLUGIN_EXIST, \
+    ADD_PLUGIN_ERROR_FILE, SELECTED_PLUGINS_SUCCESS, INCORRECT_LOAD_ORDER
+from the_elder_commands.inventory.plugin_test import PLUGIN_TEST_EMPTY_DATA, PLUGIN_TEST_FILE, \
+    PLUGIN_TEST_DICT_ALTERED_BY_FORM
 from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
 from the_elder_commands.utils_for_tests.fake_response import FakeResponse
 from the_elder_commands.utils_for_tests.manage_test_files import ManageTestFiles

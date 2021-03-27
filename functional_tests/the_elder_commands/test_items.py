@@ -1,7 +1,7 @@
 from functional_tests.the_elder_commands.tec_base import FunctionalTest
 from django.test.utils import tag
-from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, template_variables, \
-    COMMANDS_SUCCESS_MESSAGE
+from the_elder_commands.inventory.messages import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE
+from the_elder_commands.inventory.variables_for_template import template_variables
 from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
 from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
 from the_elder_commands.utils_for_tests.click_javascript_button import click_javascript_button

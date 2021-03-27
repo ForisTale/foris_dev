@@ -1,6 +1,6 @@
 import copy
 
-from the_elder_commands.inventory import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
+from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILLS, RACES_EXTRA_SKILLS
 
 
 def default_skills_race_update(race):

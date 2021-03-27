@@ -1,6 +1,6 @@
 import copy
 
-from the_elder_commands.inventory import DEFAULT_SKILLS
+from the_elder_commands.inventory.defaults_for_skills import DEFAULT_SKILLS
 
 
 def setup_default_nord():

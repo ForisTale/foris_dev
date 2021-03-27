@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from the_elder_commands.utils_for_tests.populate_plugins_table import populate_plugins_table
 from the_elder_commands.utils_for_tests.check_test_tag import check_test_tag
 from the_elder_commands.utils_for_tests.select_plugin import select_plugin
-from the_elder_commands.inventory import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
+from the_elder_commands.inventory.messages import NO_PLUGIN_SELECTED_ERROR_MESSAGE, COMMANDS_SUCCESS_MESSAGE, \
     SPELLS_COMMANDS_POST_EMPTY_MESSAGE
 
 
