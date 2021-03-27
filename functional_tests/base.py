@@ -82,3 +82,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     @wait
     def wait_for(self, fn):
         return fn()
+
+    @staticmethod
+    def extra_time_to_load_js(seconds):
+        time.sleep(seconds)

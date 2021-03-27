@@ -39,6 +39,8 @@ class SpellsTest(FunctionalTest):
         # alteration is selected
         self.assertEqual(categories.find_element_by_class_name("active").text, "Alteration")
         # each category have table with correct headers
+        self.extra_time_to_load_js(1)
+
         tables = self.driver.find_elements_by_tag_name("table")
         nav_tabs = self.driver.find_element_by_class_name("nav-tabs")
         category_links = nav_tabs.find_elements_by_tag_name("a")

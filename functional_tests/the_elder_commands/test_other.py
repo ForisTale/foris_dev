@@ -18,7 +18,7 @@ class OtherTest(FunctionalTest):
             self.select_plugin()
 
         self.driver.get(self.live_server_url + "/other/")
-        sleep(1)
+        self.extra_time_to_load_js(1)
 
     def select_plugin(self):
         self.driver.get(self.live_server_url + "/plugins/")
